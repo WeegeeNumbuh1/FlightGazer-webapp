@@ -1,0 +1,10 @@
+**/__pycache__
+test
+*test*
+*.log
+*.yaml
+*.json
+*.7z
+*.csv
+.vscode
+*.db

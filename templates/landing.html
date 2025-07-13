@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlightGazer - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        body { background: #181818; color: #fff; }
+        .logo-container { text-align: center; margin-top: 40px; }
+        .logo-img { max-width: 340px; width: 100%; height: auto; }
+        .version-text { text-align: center; font-size: 1em; margin: 12px 0 32px 0; }
+        .main-btns { display: flex; flex-direction: column; align-items: center; gap: 22px; margin-top: 10px; }
+        .main-btns .btn { min-width: 260px; font-size: 1.15em; }
+    </style>
+</head>
+<body>
+    {% set status_color = '#3ecf4a' if status == 'running' else ('#888' if status == 'stopped' else '#e53935') %}
+    <div class="logo-container">
+        <a href="https://github.com/WeegeeNumbuh1/FlightGazer" target="_blank">
+        <img src="/static/FlightGazer-logo.png" alt="FlightGazer Logo" class="logo-img">
+        </a>
+    </div>
+    <div class="status-indicator" style="text-align:center; margin-top:10px; margin-bottom:2px;">
+        <span style="display:inline-block; width:18px; height:18px; border-radius:50%; vertical-align:middle; margin-right:7px; background: {{ status_color }}; border: 2px solid #222;"></span>
+        <span style="font-size:1.05em; vertical-align:middle;">
+            {% if status == 'running' %}FlightGazer is running
+            {% elif status == 'stopped' %}FlightGazer is not running
+            {% else %}FlightGazer status error (check the logs){% endif %}
+        </span>
+    </div>
+    <div class="version-text">
+        Version {{ version }}
+    </div>
+    <div class="main-btns">
+        <a href="/config" class="btn btn-primary">Configure Settings</a>
+        <a href="/details" class="btn btn-secondary">Details and Logs</a>
+        <a href="/updates" class="btn btn-secondary">Check for Updates</a>
+        <a href="/startup" class="btn btn-secondary">Change Startup Options</a>
+    </div>
+    <div id="serviceControlBtns" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
+        <button id="startServiceBtn" class="btn btn-success me-2">Start</button>
+        <button id="restartServiceBtn" class="btn btn-warning me-2">Restart</button>
+        <button id="stopServiceBtn" class="btn btn-danger">Stop</button>
+        <span id="serviceStatusMsg" style="margin-left:16px;color:#ffd700;"></span>
+    </div>
+    <button id="themeToggleBtn" class="btn btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">Switch Theme ☀️🌙</button>
+    <script>
+    function setTheme(theme) {
+        if (theme === 'light') {
+            document.body.style.background = '#f8f9fa';
+            document.body.style.color = '#222';
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
+        } else {
+            document.body.style.background = '#181818';
+            document.body.style.color = '#fff';
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#ffd700'; });
+        }
+    }
+    function getPreferredTheme() {
+        if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function toggleTheme() {
+        let current = getPreferredTheme();
+        let next = current === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('fg_theme', next);
+        setTheme(next);
+    }
+    document.getElementById('themeToggleBtn').onclick = toggleTheme;
+    setTheme(getPreferredTheme());
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+    });
+    function disableServiceBtns() {
+        document.getElementById('startServiceBtn').disabled = true;
+        document.getElementById('restartServiceBtn').disabled = true;
+        document.getElementById('stopServiceBtn').disabled = true;
+        setTimeout(function() {
+            document.getElementById('startServiceBtn').disabled = false;
+            document.getElementById('restartServiceBtn').disabled = false;
+            document.getElementById('stopServiceBtn').disabled = false;
+        }, 60000);
+    }
+    function confirmAction(msg, cb) {
+        if (window.confirm(msg)) cb();
+    }
+    document.getElementById('startServiceBtn').onclick = function() {
+        confirmAction('Start FlightGazer service?', function() {
+            disableServiceBtns();
+            fetch('/service/start', {method:'POST'}).then(r => r.json()).then(data => {
+                if (data.status === 'already_running') {
+                    alert('FlightGazer is already running.');
+                } else if (data.status === 'started') {
+                    document.getElementById('serviceStatusMsg').innerText = 'Service started.';
+                } else {
+                    document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
+                }
+            });
+        });
+    };
+    document.getElementById('restartServiceBtn').onclick = function() {
+        confirmAction('Restart FlightGazer service?', function() {
+            disableServiceBtns();
+            fetch('/restart', {method:'POST'}).then(r => r.json()).then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('serviceStatusMsg').innerText = 'Service restarted.';
+                } else {
+                    document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
+                }
+            });
+        });
+    };
+    document.getElementById('stopServiceBtn').onclick = function() {
+        confirmAction('Stop FlightGazer service?', function() {
+            disableServiceBtns();
+            fetch('/service/stop', {method:'POST'}).then(r => r.json()).then(data => {
+                if (data.status === 'stopped') {
+                    document.getElementById('serviceStatusMsg').innerText = 'Service stopped.';
+                } else {
+                    document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
+                }
+            });
+        });
+    };
+    function updateStatusIndicator() {
+        fetch('/service/status').then(r => r.json()).then(data => {
+            let status = data.status;
+            let statusColor = status === 'running' ? '#3ecf4a' : (status === 'stopped' ? '#888' : '#e53935');
+            document.querySelector('.status-indicator span').style.background = statusColor;
+            let statusText = '';
+            if (status === 'running') statusText = 'FlightGazer is running';
+            else if (status === 'stopped') statusText = 'FlightGazer is not running';
+            else statusText = 'FlightGazer status error (check the logs)';
+            document.querySelector('.status-indicator span + span').innerText = statusText;
+        });
+    }
+    setInterval(updateStatusIndicator, 15000);
+    // Initial call
+    updateStatusIndicator();
+    </script>
+</body>
+</html>
