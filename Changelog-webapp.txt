@@ -5,6 +5,14 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.2.0 - 2025-07-14
+    - Fix actual update routine to actually do the update
+    - Update routine now shows a dedicated page for the script output
+    - Make theme switch button smaller
+    - Include previously referenced javascript files in this project so that it can operate without
+      a constant internet connection
+    - Other small UI changes
+
 v.0.1.2 - 2025-07-13
     - Rename webapp file to prevent getting caught by FlightGazer's process check
         - This would cause FlightGazer to fail to start because it sees this service running

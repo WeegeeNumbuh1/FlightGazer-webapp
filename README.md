@@ -20,11 +20,11 @@ Use the `install-FlightGazer-webapp.sh` script in the FlightGazer directory.
 ## Accessing the Webpage
 Visit:
 ```
-http://<your-device's-IP>/FlightGazer
+http://<your-device's-IP>/flightgazer
 # or
-http://<name-of-device-running-FlightGazer>.local/FlightGazer
+http://<name-of-device-running-FlightGazer>.local/flightgazer
 
-# The page can also be directly accessed over port 9898 as well
+# The page can also be directly accessed over port 9898 in case the above don't work
 ```
 
 ## Update

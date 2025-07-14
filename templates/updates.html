@@ -17,7 +17,7 @@
         <a href="/" class="btn btn btn-info">&larr; Back to Home</a>
         <h2 class="mb-4">Check for Updates</h2>
     </div>
-    <button id="themeToggleBtn" class="btn btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">Switch Theme ☀️🌙</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
     <div class="container py-4">
         <div class="mb-3">
             <button id="checkUpdatesBtn" class="btn btn-success">Check Now</button>
@@ -34,6 +34,12 @@
             <h5></h5>Update Output</h5>
             <iframe id="updateOutputFrame" style="width:100%;height:220px;background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
         </div>
+    </div>
+    <div id="updateProgressPage" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#181818;z-index:1000;">
+        <button id="backToHomeBtn" class="btn btn-info" style="position:absolute;top:24px;left:24px;display:none;z-index:1100;">&larr; Back to Home</button>
+        <h3 style="text-align:center;margin-top:48px;">Update Progress</h3>
+        <h4 style="text-align:center">Please wait, don't refresh the page or go back until "Back to Home" appears.</h4>
+        <iframe id="updateOutputFrameFull" style="display:block;margin:32px auto 0 auto;width:90vw;height:60vh;background:#222;color:#fff;font-family:monospace;border-radius:12px;border:none;"></iframe>
     </div>
     <script>
     function setTheme(theme) {
@@ -84,42 +90,104 @@
             doc.close();
         });
     };
-    document.getElementById('updateNowBtn').onclick = function() {
-        document.getElementById('updateNowBtn').disabled = true; // Disable button after click
-        document.getElementById('updateOutputSection').style.display = '';
-        let doc = document.getElementById('updateOutputFrame').contentDocument;
-        doc.open();
-        doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1em;margin:0;padding:12px;">Starting update...</pre>');
-        doc.close();
-        fetch('/updates/start', {method:'POST'}).then(r => r.json()).then(data => {
-            if (data.status === 'started') {
-                pollUpdateOutputIframe();
-                setTimeout(() => sendUpdateInput('y'), 1200); // auto-confirm
-            } else {
-                let doc = document.getElementById('updateOutputFrame').contentDocument;
-                doc.open();
-                doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1em;margin:0;padding:12px;">Update already running.</pre>');
-                doc.close();
-            }
-        });
-    };
     function sendUpdateInput(val) {
         fetch('/updates/input', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({input:val})});
     }
-    function pollUpdateOutputIframe() {
-        fetch('/updates/output').then(r => r.json()).then(data => {
-            if (data.lines && data.lines.length) {
-                let doc = document.getElementById('updateOutputFrame').contentDocument;
+    // Add a dedicated update progress page
+function showUpdateProgressPage() {
+    document.body.innerHTML = `
+        <div id="updateProgressContainer" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#181818;color:#fff;z-index:9999;display:flex;flex-direction:column;">
+            <button id="backToHomeBtn" class="btn btn-info" style="position:absolute;top:24px;left:24px;z-index:1000;display:none;">&larr; Back to Home</button>
+            <h2 style="text-align:center;margin-top:48px;">Updating FlightGazer...</h2>
+            <iframe id="updateOutputFrame" style="flex:1 1 auto;width:96vw;height:70vh;margin:32px 2vw 32px 2vw;background:#222;color:#fff;font-family:monospace;border-radius:12px;border:none;box-shadow:0 0 24px #000;overflow:auto;"></iframe>
+        </div>
+    `;
+    // Start update and polling
+    let doc = document.getElementById('updateOutputFrame').contentDocument;
+    doc.open();
+    doc.write('<pre style="background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
+    doc.close();
+    fetch('/updates/start', {method:'POST'}).then(r => r.json()).then(data => {
+        if (data.status === 'started') {
+            pollUpdateOutputIframe();
+            //setTimeout(() => sendUpdateInput('y'), 1200); // auto-confirm
+        } else {
+            let doc = document.getElementById('updateOutputFrame').contentDocument;
+            doc.open();
+            doc.write('<pre style="background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Update already running.</pre>');
+            doc.close();
+        }
+    });
+}
+function pollUpdateOutputIframe() {
+    fetch('/updates/output').then(r => r.json()).then(data => {
+        if (data.lines && data.lines.length) {
+            let doc = document.getElementById('updateOutputFrame').contentDocument;
+            doc.open();
+            let newText = data.lines[data.lines.length-1];
+            doc.write(`<pre style='background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
+            doc.close();
+        }
+        updateRunning = data.running;
+        if (updateRunning) {
+            setTimeout(pollUpdateOutputIframe, 1000);
+        } else {
+            // Show back to home button when update completes
+            let btn = document.getElementById('backToHomeBtn');
+            if (btn) btn.style.display = '';
+        }
+    });
+}
+document.getElementById('updateNowBtn').onclick = function() {
+    if (!window.confirm('Are you sure you want to update FlightGazer?')) return;
+    // Hide main content, show progress page
+    document.querySelector('.container').style.display = 'none';
+    document.getElementById('updateProgressPage').style.display = '';
+    let doc = document.getElementById('updateOutputFrameFull').contentDocument;
+    doc.open();
+    doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
+    doc.close();
+    fetch('/updates/start', {method:'POST'}).then(r => r.json()).then(data => {
+        if (data.status === 'started') {
+            pollUpdateOutputIframeFull();
+            //setTimeout(() => sendUpdateInput('y'), 1200); // auto-confirm
+        } else {
+            let doc = document.getElementById('updateOutputFrameFull').contentDocument;
+            doc.open();
+            doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Update already running.</pre>');
+            doc.close();
+        }
+    });
+}
+let lastUpdateOutput = '';
+function pollUpdateOutputIframeFull() {
+    fetch('/updates/output').then(r => r.json()).then(data => {
+        if (data.lines && data.lines.length) {
+            let newText = data.lines[data.lines.length-1];
+            if (newText !== lastUpdateOutput && newText !== '') {
+                let doc = document.getElementById('updateOutputFrameFull').contentDocument;
                 doc.open();
-                let prev = doc.body ? doc.body.innerText : '';
-                let newText = (prev ? prev : '') + data.lines.join('');
-                doc.write(`<pre style='background:#222;color:#ffffff;font-family:monospace;font-size:1em;margin:0;padding:12px;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
+                doc.write(`<pre id='updatePre' style='background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;max-height:100%;overflow-y:auto;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
                 doc.close();
+                lastUpdateOutput = newText;
+                // Auto-scroll to bottom
+                setTimeout(function() {
+                    let pre = doc.getElementById('updatePre');
+                    if (pre) pre.scrollTop = pre.scrollHeight;
+                }, 50);
             }
-            updateRunning = data.running;
-            if (updateRunning) setTimeout(pollUpdateOutputIframe, 1000);
-        });
-    }
+        }
+        updateRunning = data.running;
+        if (updateRunning) {
+            setTimeout(pollUpdateOutputIframeFull, 1000);
+        } else {
+            document.getElementById('backToHomeBtn').style.display = '';
+        }
+    });
+}
+document.getElementById('backToHomeBtn').onclick = function() {
+    window.location.href = '/';
+};
     </script>
 </body>
 </html>

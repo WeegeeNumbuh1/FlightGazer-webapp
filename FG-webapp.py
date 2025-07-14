@@ -15,7 +15,7 @@ import queue
 import subprocess
 import requests
 
-VERSION = "v.0.1.2 --- 2025-07-13"
+VERSION = "v.0.2.0 --- 2025-07-13"
 
 # Define the paths for all the files we're looking for.
 # NB: It is expected that this Flask app lives inside the `web-app` folder
@@ -374,9 +374,9 @@ def startup_options():
 
 STARTUP_OPTIONS = [
     {'name': 'No Display mode', 'flag': '-d'},
-    {'name': 'Emulate (use RGBMatrixEmulator)', 'flag': '-e'},
+    {'name': 'Emulate display (use RGBMatrixEmulator)', 'flag': '-e'},
     {'name': 'No Filter mode', 'flag': '-f'},
-    {'name': 'Verbose/debug', 'flag': '-v'},
+    {'name': 'Verbose/debug mode', 'flag': '-v'},
 ]
 
 @app.route('/startup/options')
@@ -436,23 +436,23 @@ class UpdateRunner(threading.Thread):
         global update_running
         update_running = True
         self.proc = subprocess.Popen(['bash', self.script_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+        output_history = []
         while True:
             line = self.proc.stdout.readline()
             if line == '' and self.proc.poll() is not None:
                 break
             if line:
-                update_output_queue.put(line)
+                output_history.append(line)
+                update_output_queue.put(''.join(output_history))
                 if 'Would you like to update?' in line:
                     self.prompted = True
-            # Check for input from user
-            if self.prompted and not update_input_queue.empty():
-                user_input = update_input_queue.get()
-                self.proc.stdin.write(user_input + '\n')
-                self.proc.stdin.flush()
-                self.prompted = False
+                    self.proc.stdin.write('y\n')
+                    self.proc.stdin.flush()
+                    self.prompted = False
         # Drain remaining output
         for line in self.proc.stdout:
-            update_output_queue.put(line)
+            output_history.append(line)
+            update_output_queue.put(''.join(output_history))
         update_running = False
 
 @app.route('/updates/start', methods=['POST'])
@@ -472,13 +472,15 @@ def get_update_output():
     lines = []
     while not update_output_queue.empty():
         lines.append(update_output_queue.get())
-    return jsonify({'lines': lines, 'running': update_running})
+    # Only return the last output (full history)
+    last_output = lines[-1] if lines else ''
+    return jsonify({'lines': [last_output], 'running': update_running})
 
-@app.route('/updates/input', methods=['POST'])
-def send_update_input():
-    user_input = request.json.get('input')
-    update_input_queue.put(user_input)
-    return jsonify({'status':'sent'})
+# @app.route('/updates/input', methods=['POST'])
+# def send_update_input():
+#     user_input = request.json.get('input')
+#     update_input_queue.put(user_input)
+#     return jsonify({'status':'sent'})
 
 def get_local_version():
     try:

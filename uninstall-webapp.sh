@@ -1,7 +1,7 @@
 #!/bin/bash
 {
 # Uninstall script for FlightGazer's web interface
-# Last updated: v.0.1.2
+# Last updated: v.0.2.0
 # by: WeegeeNumbuh1
 BASEDIR=$(cd `dirname -- $0` && pwd)
 GREEN='\033[0;32m'
@@ -50,9 +50,9 @@ fi
 if command -v lighttpd >/dev/null 2>&1; then
     echo "> Removing Lighttpd FlightGazer webapp config..."
     lighttpd-disable-mod proxy
-    lighttpd-disable-mod 98-flightgazer-webapp
+    lighttpd-disable-mod flightgazer-webapp
     rm -f /etc/lighttpd/conf-available/98-flightgazer-webapp.conf
-    service lighttpd force-reload
+    systemctl restart lighttpd
     echo "> Lighttpd config removed."
 fi
 
