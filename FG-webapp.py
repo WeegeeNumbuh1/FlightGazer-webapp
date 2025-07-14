@@ -15,7 +15,7 @@ import queue
 import subprocess
 import requests
 
-VERSION = "v.0.1.0 --- 2025-07-13"
+VERSION = "v.0.1.2 --- 2025-07-13"
 
 # Define the paths for all the files we're looking for.
 # NB: It is expected that this Flask app lives inside the `web-app` folder

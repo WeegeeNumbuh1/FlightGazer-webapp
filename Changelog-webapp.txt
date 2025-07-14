@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.1.2 - 2025-07-13
+    - Rename webapp file to prevent getting caught by FlightGazer's process check
+        - This would cause FlightGazer to fail to start because it sees this service running
+
 v.0.1.1 - 2025-07-13
     - Fix some f-strings
     - Change configuration for lighttpd

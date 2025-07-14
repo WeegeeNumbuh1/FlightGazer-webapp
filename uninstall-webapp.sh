@@ -1,7 +1,7 @@
 #!/bin/bash
 {
 # Uninstall script for FlightGazer's web interface
-# Last updated: v.0.1.0
+# Last updated: v.0.1.2
 # by: WeegeeNumbuh1
 BASEDIR=$(cd `dirname -- $0` && pwd)
 GREEN='\033[0;32m'
