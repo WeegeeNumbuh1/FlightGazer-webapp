@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.2.1 - 2025-07-14
+    - Fix update script for the web app
+
 v.0.2.0 - 2025-07-14
     - Fix actual update routine to actually do the update
     - Update routine now shows a dedicated page for the script output

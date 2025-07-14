@@ -1,7 +1,7 @@
 #!/bin/bash
 {
 # Script to update FlightGazer's web interface
-# Last updated: v.0.2.0
+# Last updated: v.0.2.1
 # by: WeegeeNumbuh1
 BASEDIR=$(cd `dirname -- $0` && pwd)
 TEMPPATH=/tmp/FlightGazer-tmp
@@ -19,8 +19,8 @@ if [ `id -u` -ne 0 ]; then
 	exit 1
 fi
 
-if [ ! -f "${BASEDIR}/FlightGazer-webapp.py" ]; then
-	echo -e "\n${NC}${RED}>>> ERROR: Cannot find FlightGazer-webapp.py. This installer script must be in the same directory as FlightGazer-webapp.py!${NC}"
+if [ ! -f "${BASEDIR}/FG-webapp.py" ]; then
+	echo -e "\n${NC}${RED}>>> ERROR: Cannot find FG-webapp.py. This installer script must be in the same directory as FG-webapp.py!${NC}"
 	sleep 2s
 	exit 1
 fi
