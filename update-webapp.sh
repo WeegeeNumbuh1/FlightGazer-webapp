@@ -1,7 +1,7 @@
 #!/bin/bash
 {
 # Script to update FlightGazer's web interface
-# Last updated: v.0.1.0
+# Last updated: v.0.2.0
 # by: WeegeeNumbuh1
 BASEDIR=$(cd `dirname -- $0` && pwd)
 TEMPPATH=/tmp/FlightGazer-tmp
@@ -55,4 +55,5 @@ if [ $? -ne 0 ]; then
 else
     echo -e "${GREEN}>>> Update complete."
     exit 0
+fi
 }
