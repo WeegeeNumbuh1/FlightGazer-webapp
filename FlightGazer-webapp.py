@@ -330,7 +330,9 @@ def details_migrate_log():
         with open(MIGRATE_LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
             content = f.read()
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
-        html += f'<div class="logline">{content.replace('<','&lt;').replace('>','&gt;')}</div>'
+        # Use .replace with double quotes to avoid confusion with f-string braces
+        safe_content = content.replace('<', '&lt;').replace('>', '&gt;')
+        html += f'<div class="logline">{safe_content}</div>'
         html += '</body></html>'
         return html
     except Exception as e:
@@ -359,7 +361,8 @@ def details_init_log():
             ], capture_output=True, text=True, shell=True)
         log_content = result.stdout if result.returncode == 0 else '(No init log found)'
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
-        html += f'<div class="logline">{log_content.replace('<','&lt;').replace('>','&gt;')}</div>'
+        safe_content = log_content.replace('<', '&lt;').replace('>', '&gt;')
+        html += f'<div class="logline">{safe_content}</div>'
         html += '</body></html>'
         return html
     except Exception as e:

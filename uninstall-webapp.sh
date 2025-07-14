@@ -50,9 +50,9 @@ fi
 if command -v lighttpd >/dev/null 2>&1; then
     echo "> Removing Lighttpd FlightGazer webapp config..."
     lighttpd-disable-mod proxy
-    lighttpd-disable-mod 99-flightgazer-webapp
-    rm -f /etc/lighttpd/conf-available/99-flightgazer-webapp.conf
-    systemctl reload lighttpd
+    lighttpd-disable-mod 98-flightgazer-webapp
+    rm -f /etc/lighttpd/conf-available/98-flightgazer-webapp.conf
+    service lighttpd force-reload
     echo "> Lighttpd config removed."
 fi
 
