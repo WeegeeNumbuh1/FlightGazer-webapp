@@ -135,7 +135,7 @@ function pollUpdateOutputIframe() {
         }
         updateRunning = data.running;
         if (updateRunning) {
-            setTimeout(pollUpdateOutputIframe, 1000);
+            setTimeout(pollUpdateOutputIframe, 250);
         } else {
             // Show back to home button when update completes
             let btn = document.getElementById('backToHomeBtn');
@@ -184,7 +184,7 @@ function pollUpdateOutputIframeFull() {
         }
         updateRunning = data.running;
         if (updateRunning) {
-            setTimeout(pollUpdateOutputIframeFull, 1000);
+            setTimeout(pollUpdateOutputIframeFull, 250);
         } else {
             document.getElementById('backToHomeBtn').style.display = '';
         }

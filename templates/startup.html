@@ -71,6 +71,7 @@ const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
     }
     document.getElementById('applyStartupBtn').onclick = function() {
         let checked = Array.from(document.querySelectorAll('#startupOptionsCheckboxes input:checked')).map(cb => cb.value);
+        document.getElementById('startupStatus').innerText = 'Applying changes...';
         fetch(setStartupOptionsUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({flags: checked})}).then(r => r.json()).then(data => {
             if (data.status === 'success') {
                 document.getElementById('startupStatus').innerText = 'Startup options updated and systemd reloaded.';

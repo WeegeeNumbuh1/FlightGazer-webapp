@@ -15,7 +15,7 @@ import queue
 import subprocess
 import requests
 
-VERSION = "v.0.3.1 --- 2025-07-14"
+VERSION = "v.0.3.2 --- 2025-07-15"
 
 os.environ['SCRIPT_NAME'] = '/flightgazer'
 # Define the paths for all the files we're looking for.
@@ -28,7 +28,7 @@ LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-log.log')
 MIGRATE_LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'settings_migrate.log')
 CURRENT_STATE_JSON_PATH = '/run/FlightGazer/current_state.json'
 SERVICE_PATH = '/etc/systemd/system/flightgazer.service'
-INIT_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-init.sh')
+INIT_PATH = os.path.join(os.path.dirname(os.getcwd()), 'FlightGazer-init.sh')
 UPDATE_PATH = os.path.join(os.path.dirname(__file__), '..', 'update.sh')
 
 yaml = YAML()
@@ -445,15 +445,16 @@ class UpdateRunner(threading.Thread):
         while True:
             line = self.proc.stdout.readline()
             if line == '' and self.proc.poll() is not None:
-                break
+                break # subprocess has completed
             if line:
                 output_history.append(line)
                 update_output_queue.put(''.join(output_history))
-                if 'Would you like to update?' in line:
+                if 'you like' in line:
                     self.prompted = True
                     self.proc.stdin.write('y\n')
                     self.proc.stdin.flush()
                     self.prompted = False
+                    continue
         # Drain remaining output
         for line in self.proc.stdout:
             output_history.append(line)

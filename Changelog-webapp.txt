@@ -5,6 +5,12 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.3.2 - 2025-07-15
+    - Another fix for the startup configuration to cover the case when the startup options are changed with the webapp
+      and then the webapp is later uninstalled, causing FlightGazer to not start
+    - Improved update script output refresh in the webpage
+    - The update process should now reliably start the actual update process instead of having it time out
+
 v.0.3.1 - 2025-07-14
     - Fix startup configurator breaking the startup process for FlightGazer
     - Change how the updater script restarts the web app service
