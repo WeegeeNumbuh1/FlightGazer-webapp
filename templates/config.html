@@ -13,11 +13,12 @@
         .api-schedule-table td, .api-schedule-table th { text-align: center; vertical-align: middle; }
         .color-preview { width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; }
         .setting-label { font-weight: 600; font-size: 1.08em; color: #7b86ff; }
+        .form-range { background-color: #0e0e0e2e; }
     </style>
 </head>
 <body>
-<div class="container py-4" style="padding-bottom:120px;">
-    <a href="/" class="btn btn btn-info">&larr; Back to Home</a>
+<div class="container py-4" style="margin-bottom:6em;">
+    <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
     <h2>FlightGazer Configuration Editor</h2>
     <ul class="nav nav-tabs" id="configTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -570,6 +571,8 @@
 <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery-3.6.0-min.js') }}"></script>
 <script>
+const updateConfigURL = "{{ url_for('update_config') }}";
+const restartService = "{{ url_for('restart_flightgazer') }}";
 $(document).ready(function() {
     // Colors tab logic
     $('.color-select').on('change', function() {
@@ -594,6 +597,14 @@ $(document).ready(function() {
     });
     $('#configForm').on('input change', function() {
         $('#applyBtn').show();
+    });
+    // Warn user if navigating away with unsaved changes
+    window.addEventListener('beforeunload', function(e) {
+        if ($('#applyBtn').is(':visible')) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        }
     });
     function getApiSchedule() {
         let schedule = {};
@@ -684,7 +695,7 @@ $(document).ready(function() {
         });
         data['colors'] = colorData;
         $.ajax({
-            url: '/update',
+            url: updateConfigURL,
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
@@ -692,7 +703,7 @@ $(document).ready(function() {
                 $('#applyBtn').hide();
                 // Prompt user to restart FlightGazer
                 if (confirm('Settings saved. Restart FlightGazer now to apply changes?')) {
-                    $.post('/restart', function(restartResp) {
+                    $.post(restartService, function(restartResp) {
                         if (restartResp.status === 'success') {
                             alert('FlightGazer is restarting.');
                         } else {
@@ -713,7 +724,7 @@ $(document).ready(function() {
     // Persistent restart reminder button logic
     $('#restartReminderBtn').on('click', function() {
         if (confirm('Restart FlightGazer now to apply your changes?')) {
-            $.post('/restart', function(restartResp) {
+            $.post(restartService, function(restartResp) {
                 if (restartResp.status === 'success') {
                     alert('FlightGazer is restarting.');
                 } else {

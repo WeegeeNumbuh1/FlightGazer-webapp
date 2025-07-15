@@ -14,8 +14,9 @@
 </head>
 <body>
     <div class="container py-4">
-        <a href="/" class="btn btn btn-info">&larr; Back to Home</a>
+        <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
         <h2 class="mb-4">Check for Updates</h2>
+        <h5>⚠️ If FlightGazer is working fine for you, there should be no need to update. ⚠️</h5>
     </div>
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
     <div class="container py-4">
@@ -25,14 +26,14 @@
         </div>
         <div id="changelogSection" style="display:none;">
             <h5>Changes Since Current Version</h5>
-            <iframe id="changelogFrame" style="width:100%;height:220px;background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
+            <iframe id="changelogFrame" style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
             <div class="mt-3 mb-2">
                 <button id="updateNowBtn" class="btn btn-warning">Update Now</button>
             </div>
         </div>
         <div id="updateOutputSection" style="display:none;">
             <h5></h5>Update Output</h5>
-            <iframe id="updateOutputFrame" style="width:100%;height:220px;background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
+            <iframe id="updateOutputFrame" style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
         </div>
     </div>
     <div id="updateProgressPage" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#181818;z-index:1000;">
@@ -42,6 +43,11 @@
         <iframe id="updateOutputFrameFull" style="display:block;margin:32px auto 0 auto;width:90vw;height:60vh;background:#222;color:#fff;font-family:monospace;border-radius:12px;border:none;"></iframe>
     </div>
     <script>
+    const updatesCheckUrl = "{{ url_for('check_for_updates') }}";
+    const updatesStartUrl = "{{ url_for('start_update') }}";
+    const updatesOutputUrl = "{{ url_for('get_update_output') }}";
+    const updatesInputUrl = "{{ url_for('send_update_input') }}";
+    const homepage = "{{ url_for('landing_page') }}";
     function setTheme(theme) {
         if (theme === 'light') {
             document.body.style.background = '#f8f9fa';
@@ -76,7 +82,7 @@
     let changelogContent = '';
     document.getElementById('checkUpdatesBtn').onclick = function() {
         document.getElementById('versionInfo').innerText = 'Checking...';
-        fetch('/updates/check', {method:'POST'}).then(r => r.json()).then(data => {
+        fetch(updatesCheckUrl, {method:'POST'}).then(r => r.json()).then(data => {
             if (data.error) {
                 document.getElementById('versionInfo').innerText = data.error;
                 return;
@@ -91,7 +97,7 @@
         });
     };
     function sendUpdateInput(val) {
-        fetch('/updates/input', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({input:val})});
+        fetch(updatesInputUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({input:val})});
     }
     // Add a dedicated update progress page
 function showUpdateProgressPage() {
@@ -107,10 +113,9 @@ function showUpdateProgressPage() {
     doc.open();
     doc.write('<pre style="background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
     doc.close();
-    fetch('/updates/start', {method:'POST'}).then(r => r.json()).then(data => {
+    fetch(updatesStartUrl, {method:'POST'}).then(r => r.json()).then(data => {
         if (data.status === 'started') {
             pollUpdateOutputIframe();
-            //setTimeout(() => sendUpdateInput('y'), 1200); // auto-confirm
         } else {
             let doc = document.getElementById('updateOutputFrame').contentDocument;
             doc.open();
@@ -120,7 +125,7 @@ function showUpdateProgressPage() {
     });
 }
 function pollUpdateOutputIframe() {
-    fetch('/updates/output').then(r => r.json()).then(data => {
+    fetch(updatesOutputUrl).then(r => r.json()).then(data => {
         if (data.lines && data.lines.length) {
             let doc = document.getElementById('updateOutputFrame').contentDocument;
             doc.open();
@@ -147,7 +152,7 @@ document.getElementById('updateNowBtn').onclick = function() {
     doc.open();
     doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
     doc.close();
-    fetch('/updates/start', {method:'POST'}).then(r => r.json()).then(data => {
+    fetch(updatesStartUrl, {method:'POST'}).then(r => r.json()).then(data => {
         if (data.status === 'started') {
             pollUpdateOutputIframeFull();
             //setTimeout(() => sendUpdateInput('y'), 1200); // auto-confirm
@@ -161,7 +166,7 @@ document.getElementById('updateNowBtn').onclick = function() {
 }
 let lastUpdateOutput = '';
 function pollUpdateOutputIframeFull() {
-    fetch('/updates/output').then(r => r.json()).then(data => {
+    fetch(updatesOutputUrl).then(r => r.json()).then(data => {
         if (data.lines && data.lines.length) {
             let newText = data.lines[data.lines.length-1];
             if (newText !== lastUpdateOutput && newText !== '') {
@@ -186,7 +191,7 @@ function pollUpdateOutputIframeFull() {
     });
 }
 document.getElementById('backToHomeBtn').onclick = function() {
-    window.location.href = '/';
+    window.location.href = homepage;
 };
     </script>
 </body>

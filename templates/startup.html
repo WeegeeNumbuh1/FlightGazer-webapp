@@ -14,9 +14,9 @@
 </head>
 <body>
 <div class="container py-4">
-    <a href="/" class="btn btn btn-info">&larr; Back to Home</a>
+    <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
     <h2 class="mb-4">Change Startup Options</h2>
-    <h4>Only enable these if you know what you're doing!</h4>
+    <h4>⚠️ Only enable these if you know what you're doing! ⚠️</h4>
     <h5>(Default is leaving these all unchecked)</h5>
     <form id="startupOptionsForm">
         <div id="startupOptionsCheckboxes" class="mb-3"></div>
@@ -26,6 +26,8 @@
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
 </div>
 <script>
+const startupOptionsUrl = "{{ url_for('get_startup_options') }}";
+const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
     function setTheme(theme) {
         if (theme === 'light') {
             document.body.style.background = '#f8f9fa';
@@ -55,7 +57,7 @@
         if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
     });
     function loadStartupOptions() {
-        fetch('/startup/options').then(r => r.json()).then(data => {
+        fetch(startupOptionsUrl).then(r => r.json()).then(data => {
             if (data.error) {
                 document.getElementById('startupStatus').innerText = data.error;
                 return;
@@ -69,7 +71,7 @@
     }
     document.getElementById('applyStartupBtn').onclick = function() {
         let checked = Array.from(document.querySelectorAll('#startupOptionsCheckboxes input:checked')).map(cb => cb.value);
-        fetch('/startup/set', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({flags: checked})}).then(r => r.json()).then(data => {
+        fetch(setStartupOptionsUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({flags: checked})}).then(r => r.json()).then(data => {
             if (data.status === 'success') {
                 document.getElementById('startupStatus').innerText = 'Startup options updated and systemd reloaded.';
             } else {

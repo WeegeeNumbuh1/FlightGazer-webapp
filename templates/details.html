@@ -14,13 +14,14 @@
 </head>
 <body>
 <div class="container py-4">
-    <a href="/" class="btn btn btn-info">&larr; Back to Home</a>
+    <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
     <h2 class="mb-4">Details and Logs</h2>
     <div class="mb-2 d-flex flex-wrap gap-2">
-        <a href="/details/download_json" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Live Details</a>
-        <a href="/details/download_log" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Main Log</a>
-        <a href="/details/download_migrate_log" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Migration Log</a>
+        <a href="{{ url_for('download_json') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Live Details</a>
+        <a href="{{ url_for('download_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Main Log</a>
+        <a href="{{ url_for('download_migrate_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Migration Log</a>
         <button id="refreshDetailsBtn" class="btn btn-sm btn-warning" type="button"><span style="font-size:1.1em;">&#x21bb;</span> Refresh</button>
+        <button id="scrollToBottomBtn" class="btn btn-sm btn-success" type="button"><span style="font-size:1.1em;">&#x21d3;</span> Scroll to Bottom</button>
     </div>
     <ul class="nav nav-tabs" id="detailsTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -42,13 +43,13 @@
             <div id="liveDetailsTabContent" style="margin-top:18px;"></div>
         </div>
         <div class="tab-pane fade" id="logs" role="tabpanel">
-            <iframe id="logFrame" src="/details/log_html" style="width:100%; height:400px; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+            <iframe id="logFrame" src="{{ url_for('details_log_html') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
         <div class="tab-pane fade" id="migrate-log" role="tabpanel">
-            <iframe id="migrateLogFrame" src="/details/migrate_log" style="width:100%; height:400px; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+            <iframe id="migrateLogFrame" src="{{ url_for('details_migrate_log') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
         <div class="tab-pane fade" id="init-log" role="tabpanel">
-            <iframe id="initLogFrame" src="/details/init_log" style="width:100%; height:400px; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+            <iframe id="initLogFrame" src="{{ url_for('details_init_log') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
     </div>
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
@@ -56,6 +57,7 @@
 <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery-3.6.0-min.js') }}"></script>
 <script>
+const detailsLiveUrl = "{{ url_for('details_live') }}";
 function renderJson(obj, indent=0) {
     let html = '';
     if (typeof obj === 'object' && obj !== null) {
@@ -91,7 +93,7 @@ function renderJsonIframeContent(obj) {
 function loadLiveDetails() {
     $('#liveDetailsTabsContainer').html('<em>Loading...</em>');
     $('#liveDetailsTabContent').html('');
-    $.getJSON('/details/live', function(data) {
+    $.getJSON(detailsLiveUrl, function(data) {
         let keys = Object.keys(data);
         if (!keys.length) {
             $('#liveDetailsTabsContainer').html('<em>No data</em>');
@@ -106,7 +108,7 @@ function loadLiveDetails() {
         // Build tab content
         let content = '<div class="tab-content" id="liveDetailsTabsContent2" style="background:#222; border-radius:0 0 8px 8px; padding:0; min-height:320px;">';
         keys.forEach(function(key, idx) {
-            content += `<div class="tab-pane fade${idx===0?' show active':''}" id="livekey-${key}" role="tabpanel"><iframe class="liveJsonFrame" style="width:100%;height:320px;border:none;background:#222;"></iframe></div>`;
+            content += `<div class="tab-pane fade${idx===0?' show active':''}" id="livekey-${key}" role="tabpanel"><iframe class="liveJsonFrame" style="width:100%;min-height:320px;height:calc(100vh - 260px);border:none;background:#222;"></iframe></div>`;
         });
         content += '</div>';
         $('#liveDetailsTabsContainer').html(nav);
@@ -120,9 +122,9 @@ function loadLiveDetails() {
                 doc.write(renderJsonIframeContent(data[key]));
                 doc.close();
                 // Scroll to bottom
-                setTimeout(function() {
-                    try { frame.contentWindow.scrollTo(0, doc.body.scrollHeight); } catch(e) {}
-                }, 200);
+                // setTimeout(function() {
+                //     try { frame.contentWindow.scrollTo(0, doc.body.scrollHeight); } catch(e) {}
+                // }, 200);
             }
         });
     }).fail(function(xhr) {
@@ -145,14 +147,24 @@ $(document).ready(function() {
     $('#live-tab').on('shown.bs.tab', function() { loadLiveDetails(); });
     $('#refreshDetailsBtn').on('click', function() { refreshAll(); });
     // Auto-scroll log iframes to bottom when loaded
+    function scrollAllLogFramesToBottom() {
+        ['logFrame', 'migrateLogFrame', 'initLogFrame'].forEach(function(id) {
+            let iframe = document.getElementById(id);
+            if (iframe) {
+                setTimeout(function() {
+                    try {
+                        let doc = iframe.contentDocument || iframe.contentWindow.document;
+                        iframe.contentWindow.scrollTo(0, doc.body.scrollHeight);
+                    } catch(e) {}
+                }, 100);
+            }
+        });
+    }
     $('#logFrame, #migrateLogFrame, #initLogFrame').on('load', function() {
-        let iframe = this;
-        setTimeout(function() {
-            try {
-                let doc = iframe.contentDocument || iframe.contentWindow.document;
-                iframe.contentWindow.scrollTo(0, doc.body.scrollHeight);
-            } catch(e) {}
-        }, 300);
+        scrollAllLogFramesToBottom();
+    });
+    $('#scrollToBottomBtn').on('click', function() {
+        scrollAllLogFramesToBottom();
     });
     function setTheme(theme) {
         if (theme === 'light') {

@@ -5,6 +5,14 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.3.0 - 2025-07-14
+    - Adjust web interface so that it actually works with the '/flightgazer' path
+    - Add "scroll to bottom" button for logs
+    - Settings configurator now warns of unsaved changes
+    - Settings configurator has additional margins at the bottom to handle mobile UIs
+    - Minor tweak to sliders in settings configurator for better visibility with the white theme
+    - Improved status handling
+
 v.0.2.1 - 2025-07-14
     - Fix update script for the web app
 

@@ -24,7 +24,7 @@ http://<your-device's-IP>/flightgazer
 # or
 http://<name-of-device-running-FlightGazer>.local/flightgazer
 
-# The page can also be directly accessed over port 9898 in case the above don't work
+# If you don't have a web server on the system, you can access the configuration page directly on port 9898
 ```
 
 ## Update
@@ -38,8 +38,10 @@ Use the `uninstall-webapp.sh` script in the `web-app` folder in FlightGazer dire
 [`Changelog-webapp.txt`](/Changelog-webapp.txt)
 
 ## Contributions
-Pull requests are not accepted.
+Pull requests are not accepted.<br>
+Issues, bug reports, and other comments are welcomed.
 
 ## License & Warranty
 Inherits the same license that FlightGazer uses. (GPLv3)<br>
-Zero warranty provided.
+Zero warranty provided.<br>
+The javascript and css files in the [`static`](/static/) directory are distributed under the MIT License.

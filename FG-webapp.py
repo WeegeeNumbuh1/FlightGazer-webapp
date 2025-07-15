@@ -15,8 +15,9 @@ import queue
 import subprocess
 import requests
 
-VERSION = "v.0.2.1 --- 2025-07-14"
+VERSION = "v.0.3.0 --- 2025-07-14"
 
+os.environ['SCRIPT_NAME'] = '/flightgazer'
 # Define the paths for all the files we're looking for.
 # NB: It is expected that this Flask app lives inside the `web-app` folder
 # in the FlightGazer directory.
@@ -166,11 +167,15 @@ def get_version():
 def get_flightgazer_status():
     try:
         result = subprocess.run(['systemctl', 'is-active', 'flightgazer'], capture_output=True, text=True)
-        if ((result.returncode == 0 and result.stdout.strip() == 'active')
-            or result.stdout.strip() == 'activating'):
-            return 'running'
-        elif result.returncode == 3 or result.stdout.strip() == 'inactive':
-            return 'stopped'
+        result2 = subprocess.run(['systemctl', 'is-failed', 'flightgazer'], capture_output=True, text=True)
+        if result2.returncode == 1: # no failures
+            if ((result.returncode == 0 and result.stdout.strip() == 'active')
+                or result.stdout.strip() == 'activating'):
+                return 'running'
+            elif result.returncode == 3 or result.stdout.strip() == 'inactive':
+                return 'stopped'
+            else:
+                return 'failed'
         else:
             return 'failed'
     except Exception:
@@ -476,11 +481,11 @@ def get_update_output():
     last_output = lines[-1] if lines else ''
     return jsonify({'lines': [last_output], 'running': update_running})
 
-# @app.route('/updates/input', methods=['POST'])
-# def send_update_input():
-#     user_input = request.json.get('input')
-#     update_input_queue.put(user_input)
-#     return jsonify({'status':'sent'})
+@app.route('/updates/input', methods=['POST'])
+def send_update_input():
+    user_input = request.json.get('input')
+    update_input_queue.put(user_input)
+    return jsonify({'status':'sent'})
 
 def get_local_version():
     try:
