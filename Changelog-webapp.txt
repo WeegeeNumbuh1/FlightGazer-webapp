@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.3.1 - 2025-07-14
+    - Fix startup configurator breaking the startup process for FlightGazer
+    - Change how the updater script restarts the web app service
+
 v.0.3.0 - 2025-07-14
     - Adjust web interface so that it actually works with the '/flightgazer' path
     - Add "scroll to bottom" button for logs

@@ -1,7 +1,7 @@
 #!/bin/bash
 {
 # Script to update FlightGazer's web interface
-# Last updated: v.0.2.1
+# Last updated: v.0.3.1
 # by: WeegeeNumbuh1
 BASEDIR=$(cd `dirname -- $0` && pwd)
 TEMPPATH=/tmp/FlightGazer-tmp
@@ -42,13 +42,11 @@ fi
 
 read -r OWNER_OF_FGDIR GROUP_OF_FGDIR <<<$(stat -c "%U %G" ${BASEDIR})
 chown -Rf ${OWNER_OF_FGDIR}:${GROUP_OF_FGDIR} ${TEMPPATH} # need to do this as we are running as root
-echo "> Stopping service..."
-systemctl stop flightgazer-webapp.service
 echo -e "${FADE}Copying ${TEMPPATH} to ${BASEDIR}/web-app..."
 cp -afT ${TEMPPATH} ${BASEDIR} # recall that this script already lives in the web-app folder
 echo "> Restarting service..."
 rm -rf ${TEMPPATH} >/dev/null 2>&1 # clean up after ourselves
-systemctl start flightgazer-webapp.service
+systemctl restart flightgazer-webapp.service
 if [ $? -ne 0 ]; then
     echo -e "${RED}>>> Failed to start service!"
     exit 1
