@@ -42,7 +42,7 @@ fi
 
 read -r OWNER_OF_FGDIR GROUP_OF_FGDIR <<<$(stat -c "%U %G" ${BASEDIR})
 chown -Rf ${OWNER_OF_FGDIR}:${GROUP_OF_FGDIR} ${TEMPPATH} # need to do this as we are running as root
-echo -e "${FADE}Copying ${TEMPPATH} to ${BASEDIR}/web-app..."
+echo -e "${FADE}Copying ${TEMPPATH} to ${BASEDIR}..."
 cp -afT ${TEMPPATH} ${BASEDIR} # recall that this script already lives in the web-app folder
 echo "> Restarting service..."
 rm -rf ${TEMPPATH} >/dev/null 2>&1 # clean up after ourselves
