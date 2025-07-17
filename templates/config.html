@@ -705,7 +705,7 @@ $(document).ready(function() {
                 if (confirm('Settings saved. Restart FlightGazer now to apply changes?')) {
                     $.post(restartService, function(restartResp) {
                         if (restartResp.status === 'success') {
-                            alert('FlightGazer is restarting.');
+                            alert('FlightGazer successfully restarted.');
                         } else {
                             alert('Failed to restart FlightGazer.');
                         }
@@ -717,7 +717,7 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                alert('Failed to save config!');
+                alert('Failed to save config! Your changes may not have been saved.');
             }
         });
     });
@@ -726,7 +726,7 @@ $(document).ready(function() {
         if (confirm('Restart FlightGazer now to apply your changes?')) {
             $.post(restartService, function(restartResp) {
                 if (restartResp.status === 'success') {
-                    alert('FlightGazer is restarting.');
+                    alert('FlightGazer successfully restarted.');
                 } else {
                     alert('Failed to restart FlightGazer.');
                 }

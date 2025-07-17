@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.4.1 - 2025-07-17
+    - Change text in notification to be more accurate when restarting FlightGazer
+      after committing new changes to the configuration files
+
 v.0.4.0 - 2025-07-17
     - Update page refinements:
         - Update script output now discards ANSI escape sequences
