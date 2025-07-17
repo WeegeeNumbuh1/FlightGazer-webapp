@@ -27,8 +27,12 @@
         <div id="changelogSection" style="display:none;">
             <h5>Changes Since Current Version</h5>
             <iframe id="changelogFrame" style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
-            <div class="mt-3 mb-2">
+            <div class="mt-3 mb-2" style="display:flex;align-items:center;gap:16px;">
                 <button id="updateNowBtn" class="btn btn-warning">Update Now</button>
+                <label style="margin-bottom:0;display:flex;align-items:center;gap:6px;">
+                    <input type="checkbox" id="resetConfigCheckbox" style="margin-bottom:0;">
+                    <span>Also Reset Configuration to Default</span>
+                </label>
             </div>
         </div>
         <div id="updateOutputSection" style="display:none;">
@@ -152,7 +156,13 @@ document.getElementById('updateNowBtn').onclick = function() {
     doc.open();
     doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
     doc.close();
-    fetch(updatesStartUrl, {method:'POST'}).then(r => r.json()).then(data => {
+    // Check if reset config is requested
+    let resetConfig = document.getElementById('resetConfigCheckbox').checked;
+    fetch(updatesStartUrl, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({reset_config: resetConfig})
+    }).then(r => r.json()).then(data => {
         if (data.status === 'started') {
             pollUpdateOutputIframeFull();
             //setTimeout(() => sendUpdateInput('y'), 1200); // auto-confirm

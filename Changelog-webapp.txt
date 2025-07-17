@@ -5,6 +5,11 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.5.0 - 2025-07-17
+    - Add option to reset configuration when doing an update
+        - This requires FlightGazer v.7.1.1 or newer
+    - After saving settings and enabling a restart, the config page will now show a "please wait" screen
+
 v.0.4.1 - 2025-07-17
     - Change text in notification to be more accurate when restarting FlightGazer
       after committing new changes to the configuration files

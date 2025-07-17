@@ -512,9 +512,9 @@ update_running = False
 
 class UpdateRunner(threading.Thread):
     """ Runs the update script and gathers output to be sent to the webpage. """
-    def __init__(self, script_path):
+    def __init__(self, script_args):
         super().__init__()
-        self.script_path = script_path
+        self.script_args = script_args # list: [script_path, ...flags]
         self.proc = None
         self.daemon = True
         self.prompted = False
@@ -522,7 +522,8 @@ class UpdateRunner(threading.Thread):
     def run(self):
         global update_running
         update_running = True
-        self.proc = subprocess.Popen(['bash', self.script_path],
+        # Always run with bash, pass script path and any flags
+        self.proc = subprocess.Popen(['bash'] + self.script_args,
                                      stdin=subprocess.PIPE,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.STDOUT,
@@ -562,12 +563,20 @@ class UpdateRunner(threading.Thread):
 @app.route('/updates/start', methods=['POST'])
 def start_update():
     global update_process, update_output_queue, update_input_queue, update_running
+    # Get reset_config flag from frontend
+    reset_config = False
+    if request.is_json:
+        data = request.get_json()
+        reset_config = data.get('reset_config', False)
     with update_lock:
         if update_running:
             return jsonify({'status':'already_running'})
         update_output_queue = queue.Queue()
         update_input_queue = queue.Queue()
-        update_process = UpdateRunner(UPDATE_PATH)
+        script_args = [UPDATE_PATH]
+        if reset_config:
+            script_args.append('-r')
+        update_process = UpdateRunner(script_args)
         update_process.start()
     return jsonify({'status':'started'})
 

@@ -24,7 +24,8 @@ http://<your-device's-IP>/flightgazer
 # or
 http://<name-of-device-running-FlightGazer>.local/flightgazer
 
-# If you don't have a web server on the system, you can access the configuration page directly on port 9898
+# If you don't have a web server on the system,
+# you can access the configuration page directly on port 9898/flightgazer
 ```
 
 ## Update
