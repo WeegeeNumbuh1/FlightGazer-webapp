@@ -1,7 +1,7 @@
 #!/bin/bash
 {
 # Script to update FlightGazer's web interface
-# Last updated: v.0.3.1
+# Last updated: v.0.4.0
 # by: WeegeeNumbuh1
 BASEDIR=$(cd `dirname -- $0` && pwd)
 TEMPPATH=/tmp/FlightGazer-tmp
@@ -11,7 +11,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -ne "\033]0;FlightGazer Web Interface Updater\007" # set window title
-echo -e "\n${ORANGE}>>> FlightGazer web interface update script started."
+echo -e "\n${ORANGE}>>> FlightGazer Web Interface update script started."
 echo -e "${GREEN}>>> Setting up...${NC}"
 if [ `id -u` -ne 0 ]; then
 	>&2 echo -e "${RED}>>> ERROR: This script must be run as root.${NC}"

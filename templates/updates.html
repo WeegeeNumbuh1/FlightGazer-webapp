@@ -36,11 +36,11 @@
             <iframe id="updateOutputFrame" style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
         </div>
     </div>
-    <div id="updateProgressPage" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#181818;z-index:1000;">
+    <div id="updateProgressPage" style="display:none;position:fixed;top:0;left:0;width:100vw;height:77vh;background:#181818;z-index:1000;padding-right: 12px;padding-left: 12px;">
         <button id="backToHomeBtn" class="btn btn-info" style="position:absolute;top:24px;left:24px;display:none;z-index:1100;">&larr; Back to Home</button>
         <h3 style="text-align:center;margin-top:48px;">Update Progress</h3>
         <h4 style="text-align:center">Please wait, don't refresh the page or go back until "Back to Home" appears.</h4>
-        <iframe id="updateOutputFrameFull" style="display:block;margin:32px auto 0 auto;width:90vw;height:60vh;background:#222;color:#fff;font-family:monospace;border-radius:12px;border:none;"></iframe>
+        <iframe id="updateOutputFrameFull" style="display:block;margin:32px auto 0 auto;width:90vw;height:78vh;background:#222;color:#fff;font-family:monospace;border-radius:12px;border:none;padding-bottom: 5vh;"></iframe>
     </div>
     <script>
     const updatesCheckUrl = "{{ url_for('check_for_updates') }}";
@@ -172,7 +172,7 @@ function pollUpdateOutputIframeFull() {
             if (newText !== lastUpdateOutput && newText !== '') {
                 let doc = document.getElementById('updateOutputFrameFull').contentDocument;
                 doc.open();
-                doc.write(`<pre id='updatePre' style='background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;max-height:100%;overflow-y:auto;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
+                doc.write(`<pre id='updatePre' style='background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:10px;/* max-height:100%; */overflow-y:auto;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
                 doc.close();
                 lastUpdateOutput = newText;
                 // Auto-scroll to bottom

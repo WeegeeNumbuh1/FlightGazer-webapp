@@ -32,7 +32,7 @@ Use the `install-FlightGazer-webapp.sh` file again once the web app is installed
 The `update.sh` script for FlightGazer also handles updating the web interface as well and this is the preferred method.
 
 ## Uninstall
-Use the `uninstall-webapp.sh` script in the `web-app` folder in FlightGazer directory.
+Use the `uninstall-webapp.sh` script in the `web-app` folder in the FlightGazer directory.
 
 ## Changelog
 [`Changelog-webapp.txt`](/Changelog-webapp.txt)

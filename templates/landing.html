@@ -27,6 +27,7 @@
         <span style="font-size:1.05em; vertical-align:middle;">
             {% if status == 'running' %}FlightGazer is running
             {% elif status == 'stopped' %}FlightGazer is not running
+            {% elif status == 'manually running' %}FlightGazer has been started manually
             {% else %}FlightGazer status error (check the logs){% endif %}
         </span>
     </div>
@@ -133,16 +134,26 @@
     function updateStatusIndicator() {
         fetch(statusURL).then(r => r.json()).then(data => {
             let status = data.status;
-            let statusColor = status === 'running' ? '#3ecf4a' : (status === 'stopped' ? '#888' : '#e53935');
-            document.querySelector('.status-indicator span').style.background = statusColor;
             let statusText = '';
-            if (status === 'running') statusText = 'FlightGazer is running';
-            else if (status === 'stopped') statusText = 'FlightGazer is not running';
-            else statusText = 'FlightGazer status error (check the logs)';
+            let statusColor = '#ffffff00';
+            if (status === 'running') {
+                statusColor = '#3ecf4a';
+                statusText = 'FlightGazer is running';
+            } else if (status === 'stopped') {
+                statusColor = '#888';
+                statusText = 'FlightGazer is not running';
+            } else if (status === 'manually running') {
+                statusColor = '#ffd710';
+                statusText = 'FlightGazer has been started manually';
+            } else if (status === 'failed') {
+                statusColor = '#e53935';
+                statusText = 'FlightGazer status error (check the logs)';
+            }
+            document.querySelector('.status-indicator span').style.background = statusColor;
             document.querySelector('.status-indicator span + span').innerText = statusText;
         });
     }
-    setInterval(updateStatusIndicator, 15000);
+    setInterval(updateStatusIndicator, 10000);
     // Initial call
     updateStatusIndicator();
     </script>

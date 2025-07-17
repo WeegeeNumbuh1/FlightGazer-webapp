@@ -1,7 +1,7 @@
 """ FlightGazer web interface. Handles editing the config file,
-reading the logs, checking for updates, and modifying startup options. 
+reading the logs, checking for updates, and modifying startup options.
 This won't run if FlightGazer isn't installed on the system as it depends on
-FlightGazer's virtual environment. (should be handled via the install script). 
+FlightGazer's virtual environment. (should be handled via the install script).
 Disclosures: most of this was vibe-coded, but does contain manual edits to make sure
 it actually works (mostly) and that the actual web pages aren't too janky. """
 
@@ -14,10 +14,13 @@ import threading
 import queue
 import subprocess
 import requests
+import psutil
 
-VERSION = "v.0.3.2 --- 2025-07-15"
+VERSION = "v.0.4.0 --- 2025-07-17"
 
+# don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
+
 # Define the paths for all the files we're looking for.
 # NB: It is expected that this Flask app lives inside the `web-app` folder
 # in the FlightGazer directory.
@@ -28,6 +31,9 @@ LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-log.log')
 MIGRATE_LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'settings_migrate.log')
 CURRENT_STATE_JSON_PATH = '/run/FlightGazer/current_state.json'
 SERVICE_PATH = '/etc/systemd/system/flightgazer.service'
+# Get the main FlightGazer path rather than using a relational path.
+# If the latter approach is used and this web-app is uninstalled, it will break the service
+# as now this working directory `web-app` no longer exists.
 INIT_PATH = os.path.join(os.path.dirname(os.getcwd()), 'FlightGazer-init.sh')
 UPDATE_PATH = os.path.join(os.path.dirname(__file__), '..', 'update.sh')
 
@@ -47,7 +53,7 @@ def load_config():
     return data
 
 def save_config(data):
-    # Save config and preserve owner/group
+    """ Save config and preserve owner/group """
     orig_stat = None
     if os.path.exists(CONFIG_PATH):
         orig_stat = os.stat(CONFIG_PATH)
@@ -57,7 +63,7 @@ def save_config(data):
         os.chown(CONFIG_PATH, orig_stat.st_uid, orig_stat.st_gid)
 
 def get_predefined_colors():
-    # Parse colors.py for color names and RGB values
+    """  Parse colors.py for color names and RGB values """
     color_names = []
     color_rgbs = {}
     with open(COLORS_PATH, 'r', encoding='utf-8') as f:
@@ -73,7 +79,7 @@ def get_predefined_colors():
     return color_names, color_rgbs
 
 def get_color_config():
-    # Parse colors.py for current color assignments
+    """ Parse colors.py for current color assignments """
     color_vars = [
         # Clock colors
         'clock_color','seconds_color','am_pm_color','day_of_week_color','date_color',
@@ -113,7 +119,7 @@ def get_color_config():
     return color_config
 
 def save_color_config(colors):
-    # Update colors.py assignments for color_vars and preserve owner/group
+    """  Update colors.py assignments for color_vars and preserve owner/group """
     color_vars = [
         # Clock colors
         'clock_color','seconds_color','am_pm_color','day_of_week_color','date_color',
@@ -164,22 +170,96 @@ def get_version():
     except Exception:
         return 'Unknown'
 
+def match_commandline(command_search: str, process_name: str) -> int | None:
+    """ Taken directly from `FlightGazer.py` but modified to only return the PID. 
+    This must only be used when it's known that a single instance is running. """
+    list_of_processes = []
+    # iterate over all running processes
+    iter = 0
+    for proc in psutil.process_iter():
+       iter += 1
+       try:
+           pinfo = proc.as_dict(attrs=['pid', 'name', 'create_time'])
+           cmdline = proc.cmdline()
+           # check if process name contains the given string in its command line
+           if any(command_search in position for position in cmdline) and process_name in pinfo['name']:
+               list_of_processes.append(pinfo)
+       except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+           pass
+
+    if len(list_of_processes) >= 1:
+        return list_of_processes[0]['pid']
+    else:
+        return None
+
+# Use psutil to track/monitor the main running FlightGazer process instead of
+# having to fire up a subprocess each time we want to poll FlightGazer's running status
+current_flightgazer_pid = None
+current_flightgazer_process = None
+manually_running = False
+
 def get_flightgazer_status():
+    """ Poll the service status """
+    global current_flightgazer_pid, current_flightgazer_process, manually_running
     try:
-        result = subprocess.run(['systemctl', 'is-active', 'flightgazer'], capture_output=True, text=True)
-        result2 = subprocess.run(['systemctl', 'is-failed', 'flightgazer'], capture_output=True, text=True)
-        if result2.returncode == 1: # no failures
-            if ((result.returncode == 0 and result.stdout.strip() == 'active')
-                or result.stdout.strip() == 'activating'):
-                return 'running'
-            elif result.returncode == 3 or result.stdout.strip() == 'inactive':
-                return 'stopped'
+        # if the previous poll showed that no existing PID for FlightGazer is running, run through this
+        if current_flightgazer_process is None or not current_flightgazer_process.is_running():
+            result = subprocess.run(['systemctl', 'is-active', 'flightgazer'], capture_output=True, text=True)
+            result2 = subprocess.run(['systemctl', 'is-failed', 'flightgazer'], capture_output=True, text=True)
+            if result2.returncode == 1: # no failures
+                if ((result.returncode == 0 and result.stdout.strip() == 'active')
+                    or result.stdout.strip() == 'activating'):
+                    if current_flightgazer_pid is None:
+                        current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
+                        if current_flightgazer_pid is not None:
+                            # The main process of FlightGazer is running (not in the systemd startup phase)
+                            current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
+                            manually_running = False
+                    return 'running'
+                elif result.returncode == 3 or result.stdout.strip() == 'inactive':
+                    current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
+                    if current_flightgazer_pid is not None:
+                        current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
+                        manually_running = True
+                        return 'manually running'
+                    else:
+                        current_flightgazer_process = None
+                        manually_running = False
+                        return 'stopped'
+                else:
+                    current_flightgazer_pid = None
+                    current_flightgazer_process = None
+                    manually_running = False
+                    return 'failed'
             else:
-                return 'failed'
+                # case when it is manually running and a service restart was attempted (it will always fail)
+                current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
+                if current_flightgazer_pid is not None:
+                    current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
+                    manually_running = True
+                    return 'manually running'
+                else:
+                    current_flightgazer_pid = None
+                    current_flightgazer_process = None
+                    manually_running = False
+                    return 'failed'
         else:
-            return 'failed'
+            if not manually_running:
+                return 'running'
+            else:
+                return 'manually running'
+
     except Exception:
+        current_flightgazer_pid = None
+        current_flightgazer_process = None
+        manually_running = False
         return 'failed'
+
+ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+def remove_ansi_escape(input: str) -> str:
+    """ Remove the escape sequences used in the update script.
+    https://stackoverflow.com/a/14693789 """
+    return ANSI_ESCAPE.sub('', input)
 
 @app.route('/')
 def landing_page():
@@ -256,7 +336,7 @@ def update_config():
 @app.route('/restart', methods=['POST'])
 def restart_flightgazer():
     try:
-        # Restart the systemd service for FlightGazer
+        # Restart the systemd service
         subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True)
         return jsonify({'status': 'success'})
     except Exception as e:
@@ -431,30 +511,48 @@ update_lock = threading.Lock()
 update_running = False
 
 class UpdateRunner(threading.Thread):
+    """ Runs the update script and gathers output to be sent to the webpage. """
     def __init__(self, script_path):
         super().__init__()
         self.script_path = script_path
         self.proc = None
         self.daemon = True
         self.prompted = False
+        self.prompted_count = 0
     def run(self):
         global update_running
         update_running = True
-        self.proc = subprocess.Popen(['bash', self.script_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+        self.proc = subprocess.Popen(['bash', self.script_path],
+                                     stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT,
+                                     text=True,
+                                     bufsize=1
+                                     )
         output_history = []
         while True:
             line = self.proc.stdout.readline()
             if line == '' and self.proc.poll() is not None:
                 break # subprocess has completed
             if line:
-                output_history.append(line)
+                output_history.append(remove_ansi_escape(line))
                 update_output_queue.put(''.join(output_history))
                 if 'you like' in line:
-                    self.prompted = True
-                    self.proc.stdin.write('y\n')
-                    self.proc.stdin.flush()
-                    self.prompted = False
-                    continue
+                    if self.prompted_count == 0:
+                        self.prompted = True
+                        self.prompted_count += 1
+                        self.proc.stdin.write('y\n')
+                        self.proc.stdin.flush()
+                        self.prompted = False
+                        continue
+                    else: # we're stuck in a prompt loop; break out
+                        self.proc.terminate()
+                        update_running = False
+                        break
+                if '>>> Update complete' in line: # we're done, don't wait for subprocesses
+                    self.proc.terminate()
+                    update_running = False
+                    break
         # Drain remaining output
         for line in self.proc.stdout:
             output_history.append(line)

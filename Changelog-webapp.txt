@@ -5,6 +5,20 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.4.0 - 2025-07-17
+    - Update page refinements:
+        - Update script output now discards ANSI escape sequences
+        - Handle exceedingly rare case the update process ends up in an endless loop
+        - Changes to how the update script output polling works so it reliably finishes
+        - Refined update script output layout on webpage
+    - Refactor the status indicator
+        - Status indicator now detects when FlightGazer is running manually
+        - Status check spawns less PIDs than before
+        - Polls faster
+    - Fix uninstaller due to v.0.1.2 change
+    - Add some docstrings
+    - Releases with FlightGazer v.7.1.0
+
 v.0.3.2 - 2025-07-15
     - Another fix for the startup configuration to cover the case when the startup options are changed with the webapp
       and then the webapp is later uninstalled, causing FlightGazer to not start
