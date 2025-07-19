@@ -20,6 +20,7 @@
         <a href="{{ url_for('download_json') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Live Details</a>
         <a href="{{ url_for('download_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Main Log</a>
         <a href="{{ url_for('download_migrate_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Migration Log</a>
+        <a href="{{ url_for('download_flybys_csv') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Hourly Data</a>
         <button id="refreshDetailsBtn" class="btn btn-sm btn-warning" type="button"><span style="font-size:1.1em;">&#x21bb;</span> Refresh</button>
         <button id="scrollToBottomBtn" class="btn btn-sm btn-success" type="button"><span style="font-size:1.1em;">&#x21d3;</span> Scroll to Bottom</button>
     </div>
@@ -36,6 +37,9 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="init-log-tab" data-bs-toggle="tab" data-bs-target="#init-log" type="button" role="tab">Initialization Log</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="flybys-csv-tab" data-bs-toggle="tab" data-bs-target="#flybys-csv" type="button" role="tab">Hourly Data</button>
+        </li>
     </ul>
     <div class="tab-content" id="detailsTabsContent" style="background:#222; border-radius:0 0 8px 8px; padding:24px 18px; min-height:420px;">
         <div class="tab-pane fade show active" id="live" role="tabpanel">
@@ -50,6 +54,9 @@
         </div>
         <div class="tab-pane fade" id="init-log" role="tabpanel">
             <iframe id="initLogFrame" src="{{ url_for('details_init_log') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+        </div>
+        <div class="tab-pane fade" id="flybys-csv" role="tabpanel">
+            <iframe id="flybysCsvFrame" src="{{ url_for('details_flybys_csv') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
     </div>
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
@@ -142,13 +149,15 @@ $(document).ready(function() {
         if (migrateLogFrame) migrateLogFrame.contentWindow.location.reload();
         let initLogFrame = document.getElementById('initLogFrame');
         if (initLogFrame) initLogFrame.contentWindow.location.reload();
+        let flybysCsvFrame = document.getElementById('flybysCsvFrame');
+        if (flybysCsvFrame) flybysCsvFrame.contentWindow.location.reload();
     }
     loadLiveDetails();
     $('#live-tab').on('shown.bs.tab', function() { loadLiveDetails(); });
     $('#refreshDetailsBtn').on('click', function() { refreshAll(); });
     // Auto-scroll log iframes to bottom when loaded
     function scrollAllLogFramesToBottom() {
-        ['logFrame', 'migrateLogFrame', 'initLogFrame'].forEach(function(id) {
+        ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame'].forEach(function(id) {
             let iframe = document.getElementById(id);
             if (iframe) {
                 setTimeout(function() {
@@ -160,7 +169,7 @@ $(document).ready(function() {
             }
         });
     }
-    $('#logFrame, #migrateLogFrame, #initLogFrame').on('load', function() {
+    $('#logFrame, #migrateLogFrame, #initLogFrame, #flybysCsvFrame').on('load', function() {
         scrollAllLogFramesToBottom();
     });
     $('#scrollToBottomBtn').on('click', function() {

@@ -5,6 +5,11 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.6.0 - 2025-07-18
+    - Tweaks to the config page
+    - In the Details page, the flybys csv file can be seen and downloaded now
+    - Rearranged internal code for better organization
+
 v.0.5.0 - 2025-07-17
     - Add option to reset configuration when doing an update
         - This requires FlightGazer v.7.1.1 or newer

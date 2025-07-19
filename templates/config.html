@@ -58,7 +58,7 @@
             </div>
             <div class="mt-3">
                 <label for="HEIGHT_LIMIT" class="form-label setting-label">Height Limit</label>
-                <div class="help-text">Filter out aircraft at an altitude higher than this. (Feet or meters, based on above units)</div>
+                <div class="help-text">Filter out aircraft at an altitude higher than this for detailed tracking. (Feet or meters, based on above units)</div>
                 <input type="range" class="form-range" min="2500" max="75000" step="100" id="HEIGHT_LIMIT" name="HEIGHT_LIMIT" value="{{ config.HEIGHT_LIMIT }}" oninput="HEIGHT_LIMIT_value.value = this.value">
                 <output id="HEIGHT_LIMIT_value">{{ config.HEIGHT_LIMIT }}</output>
             </div>
@@ -74,14 +74,14 @@
             <div class="mt-3">
                 <label for="API_KEY" class="form-label setting-label">API Key</label>
                 <div class="help-text">Put your FlightAware API key here. Leave as blank to not use the API.<br>
-                <b>Having an API key will enable the journey readout (the origin and departure) data for an aircraft.</b><br>
-                Don't have one? Sign up at <a href="https://www.flightaware.com/commercial/aeroapi/#compare-plans-section">FlightAware</a></div>
+                <h5>Having an API key will enable the journey readout (the origin and departure) data for an aircraft.</h5><br>
+                Don't have one? Sign up at <a href="https://www.flightaware.com/commercial/aeroapi/#compare-plans-section">FlightAware</a>.</div>
                 <input type="text" class="form-control" id="API_KEY" name="API_KEY" value="{{ config.API_KEY }}">
             </div>
             <div class="mt-3">
                 <label for="API_DAILY_LIMIT" class="form-label setting-label">API Daily Limit</label>
                 <div class="help-text">Type in an integer to limit the amount of API calls in a day.<br>Leave blank for unlimited calls.</div>
-                <input type="number" step="1" class="form-control" id="API_DAILY_LIMIT" name="API_DAILY_LIMIT" value="{{ config.API_DAILY_LIMIT or '' }}">
+                <input type="number" step="1" class="form-control" id="API_DAILY_LIMIT" name="API_DAILY_LIMIT" value="{{ config.API_DAILY_LIMIT or '' }}" maxlength="5">
             </div>
             <div class="mt-3">
                 <label for="API_COST_LIMIT" class="form-label setting-label">API Cost Limit</label>
@@ -89,7 +89,7 @@
                 If the cost exceeds this value, API calls will stop and will not resume until there are credits available again.<br>
                 If the cost upon startup exceeds this value, the API will not be used but will start if there are credits available at a later time.<br>
                 Leave this blank to have no limit.</div>
-                <input type="number" step="0.01" class="form-control" id="API_COST_LIMIT" name="API_COST_LIMIT" value="{{ config.API_COST_LIMIT }}">
+                <input type="number" step="0.01" class="form-control" id="API_COST_LIMIT" name="API_COST_LIMIT" value="{{ config.API_COST_LIMIT }}" maxlength="10">
             </div>
             <div class="mt-3">
                 <label class="form-label setting-label">API Schedule</label>
@@ -249,11 +249,11 @@
                 <div class="row g-2">
                     <div class="col">
                         <label for="BRIGHTNESS_SWITCH_TIME_Sunrise" class="form-label">Sunrise</label>
-                        <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunrise" name="BRIGHTNESS_SWITCH_TIME_Sunrise" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunrise }}">
+                        <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunrise" name="BRIGHTNESS_SWITCH_TIME_Sunrise" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunrise }}" required>
                     </div>
                     <div class="col">
                         <label for="BRIGHTNESS_SWITCH_TIME_Sunset" class="form-label">Sunset</label>
-                        <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunset" name="BRIGHTNESS_SWITCH_TIME_Sunset" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunset }}">
+                        <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunset" name="BRIGHTNESS_SWITCH_TIME_Sunset" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunset }}" required>
                     </div>
                 </div>
             </div>
@@ -284,14 +284,14 @@
             <div class="mt-3">
                 <label for="CUSTOM_DUMP1090_LOCATION" class="form-label setting-label">Custom dump1090 Location</label>
                 <div class="help-text">URL of your dump1090 install if it's in a different location or on a different network device.<br>
-                <i>Example: http://localhost/custom_name_here or http://192.168.xxx.xxx:8080 (no trailing /)</i></div>
-                <input type="text" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION" value="{{ config.CUSTOM_DUMP1090_LOCATION }}">
+                <i>Example: http://localhost/custom_name_here</i> or <i>http://192.168.xxx.xxx:8080 (no trailing /)</i></div>
+                <input type="text" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION" value="{{ config.CUSTOM_DUMP1090_LOCATION }}" style="font-family: monospace;">
             </div>
             <div class="mt-3">
                 <label for="CUSTOM_DUMP978_LOCATION" class="form-label setting-label">Custom dump978 Location</label>
                 <div class="help-text">URL of your dump978 install if it's in a different location or on a different network device.<br>
                 <i>Example: http://192.168.xxx.xxx:8978</i></div>
-                <input type="text" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION" value="{{ config.CUSTOM_DUMP978_LOCATION }}">
+                <input type="text" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION" value="{{ config.CUSTOM_DUMP978_LOCATION }}" style="font-family: monospace;">
             </div>
             <div class="mt-3">
                 <label for="FOLLOW_THIS_AIRCRAFT" class="form-label setting-label">Follow This Aircraft</label>
@@ -299,8 +299,13 @@
                 When this aircraft enters the reception area for your ADS-B receiver (not the values set by Height Limit or Range),<br>
                 FlightGazer will start tracking it as if it were inside your designated Range.<br>
                 When tracking this aircraft, Enhanced Readout will be used regardless of the setting for that option<br>
-                and will append a "*" on the aircraft's callsign. This does not disable API use.</div>
-                <input type="text" class="form-control" id="FOLLOW_THIS_AIRCRAFT" name="FOLLOW_THIS_AIRCRAFT" value="{{ config.FOLLOW_THIS_AIRCRAFT }}">
+                and will append a "*" on the aircraft's callsign. This does not disable API use when this aircraft is being tracked.</div>
+                <input type="text" class="form-control" id="FOLLOW_THIS_AIRCRAFT" name="FOLLOW_THIS_AIRCRAFT" value="{{ config.FOLLOW_THIS_AIRCRAFT }}" style="font-family: monospace;" maxlength="6" pattern="[0-9a-fA-F]+">
+                <style>
+                input:invalid {
+                border: red solid 3px;
+                }
+                </style>
             </div>
             <div class="mt-3">
                 <div class="form-check">
@@ -311,19 +316,19 @@
             </div>
             <div class="mt-3">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="FLYBY_STATS_ENABLED" name="FLYBY_STATS_ENABLED" {% if config.FLYBY_STATS_ENABLED %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="FLYBY_STATS_ENABLED">Flyby Stats Enabled</label>
+                    <input class="form-check-input" type="checkbox" id="FLYBY_STATS_ENABLED" name="FLYBY_STATS_ENABLED" {% if config.FLYBY_STATS_ENABLED %}checked{% endif %} disabled>
+                    <label class="form-check-label setting-label" for="FLYBY_STATS_ENABLED" style="pointer-events:none;opacity:0.6;">Flyby Stats Enabled</label>
                 </div>
-                <div class="help-text">Save general stats of aircraft flybys and API usage to a CSV file.<br>
-                <i>There should be no reason to disable this.</i></div>
+                <div class="help-text" style="opacity:0.7;">Save general stats of aircraft flybys and API usage to a CSV file.<br>
+                <i>You must modify the configuration file directly to change this.</i></div>
             </div>
             <div class="mt-3">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="WRITE_STATE" name="WRITE_STATE" {% if config.WRITE_STATE %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="WRITE_STATE">Write State</label>
+                    <input class="form-check-input" type="checkbox" id="WRITE_STATE" name="WRITE_STATE" {% if config.WRITE_STATE %}checked{% endif %} disabled>
+                    <label class="form-check-label setting-label" for="WRITE_STATE" style="pointer-events:none;opacity:0.6;">Write State</label>
                 </div>
-                <div class="help-text">Write a JSON file of current operating state.<br>
-                <i>There should be no reason to disable this.</i></div>
+                <div class="help-text" style="opacity:0.7;">Write a JSON file of current operating state.<br>
+                <i>You must modify the configuration file directly to change this.</i></div>
             </div>
         </div>
         <!-- RGB-Matrix Tab -->

@@ -16,7 +16,7 @@ import subprocess
 import requests
 import psutil
 
-VERSION = "v.0.4.1 --- 2025-07-17"
+VERSION = "v.0.6.0 --- 2025-07-18"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -29,6 +29,7 @@ COLORS_PATH = os.path.join(os.path.dirname(__file__), '..', 'setup', 'colors.py'
 VERSION_PATH = os.path.join(os.path.dirname(__file__), '..', 'version')
 LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-log.log')
 MIGRATE_LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'settings_migrate.log')
+FLYBY_STATS_PATH = os.path.join(os.path.dirname(__file__), '..', 'flybys.csv')
 CURRENT_STATE_JSON_PATH = '/run/FlightGazer/current_state.json'
 SERVICE_PATH = '/etc/systemd/system/flightgazer.service'
 # Get the main FlightGazer path rather than using a relational path.
@@ -46,6 +47,8 @@ app = Flask(__name__)
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+# ========= Helper Functions =========
 
 def load_config():
     with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
@@ -261,11 +264,53 @@ def remove_ansi_escape(input: str) -> str:
     https://stackoverflow.com/a/14693789 """
     return ANSI_ESCAPE.sub('', input)
 
+# ========= Root Route =========
+
 @app.route('/')
 def landing_page():
     version = get_version()
     status = get_flightgazer_status()
     return render_template('landing.html', version=version, status=status)
+
+# ========= Service Control Routes =========
+
+@app.route('/restart', methods=['POST'])
+def restart_flightgazer():
+    try:
+        # Restart the systemd service
+        subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True)
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
+@app.route('/service/start', methods=['POST'])
+def start_flightgazer_service():
+    import subprocess
+    try:
+        status = get_flightgazer_status()
+        if status == 'running':
+            return jsonify({'status': 'already_running'})
+        # Start the service in the background
+        subprocess.Popen(['systemctl', 'start', 'flightgazer'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return jsonify({'status': 'started'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
+@app.route('/service/stop', methods=['POST'])
+def stop_flightgazer_service():
+    import subprocess
+    try:
+        subprocess.run(['systemctl', 'stop', 'flightgazer'], check=True)
+        return jsonify({'status': 'stopped'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
+@app.route('/service/status')
+def service_status():
+    status = get_flightgazer_status()
+    return jsonify({'status': status})
+
+# ========= Config Modification Routes =========
 
 @app.route('/config')
 def config_page():
@@ -273,14 +318,6 @@ def config_page():
     predefined_colors, predefined_colors_rgb = get_predefined_colors()
     color_config = get_color_config()
     return render_template('config.html', config=config, predefined_colors=predefined_colors, predefined_colors_rgb=predefined_colors_rgb, color_config=color_config)
-
-@app.route('/details')
-def details_page():
-    return render_template('details.html')
-
-@app.route('/updates')
-def updates_page():
-    return render_template('updates.html')
 
 @app.route('/update', methods=['POST'])
 def update_config():
@@ -333,14 +370,11 @@ def update_config():
         save_color_config(data['colors'])
     return jsonify({'status': 'success'})
 
-@app.route('/restart', methods=['POST'])
-def restart_flightgazer():
-    try:
-        # Restart the systemd service
-        subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True)
-        return jsonify({'status': 'success'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'error': str(e)})
+# ========= Details and Log Routes =========
+
+@app.route('/details')
+def details_page():
+    return render_template('details.html')
 
 @app.route('/details/live')
 def details_live():
@@ -453,6 +487,41 @@ def details_init_log():
     except Exception as e:
         return f'<span style="color:#f66;font-family:monospace;">Init log not found: {e}</span>', 404
 
+@app.route('/details/download_flybys_csv')
+def download_flybys_csv():
+    if not os.path.exists(FLYBY_STATS_PATH):
+        return 'flybys.csv not found', 404
+    try:
+        return send_file(FLYBY_STATS_PATH, mimetype='text/csv', as_attachment=True, download_name='flybys.csv')
+    except Exception as e:
+        return f'CSV file not found: {e}', 404
+
+@app.route('/details/flybys_csv')
+def details_flybys_csv():
+    if not os.path.exists(FLYBY_STATS_PATH):
+        return '<div style="color:#f66;font-family:monospace;padding:12px;">flybys.csv not found.</div>', 404
+    try:
+        with open(FLYBY_STATS_PATH, 'r', encoding='utf-8', errors='replace') as f:
+            lines = f.readlines()
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #444;padding:4px 8px;} th{background:#222;color:#ffd700;} tr:nth-child(even){background:#222;} tr:nth-child(odd){background:#181818;} caption{color:#ffd700;font-weight:bold;margin-bottom:8px;}</style></head><body>'
+        if lines:
+            html += '<table>'
+            for i, line in enumerate(lines):
+                cells = [c.strip() for c in line.strip().split(',')]
+                if i == 0:
+                    html += '<tr>' + ''.join(f'<th>{c}</th>' for c in cells) + '</tr>'
+                else:
+                    html += '<tr>' + ''.join(f'<td>{c}</td>' for c in cells) + '</tr>'
+            html += '</table>'
+        else:
+            html += '<div style="color:#aaa">(No data in flybys.csv)</div>'
+        html += '</body></html>'
+        return html
+    except Exception as e:
+        return f'<span style="color:#f66;font-family:monospace">CSV file not found: {e}</span>', 404
+
+# ========= Startup Control Routes =========
+
 @app.route('/startup')
 def startup_options():
     return render_template('startup.html')
@@ -503,6 +572,12 @@ def set_startup_options():
         return jsonify({'status': 'success'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# ========= Updates Handling Routes and Functions =========
+
+@app.route('/updates')
+def updates_page():
+    return render_template('updates.html')
 
 update_process = None
 update_output_queue = queue.Queue()
@@ -595,13 +670,6 @@ def send_update_input():
     update_input_queue.put(user_input)
     return jsonify({'status':'sent'})
 
-def get_local_version():
-    try:
-        with open(VERSION_PATH, 'r', encoding='utf-8') as f:
-            return f.read().strip()
-    except Exception:
-        return 'Unknown'
-
 # def get_local_changelog():
 #     changelog_path = os.path.join(os.path.dirname(__file__), 'Changelog.txt')
 #     try:
@@ -618,7 +686,7 @@ def check_for_updates():
         remote_changelog = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt', timeout=10).text
     except Exception as e:
         return jsonify({'error': f'Failed to fetch remote files: {e}'}), 500
-    local_ver = get_local_version()
+    local_ver = get_version()
     # Truncate changelog to only show entries newer than local version
     lines = remote_changelog.splitlines()
     truncated = []
@@ -636,33 +704,7 @@ def check_for_updates():
         'changelog': changelog_to_show
     })
 
-@app.route('/service/start', methods=['POST'])
-def start_flightgazer_service():
-    import subprocess
-    try:
-        status = get_flightgazer_status()
-        if status == 'running':
-            return jsonify({'status': 'already_running'})
-        # Start the service in the background
-        subprocess.Popen(['systemctl', 'start', 'flightgazer'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return jsonify({'status': 'started'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'error': str(e)})
-
-@app.route('/service/stop', methods=['POST'])
-def stop_flightgazer_service():
-    import subprocess
-    try:
-        subprocess.run(['systemctl', 'stop', 'flightgazer'], check=True)
-        return jsonify({'status': 'stopped'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'error': str(e)})
-
-@app.route('/service/status')
-def service_status():
-    status = get_flightgazer_status()
-    return jsonify({'status': status})
-
+# ========= Debugging =========
 if __name__ == '__main__':
-    if os.name == 'nt': # debugging
+    if os.name == 'nt':
         app.run(debug=True, port=9898)
