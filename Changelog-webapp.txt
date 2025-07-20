@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.6.2 - 2025-07-20
+    - Some layout tweaks to support really small mobile screens (eg. 320x480)
+    - Additional text tweaks for some pages
+
 v.0.6.1 - 2025-07-19
     - Add an "Add to Bookmarks" button on the landing page
 
