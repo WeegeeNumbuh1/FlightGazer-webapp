@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.6.1 - 2025-07-19
+    - Add an "Add to Bookmarks" button on the landing page
+
 v.0.6.0 - 2025-07-18
     - Tweaks to the config page
     - In the Details page, the flybys csv file can be seen and downloaded now

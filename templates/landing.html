@@ -47,6 +47,7 @@
         <span id="serviceStatusMsg" style="margin-left:16px;color:#ffd700;"></span>
     </div>
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
+    <button id="bookmarkBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:absolute;top:18px;left:24px;z-index:9;">⭐</button>
     <script>
     const statusURL = "{{ url_for('service_status') }}";
     const serviceRestart = "{{ url_for('restart_flightgazer') }}";
@@ -131,6 +132,20 @@
             });
         });
     };
+    document.getElementById("bookmarkBtn").addEventListener("click", function() {
+        if (window.sidebar && window.sidebar.addPanel) { // Firefox
+            window.sidebar.addPanel(document.title, window.location.href, "");
+        } else if(window.external && ('AddFavorite' in window.external)) { // IE (who's still using this in current year)
+            window.external.AddFavorite(location.href,document.title);
+        } else if(window.opera && window.print) { // Opera
+            this.title=document.title;
+        return true;
+            } else { // webkit - safari/chrome/anything else really
+        alert('This is the \"Add to Bookmarks\" button! Once bookmarked, you can visit this page without having to remember the URL or port number.\n\n\
+- If you\'re on a computer, press ' + (navigator.userAgent.toLowerCase().indexOf('mac') != - 1 ? 'Command/Cmd' : 'CTRL') + ' + D to bookmark this page.\n\
+- If you\'re using a mobile device, open your browser\'s menu and select the option to bookmark this page.');
+    }
+  });
     function updateStatusIndicator() {
         fetch(statusURL).then(r => r.json()).then(data => {
             let status = data.status;
