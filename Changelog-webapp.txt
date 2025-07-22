@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.6.3 - 2025-07-22
+    - Minor text tweaks
+
 v.0.6.2 - 2025-07-20
     - Some layout tweaks to support really small mobile screens (eg. 320x480)
     - Additional text tweaks for some pages

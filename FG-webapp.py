@@ -16,7 +16,7 @@ import subprocess
 import requests
 import psutil
 
-VERSION = "v.0.6.2 --- 2025-07-20"
+VERSION = "v.0.6.3 --- 2025-07-22"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
