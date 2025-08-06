@@ -16,7 +16,7 @@ import subprocess
 import requests
 import psutil
 
-VERSION = "v.0.6.4 --- 2025-08-06"
+VERSION = "v.0.6.5 --- 2025-08-06"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -678,12 +678,21 @@ def send_update_input():
 #     except Exception:
 #         return ''
 
+remote_ver = None
+remote_changelog = None
 @app.route('/updates/check', methods=['POST'])
 def check_for_updates():
+    global remote_ver, remote_changelog
     # Fetch remote version and changelog
     try:
-        remote_ver = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version', timeout=10).text.strip()
-        remote_changelog = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt', timeout=10).text
+        if remote_ver is None:
+            remote_ver = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version', timeout=10).text.strip()
+            remote_changelog = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt', timeout=10).text
+        else:
+            remote_ver_ = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version', timeout=10).text.strip()
+            if remote_ver_ != remote_ver:
+                remote_ver = remote_ver_
+                remote_changelog = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt', timeout=10).text
     except Exception as e:
         return jsonify({'error': f'Failed to fetch remote files: {e}'}), 500
     local_ver = get_version()

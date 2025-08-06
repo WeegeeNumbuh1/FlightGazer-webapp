@@ -81,8 +81,9 @@
             </div>
             <div class="mt-3">
                 <label for="API_DAILY_LIMIT" class="form-label setting-label">API Daily Limit</label>
-                <div class="help-text">Type in an integer to limit the amount of API calls in a day.<br>Leave blank for unlimited calls.</div>
-                <input type="number" step="1" class="form-control" id="API_DAILY_LIMIT" name="API_DAILY_LIMIT" value="{{ config.API_DAILY_LIMIT or '' }}" maxlength="5">
+                <div class="help-text">Type in an integer to limit the amount of API calls in a day.<br>
+                Leave this blank for unlimited calls.</div>
+                <input type="number" step="1" class="form-control" id="API_DAILY_LIMIT" name="API_DAILY_LIMIT" value="{{ config.API_DAILY_LIMIT or '' }}" min="1" max="10000">
             </div>
             <div class="mt-3">
                 <label for="API_COST_LIMIT" class="form-label setting-label">API Cost Limit</label>
@@ -90,7 +91,7 @@
                 If the cost exceeds this value, API calls will stop and will not resume until there are credits available again.<br>
                 If the cost upon startup exceeds this value, the API will not be used but will start if there are credits available at a later time.<br>
                 Leave this blank to have no limit.</div>
-                <input type="number" step="0.01" class="form-control" id="API_COST_LIMIT" name="API_COST_LIMIT" value="{{ config.API_COST_LIMIT }}" maxlength="10">
+                <input type="number" step="0.01" class="form-control" id="API_COST_LIMIT" name="API_COST_LIMIT" value="{{ config.API_COST_LIMIT }}" min="0.01" max="10000">
             </div>
             <div class="mt-3">
                 <label class="form-label setting-label">API Schedule</label>
@@ -130,7 +131,7 @@
                     <input class="form-check-input" type="checkbox" id="JOURNEY_PLUS" name="JOURNEY_PLUS" {% if config.JOURNEY_PLUS %}checked{% endif %}>
                     <label class="form-check-label setting-label" for="JOURNEY_PLUS">Journey Plus</label>
                 </div>
-                <div class="help-text">A hybrid between Enhanced Readout and the default journey display.<br>Adds track, vertical speed, RSSI.<br>
+                <div class="help-text">A hybrid between <code>Enhanced Readout</code> and the default journey display.<br>Adds track, vertical speed, RSSI.<br>
                 Recommended if you prefer information density.</div>
             </div>
             <div class="mt-3">
@@ -146,8 +147,8 @@
                     <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT_AS_FALLBACK" name="ENHANCED_READOUT_AS_FALLBACK" {% if config.ENHANCED_READOUT_AS_FALLBACK %}checked{% endif %}>
                     <label class="form-check-label setting-label" for="ENHANCED_READOUT_AS_FALLBACK">Enhanced Readout as Fallback</label>
                 </div>
-                <div class="help-text">Switch to Enhanced Readout if API fails on startup or any of the API limits are reached.<br>
-                Only works when Enhanced Readout is disabled.<br>
+                <div class="help-text">Switch to <code>Enhanced Readout</code> if API fails on startup or any of the API limits are reached.<br>
+                Only works when <code>Enhanced Readout</code> is disabled.<br>
                 Recommended to be left enabled.</div>
             </div>
             <div class="mt-3">
@@ -156,8 +157,8 @@
                     <label class="form-check-label setting-label" for="SHOW_EVEN_MORE_INFO">Show Even More Info</label>
                 </div>
                 <div class="help-text">Display additional info such as aircraft type, airline, owner, and journey details as a scrolling marquee/ticker.<br>
-                Only works with the Journey Plus or Enhanced Readout modes.<br>
-                Replaces ground track and vertical speed readout in Journey Plus.</div>
+                Only works with the <code>Journey Plus</code> or <code>Enhanced Readout</code> modes.<br>
+                Replaces ground track and vertical speed readout in <code>Journey Plus.</code></div>
             </div>
             <div class="mt-3">
                 <div class="form-check">
@@ -218,14 +219,14 @@
                     <label class="form-check-label setting-label" for="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE">Active Plane Display Brightness</label>
                 </div>
                 <div class="help-text">Use a different brightness when tracking an aircraft. Toggle to enable and set value.<br>
-                This setting is unaffected by Dynamic Brightness.</div>
+                This setting is unaffected by <code>Dynamic Brightness</code>.</div>
                 <input type="range" class="form-range" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}>
                 <output id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value">{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}</output>
             </div>
             <div class="mt-3">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="ENABLE_TWO_BRIGHTNESS" name="ENABLE_TWO_BRIGHTNESS" {% if config.ENABLE_TWO_BRIGHTNESS %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="ENABLE_TWO_BRIGHTNESS">Enable Dynamic Brightness</label>
+                    <label class="form-check-label setting-label" for="ENABLE_TWO_BRIGHTNESS">Dynamic Brightness</label>
                 </div>
                 <div class="help-text">Enable dynamic switching of brightness based on time of day.<br>
                 If this setting is disabled, the below settings won't do anything.</div>
@@ -248,7 +249,7 @@
                 <label class="form-label setting-label">Brightness Switch Time</label>
                 <div class="help-text">Set the time of day to switch brightness levels.<br>
                 This setting is the fallback in case sunrise and sunset times can't be determined for your location.<br>
-                If this setting is left blank, Dynamic Brightness will not work.</div>
+                If this setting is left blank, <code>Dynamic Brightness</code> will not work.</div>
                 <div class="row g-2">
                     <div class="col">
                         <label for="BRIGHTNESS_SWITCH_TIME_Sunrise" class="form-label">Sunrise</label>
@@ -284,7 +285,7 @@
                     <label class="form-check-label setting-label" for="PREFER_LOCAL">Prefer Local</label>
                 </div>
                 <div class="help-text">Read dump1090 data from local file system first.<br>
-                Disable this if you're using a custom dump1090 location.
+                Disable this if you're using a custom dump1090 location.<br>
                 <i>Default: Enabled</i></div>
             </div>
             <div class="mt-3">
@@ -304,9 +305,9 @@
             <div class="mt-3">
                 <label for="FOLLOW_THIS_AIRCRAFT" class="form-label setting-label">Follow This Aircraft</label>
                 <div class="help-text">ICAO hex ID of a specific aircraft to follow. Leave this blank to not use this feature.<br>
-                When this aircraft enters the reception area for your ADS-B receiver (not the values set by Height Limit or Range),<br>
-                FlightGazer will start tracking it as if it were inside your designated Range.<br>
-                When tracking this aircraft, Enhanced Readout will be used regardless of the setting for that option<br>
+                When this aircraft enters the reception area for your ADS-B receiver (not the values set by <code>Height Limit</code> or <code>Range</code>),<br>
+                FlightGazer will start tracking it as if it were inside your designated <code>Range</code>.<br>
+                When tracking this aircraft, <code>Enhanced Readout</code> will be used regardless of the setting for that option<br>
                 and will append a "*" on the aircraft's callsign. This does not disable API use when this aircraft is being tracked.</div>
                 <input type="text" class="form-control" id="FOLLOW_THIS_AIRCRAFT" name="FOLLOW_THIS_AIRCRAFT" value="{{ config.FOLLOW_THIS_AIRCRAFT }}" style="font-family: monospace;" maxlength="6" pattern="[0-9a-fA-F]+">
                 <style>

@@ -5,6 +5,12 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.6.5 - 2025-08-06
+    - Add option to read full changelog when checking for updates
+    - When downloading the latest changelog, the result is now cached
+    - Set limits for numerical input fields
+    - More text tweaks
+
 v.0.6.4 - 2025-08-06
     - Better explanations with some settings and more text tweaks
 
