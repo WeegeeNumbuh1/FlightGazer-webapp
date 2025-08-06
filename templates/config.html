@@ -94,7 +94,8 @@
             </div>
             <div class="mt-3">
                 <label class="form-label setting-label">API Schedule</label>
-                <div class="help-text">Set hours when the API can be used.</div>
+                <div class="help-text">Set hours when the API can be used.<br>
+                If this setting is disabled, the API can be used at all times.</div>
                 <div class="form-check form-switch mb-2">
                     <input class="form-check-input" type="checkbox" id="API_SCHEDULE_ENABLED" name="API_SCHEDULE_ENABLED" {% if config.API_SCHEDULE.ENABLED %}checked{% endif %}>
                     <label class="form-check-label" for="API_SCHEDULE_ENABLED">Enable API Schedule</label>
@@ -246,7 +247,8 @@
             <div class="mt-3">
                 <label class="form-label setting-label">Brightness Switch Time</label>
                 <div class="help-text">Set the time of day to switch brightness levels.<br>
-                This setting is the fallback in case sunrise and sunset times can't be determined for your location.</div>
+                This setting is the fallback in case sunrise and sunset times can't be determined for your location.<br>
+                If this setting is left blank, Dynamic Brightness will not work.</div>
                 <div class="row g-2">
                     <div class="col">
                         <label for="BRIGHTNESS_SWITCH_TIME_Sunrise" class="form-label">Sunrise</label>
@@ -264,13 +266,15 @@
             <div class="mt-3">
                 <label for="FLYBY_STALENESS" class="form-label setting-label">Flyby Staleness</label>
                 <div class="help-text">Time in minutes before a flyby is considered new.<br>
-                Affects the daily flyby count and number of API calls in a day.</div>
+                Affects the daily flyby count and number of API calls in a day.<br>
+                <i>Default: 60</i></div>
                 <input type="range" class="form-range" min="2" max="1440" id="FLYBY_STALENESS" name="FLYBY_STALENESS" value="{{ config.FLYBY_STALENESS }}" oninput="FLYBY_STALENESS_value.value = this.value">
                 <output id="FLYBY_STALENESS_value">{{ config.FLYBY_STALENESS }}</output>
             </div>
             <div class="mt-3">
                 <label for="LOCATION_TIMEOUT" class="form-label setting-label">Location Timeout</label>
-                <div class="help-text">Time in seconds before an aircraft's location is considered stale and is discarded from the total tracking count.</div>
+                <div class="help-text">Time in seconds before an aircraft's location is considered stale and is discarded from the total tracking count.<br>
+                <i>Default: 60</i></div>
                 <input type="range" class="form-range" min="15" max="60" id="LOCATION_TIMEOUT" name="LOCATION_TIMEOUT" value="{{ config.LOCATION_TIMEOUT }}" oninput="LOCATION_TIMEOUT_value.value = this.value">
                 <output id="LOCATION_TIMEOUT_value">{{ config.LOCATION_TIMEOUT }}</output>
             </div>
@@ -280,17 +284,20 @@
                     <label class="form-check-label setting-label" for="PREFER_LOCAL">Prefer Local</label>
                 </div>
                 <div class="help-text">Read dump1090 data from local file system first.<br>
-                Disable this if you're using a custom dump1090 location.</div>
+                Disable this if you're using a custom dump1090 location.
+                <i>Default: Enabled</i></div>
             </div>
             <div class="mt-3">
                 <label for="CUSTOM_DUMP1090_LOCATION" class="form-label setting-label">Custom dump1090 Location</label>
                 <div class="help-text">URL of your dump1090 install if it's in a different location or on a different network device.<br>
+                Leave this blank to not use this feature.<br>
                 <i>Example: http://localhost/custom_name_here</i> or <i>http://192.168.xxx.xxx:8080 (no trailing /)</i></div>
                 <input type="text" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION" value="{{ config.CUSTOM_DUMP1090_LOCATION }}" style="font-family: monospace;">
             </div>
             <div class="mt-3">
                 <label for="CUSTOM_DUMP978_LOCATION" class="form-label setting-label">Custom dump978 Location</label>
                 <div class="help-text">URL of your dump978 install if it's in a different location or on a different network device.<br>
+                Leave this blank to not use this feature.<br>
                 <i>Example: http://192.168.xxx.xxx:8978</i></div>
                 <input type="text" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION" value="{{ config.CUSTOM_DUMP978_LOCATION }}" style="font-family: monospace;">
             </div>

@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.6.4 - 2025-08-06
+    - Better explanations with some settings and more text tweaks
+
 v.0.6.3 - 2025-07-22
     - Minor text tweaks
 
