@@ -5,6 +5,18 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.7.0 - 2025-08-22
+    - On the landing page, there are now dynamically generated links that lead to
+      other related webpages served by the same system
+      - Links to adsb.im homepage, PiAware, tar1090, graphs1090, and/or RGBMatrixEmulator, if present
+    - Configuration page improvements:
+        - Sliders now have editable inputs in the configuration page where necessary
+        - Basic form validation is now present
+        - Colors tab now has a better layout on mobile
+        - A partial rewrite to some settings' help text for better clarity
+        - The range or height limit sliders now adjust their limits based on the selected units
+    - Layout improvements for the landing page
+
 v.0.6.5 - 2025-08-06
     - Add option to read full changelog when checking for updates
     - When downloading the latest changelog, the result is now cached

@@ -50,7 +50,7 @@
         <div class="tab-pane fade show active" id="general" role="tabpanel">
             <div class="mt-3">
                 <label for="units" class="form-label setting-label">Units</label>
-                <div class="help-text"><ul><li>Aeronautical (nmi, ft, kt)</li><li>Metric (km, m, km/h)</li><li>Imperial (mi, ft, mph)</li></ul></div>
+                <div class="help-text"><ul><li>Aeronautical (nmi, ft, kt) [default]</li><li>Metric (km, m, km/h)</li><li>Imperial (mi, ft, mph)</li></ul></div>
                 <select class="form-select" id="UNITS" name="UNITS">
                     <option value="0" {% if config.UNITS == 0 %}selected{% endif %}>Aeronautical</option>
                     <option value="1" {% if config.UNITS == 1 %}selected{% endif %}>Metric</option>
@@ -59,15 +59,28 @@
             </div>
             <div class="mt-3">
                 <label for="HEIGHT_LIMIT" class="form-label setting-label">Height Limit</label>
-                <div class="help-text">Filter out aircraft at an altitude higher than this for detailed tracking. (Feet or meters, based on above units)</div>
-                <input type="range" class="form-range" min="2500" max="75000" step="100" id="HEIGHT_LIMIT" name="HEIGHT_LIMIT" value="{{ config.HEIGHT_LIMIT }}" oninput="HEIGHT_LIMIT_value.value = this.value">
-                <output id="HEIGHT_LIMIT_value">{{ config.HEIGHT_LIMIT }}</output>
+                <div class="help-text">Aircraft at an altitude lower than this will be considered for detailed tracking on the display. (Feet or meters, based on above units)<br>
+                <i>Default: 15000 feet</i></div>
+                <div class="input-group">
+                    <!-- Limits when (UNITS = 0 or 2): min="2500", max="75000"
+                    (UNITS = 1): min="760", max="22860" -->
+                    <input type="range" class="form-range" min="2500" max="75000" step="5" id="HEIGHT_LIMIT" name="HEIGHT_LIMIT" value="{{ config.HEIGHT_LIMIT }}" oninput="HEIGHT_LIMIT_num.value = this.value">
+                    <input type="number" class="form-control" min="2500" max="75000" step="5" id="HEIGHT_LIMIT_num" value="{{ config.HEIGHT_LIMIT }}" style="max-width:100px; margin-left:8px;" oninput="HEIGHT_LIMIT.value = this.value">
+                </div>
             </div>
             <div class="mt-3">
                 <label for="RANGE" class="form-label setting-label">Range</label>
-                <div class="help-text">Radius for detailed tracking of aircraft. (nmi, km, or mi based on above units)</div>
-                <input type="range" class="form-range" min="0.5" max="20" step="0.1" id="RANGE" name="RANGE" value="{{ config.RANGE }}" oninput="RANGE_value.value = this.value">
-                <output id="RANGE_value">{{ config.RANGE }}</output>
+                <div class="help-text">Aircraft within this radius from your location will be considered for detailed tracking on the display. (nmi, km, or mi, based on above units)<br>
+                This setting does not limit the range of your receiver.<br>
+                <i>If you are near an airport or inline with a runway, 2 nmi (2.3 mi, 3.7 km) or less works best.</i></div>
+                <div class="input-group">
+                    <!-- Limits when (UNITS = 0): min="0.5" max="20"
+                    (UNITS = 1): min="0.9" max="37"
+                    (UNITS = 2): min="0.6" max="23" -->
+                    <input type="range" class="form-range" min="0.5" max="20" step="0.1" id="RANGE" name="RANGE" value="{{ config.RANGE }}" oninput="RANGE_num.value = this.value">
+                    <input type="number" class="form-control" min="0.5" max="20" step="0.1" id="RANGE_num" value="{{ config.RANGE }}" style="max-width:100px; margin-left:8px;" oninput="RANGE.value = this.value">
+                    <!-- <output id="RANGE_value" style="margin-left:8px;">{{ config.RANGE }}</output> -->
+                </div>
             </div>
         </div>
         <!-- API Tab -->
@@ -76,7 +89,7 @@
                 <label for="API_KEY" class="form-label setting-label">API Key</label>
                 <div class="help-text">Put your FlightAware API key here. Leave as blank to not use the API.<br>
                 <h5>Having an API key will enable the journey readout (the origin and departure) data for an aircraft.</h5><br>
-                Don't have one? Sign up at <a href="https://www.flightaware.com/commercial/aeroapi/#compare-plans-section">FlightAware</a>. (There is a free tier, billing information required)</div>
+                Don't have one? Sign up at <a href="https://www.flightaware.com/commercial/aeroapi/#compare-plans-section" target="_blank" rel="noopener noreferrer">FlightAware</a>. (There is a free tier, billing information required)</div>
                 <input type="text" class="form-control" id="API_KEY" name="API_KEY" value="{{ config.API_KEY }}" style="font-family: monospace;">
             </div>
             <div class="mt-3">
@@ -87,7 +100,7 @@
             </div>
             <div class="mt-3">
                 <label for="API_COST_LIMIT" class="form-label setting-label">API Cost Limit</label>
-                <div class="help-text">Limit API usage of an API key based on its running cost over the past 30 days. (ex: $10.00)<br>
+                <div class="help-text">Limit API usage of the provided API key based on its running cost over the past 30 days. (ex: $10.00)<br>
                 If the cost exceeds this value, API calls will stop and will not resume until there are credits available again.<br>
                 If the cost upon startup exceeds this value, the API will not be used but will start if there are credits available at a later time.<br>
                 Leave this blank to have no limit.</div>
@@ -96,7 +109,9 @@
             <div class="mt-3">
                 <label class="form-label setting-label">API Schedule</label>
                 <div class="help-text">Set hours when the API can be used.<br>
-                If this setting is disabled, the API can be used at all times.</div>
+                If this setting is disabled, the API can be used at all times.<br>
+                <i>On mobile screens, you might need to scroll to the right →</i>
+            </div>
                 <div class="form-check form-switch mb-2">
                     <input class="form-check-input" type="checkbox" id="API_SCHEDULE_ENABLED" name="API_SCHEDULE_ENABLED" {% if config.API_SCHEDULE.ENABLED %}checked{% endif %}>
                     <label class="form-check-label" for="API_SCHEDULE_ENABLED">Enable API Schedule</label>
@@ -131,7 +146,7 @@
                     <input class="form-check-input" type="checkbox" id="JOURNEY_PLUS" name="JOURNEY_PLUS" {% if config.JOURNEY_PLUS %}checked{% endif %}>
                     <label class="form-check-label setting-label" for="JOURNEY_PLUS">Journey Plus</label>
                 </div>
-                <div class="help-text">A hybrid between <code>Enhanced Readout</code> and the default journey display.<br>Adds track, vertical speed, RSSI.<br>
+                <div class="help-text">A hybrid between <code>Enhanced Readout</code> and the default journey (origin/destination) display.<br>Adds track, vertical speed, RSSI.<br>
                 Recommended if you prefer information density.</div>
             </div>
             <div class="mt-3">
@@ -139,7 +154,7 @@
                     <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT" name="ENHANCED_READOUT" {% if config.ENHANCED_READOUT %}checked{% endif %}>
                     <label class="form-check-label setting-label" for="ENHANCED_READOUT">Enhanced Readout</label>
                 </div>
-                <div class="help-text">Replaces the default journey readout with aircraft coordinates, ground track, vertical speed, and RSSI.<br>
+                <div class="help-text">Replaces the default journey (origin/destination) readout with aircraft coordinates, ground track, vertical speed, and RSSI.<br>
                     When enabled, disables the API even if a valid key is present.</div>
             </div>
             <div class="mt-3">
@@ -149,7 +164,7 @@
                 </div>
                 <div class="help-text">Switch to <code>Enhanced Readout</code> if API fails on startup or any of the API limits are reached.<br>
                 Only works when <code>Enhanced Readout</code> is disabled.<br>
-                Recommended to be left enabled.</div>
+                This setting is recommended to be left enabled.</div>
             </div>
             <div class="mt-3">
                 <div class="form-check">
@@ -158,7 +173,7 @@
                 </div>
                 <div class="help-text">Display additional info such as aircraft type, airline, owner, and journey details as a scrolling marquee/ticker.<br>
                 Only works with the <code>Journey Plus</code> or <code>Enhanced Readout</code> modes.<br>
-                Replaces ground track and vertical speed readout in <code>Journey Plus.</code></div>
+                Replaces ground track and vertical speed readout in <code>Journey Plus</code>.</div>
             </div>
             <div class="mt-3">
                 <div class="form-check">
@@ -210,8 +225,11 @@
             <div class="mt-3">
                 <label for="BRIGHTNESS" class="form-label setting-label">Brightness</label>
                 <div class="help-text">Set the default LED brightness.</div>
-                <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS" name="BRIGHTNESS" value="{{ config.BRIGHTNESS }}" oninput="BRIGHTNESS_value.value = this.value">
-                <output id="BRIGHTNESS_value">{{ config.BRIGHTNESS }}</output>
+                <div class="input-group">
+                    <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS" name="BRIGHTNESS" value="{{ config.BRIGHTNESS }}" oninput="BRIGHTNESS_value.value = this.value; BRIGHTNESS_num.value = this.value">
+                    <!-- <input type="number" class="form-control" min="0" max="100" id="BRIGHTNESS_num" value="{{ config.BRIGHTNESS }}" style="max-width:100px; margin-left:8px;" oninput="BRIGHTNESS.value = this.value; BRIGHTNESS_value.value = this.value"> -->
+                    <output id="BRIGHTNESS_value" style="margin-left:8px;">{{ config.BRIGHTNESS }}</output>
+                </div>
             </div>
             <div class="mt-3">
                 <div class="form-check form-switch">
@@ -220,8 +238,11 @@
                 </div>
                 <div class="help-text">Use a different brightness when tracking an aircraft. Toggle to enable and set value.<br>
                 This setting is unaffected by <code>Dynamic Brightness</code>.</div>
-                <input type="range" class="form-range" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}>
-                <output id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value">{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}</output>
+                <div class="input-group">
+                    <input type="range" class="form-range" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}>
+                    <!-- <input type="number" class="form-control" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" style="max-width:100px; margin-left:8px;" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}> -->
+                    <output id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value" style="margin-left:8px;">{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}</output>
+                </div>
             </div>
             <div class="mt-3">
                 <div class="form-check">
@@ -234,8 +255,11 @@
             <div class="mt-3">
                 <label for="BRIGHTNESS_2" class="form-label setting-label">Secondary Brightness</label>
                 <div class="help-text">Used from sunset to sunrise ("night").</div>
-                <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS_2" name="BRIGHTNESS_2" value="{{ config.BRIGHTNESS_2 }}" oninput="BRIGHTNESS_2_value.value = this.value">
-                <output id="BRIGHTNESS_2_value">{{ config.BRIGHTNESS_2 }}</output>
+                <div class="input-group">
+                    <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS_2" name="BRIGHTNESS_2" value="{{ config.BRIGHTNESS_2 }}" oninput="BRIGHTNESS_2_value.value = this.value; BRIGHTNESS_2_num.value = this.value">
+                    <!-- <input type="number" class="form-control" min="0" max="100" id="BRIGHTNESS_2_num" value="{{ config.BRIGHTNESS_2 }}" style="max-width:100px; margin-left:8px;" oninput="BRIGHTNESS_2.value = this.value; BRIGHTNESS_2_value.value = this.value"> -->
+                    <output id="BRIGHTNESS_2_value" style="margin-left:8px;">{{ config.BRIGHTNESS_2 }}</output>
+                </div>
             </div>
             <div class="mt-3">
                 <div class="form-check">
@@ -249,7 +273,7 @@
                 <label class="form-label setting-label">Brightness Switch Time</label>
                 <div class="help-text">Set the time of day to switch brightness levels.<br>
                 This setting is the fallback in case sunrise and sunset times can't be determined for your location.<br>
-                If this setting is left blank, <code>Dynamic Brightness</code> will not work.</div>
+            </div>
                 <div class="row g-2">
                     <div class="col">
                         <label for="BRIGHTNESS_SWITCH_TIME_Sunrise" class="form-label">Sunrise</label>
@@ -269,15 +293,21 @@
                 <div class="help-text">Time in minutes before a flyby is considered new.<br>
                 Affects the daily flyby count and number of API calls in a day.<br>
                 <i>Default: 60</i></div>
-                <input type="range" class="form-range" min="2" max="1440" id="FLYBY_STALENESS" name="FLYBY_STALENESS" value="{{ config.FLYBY_STALENESS }}" oninput="FLYBY_STALENESS_value.value = this.value">
-                <output id="FLYBY_STALENESS_value">{{ config.FLYBY_STALENESS }}</output>
+                <div class="input-group">
+                    <input type="range" class="form-range" min="2" max="1440" id="FLYBY_STALENESS" name="FLYBY_STALENESS" value="{{ config.FLYBY_STALENESS }}" oninput="FLYBY_STALENESS_num.value = this.value">
+                    <input type="number" class="form-control" min="2" max="1440" id="FLYBY_STALENESS_num" value="{{ config.FLYBY_STALENESS }}" style="max-width:100px; margin-left:8px;" oninput="FLYBY_STALENESS.value = this.value; FLYBY_STALENESS_value.value = this.value">
+                    <!-- <output id="FLYBY_STALENESS_value" style="margin-left:8px;">{{ config.FLYBY_STALENESS }}</output> -->
+                </div>
             </div>
             <div class="mt-3">
                 <label for="LOCATION_TIMEOUT" class="form-label setting-label">Location Timeout</label>
                 <div class="help-text">Time in seconds before an aircraft's location is considered stale and is discarded from the total tracking count.<br>
                 <i>Default: 60</i></div>
-                <input type="range" class="form-range" min="15" max="60" id="LOCATION_TIMEOUT" name="LOCATION_TIMEOUT" value="{{ config.LOCATION_TIMEOUT }}" oninput="LOCATION_TIMEOUT_value.value = this.value">
-                <output id="LOCATION_TIMEOUT_value">{{ config.LOCATION_TIMEOUT }}</output>
+                <div class="input-group">
+                    <input type="range" class="form-range" min="15" max="60" id="LOCATION_TIMEOUT" name="LOCATION_TIMEOUT" value="{{ config.LOCATION_TIMEOUT }}" oninput="LOCATION_TIMEOUT_value.value = this.value; LOCATION_TIMEOUT_num.value = this.value">
+                    <!-- <input type="number" class="form-control" min="15" max="60" id="LOCATION_TIMEOUT_num" value="{{ config.LOCATION_TIMEOUT }}" style="max-width:100px; margin-left:8px;" oninput="LOCATION_TIMEOUT.value = this.value; LOCATION_TIMEOUT_value.value = this.value"> -->
+                    <output id="LOCATION_TIMEOUT_value" style="margin-left:8px;">{{ config.LOCATION_TIMEOUT }}</output>
+                </div>
             </div>
             <div class="mt-3">
                 <div class="form-check">
@@ -347,10 +377,13 @@
             </div>
             <div class="mt-3">
                 <label for="GPIO_SLOWDOWN" class="form-label setting-label">GPIO Slowdown</label>
-                <div class="help-text">Set for your setup. Higher for faster Raspberry Pi's.<br>
+                <div class="help-text">Set for your setup. Higher values are used for faster Raspberry Pi's.<br>
                 <i>Default: 2</i></div>
-                <input type="range" class="form-range" min="0" max="4" id="GPIO_SLOWDOWN" name="GPIO_SLOWDOWN" value="{{ config.GPIO_SLOWDOWN }}" oninput="GPIO_SLOWDOWN_value.value = this.value">
-                <output id="GPIO_SLOWDOWN_value">{{ config.GPIO_SLOWDOWN }}</output>
+                <div class="input-group">
+                    <input type="range" class="form-range" min="0" max="4" id="GPIO_SLOWDOWN" name="GPIO_SLOWDOWN" value="{{ config.GPIO_SLOWDOWN }}" oninput="GPIO_SLOWDOWN_value.value = this.value">
+                    <!-- <input type="number" class="form-control" min="0" max="4" id="GPIO_SLOWDOWN_num" value="{{ config.GPIO_SLOWDOWN }}" style="max-width:100px; margin-left:8px;" oninput="GPIO_SLOWDOWN.value = this.value; GPIO_SLOWDOWN_value.value = this.value"> -->
+                    <output id="GPIO_SLOWDOWN_value" style="margin-left:8px;">{{ config.GPIO_SLOWDOWN }}</output>
+                </div>
             </div>
             <div class="mt-3">
                 <div class="form-check">
@@ -364,8 +397,11 @@
                 <label for="LED_PWM_BITS" class="form-label setting-label">LED PWM Bits</label>
                 <div class="help-text">Lower values enable higher refresh rates on the physical RGB-Matrix but there is less color depth.<br>
                 <i>Should be left at '8' (default) in most cases.</i></div>
-                <input type="range" class="form-range" min="1" max="11" id="LED_PWM_BITS" name="LED_PWM_BITS" value="{{ config.LED_PWM_BITS }}" oninput="LED_PWM_BITS_value.value = this.value">
-                <output id="LED_PWM_BITS_value">{{ config.LED_PWM_BITS }}</output>
+                <div class="input-group">
+                    <input type="range" class="form-range" min="1" max="11" id="LED_PWM_BITS" name="LED_PWM_BITS" value="{{ config.LED_PWM_BITS }}" oninput="LED_PWM_BITS_value.value = this.value">
+                    <!-- <input type="number" class="form-control" min="1" max="11" id="LED_PWM_BITS_num" value="{{ config.LED_PWM_BITS }}" style="max-width:100px; margin-left:8px;" oninput="LED_PWM_BITS.value = this.value; LED_PWM_BITS_value.value = this.value"> -->
+                    <output id="LED_PWM_BITS_value" style="margin-left:8px;">{{ config.LED_PWM_BITS }}</output>
+                </div>
             </div>
         </div>
         <!-- Colors Tab -->
@@ -391,7 +427,7 @@
             <div class="col-4">
                 <label class="form-label">{{ label }}</label>
             </div>
-            <div class="col-5 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
                 {% for cname in predefined_colors %}
                     <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
@@ -416,7 +452,7 @@
             <div class="col-4">
                 <label class="form-label">{{ label }}</label>
             </div>
-            <div class="col-5 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
                 {% for cname in predefined_colors %}
                     <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
@@ -440,7 +476,7 @@
             <div class="col-4">
                 <label class="form-label">{{ label }}</label>
             </div>
-            <div class="col-5 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
                 {% for cname in predefined_colors %}
                     <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
@@ -464,7 +500,7 @@
             <div class="col-4">
                 <label class="form-label">{{ label }}</label>
             </div>
-            <div class="col-5 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
                 {% for cname in predefined_colors %}
                     <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
@@ -489,7 +525,7 @@
             <div class="col-4">
                 <label class="form-label">{{ label }}</label>
             </div>
-            <div class="col-5 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
                 {% for cname in predefined_colors %}
                     <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
@@ -512,7 +548,7 @@
             <div class="col-4">
                 <label class="form-label">{{ label }}</label>
             </div>
-            <div class="col-5 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
                 {% for cname in predefined_colors %}
                     <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
@@ -539,7 +575,7 @@
             <div class="col-4">
                 <label class="form-label">{{ label }}</label>
             </div>
-            <div class="col-5 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
                 {% for cname in predefined_colors %}
                     <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
@@ -562,7 +598,7 @@
             <div class="col-4">
                 <label class="form-label">{{ label }}</label>
             </div>
-            <div class="col-5 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
                 {% for cname in predefined_colors %}
                     <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
@@ -577,8 +613,8 @@
         </div>
         </div>
     </div>
-    <button type="button" class="btn btn-primary apply-btn" id="applyBtn">Save Settings</button>
-    <button type="button" class="btn btn-warning" id="restartReminderBtn" style="display:none; position:fixed; bottom:72px; right:24px; z-index:9999;">Restart FlightGazer to apply changes</button>
+    <button type="button" class="btn btn-primary apply-btn" id="applyBtn" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Save Settings</button>
+    <button type="button" class="btn btn-warning" id="restartReminderBtn" style="display:none; position:fixed; bottom:72px; right:24px; z-index:9999; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Restart FlightGazer to apply changes</button>
     </form>
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
 </div>
@@ -588,6 +624,57 @@
 const updateConfigURL = "{{ url_for('update_config') }}";
 const restartService = "{{ url_for('restart_flightgazer') }}";
 $(document).ready(function() {
+    // Dynamically adjust HEIGHT_LIMIT and RANGE min/max based on selected units
+    function updateLimits() {
+        var units = parseInt($('#UNITS').val());
+        // HEIGHT_LIMIT
+        var heightMin, heightMax, heightStep;
+        if (units === 1) { // metric
+            heightMin = 760;
+            heightMax = 22860;
+            heightStep = 5;
+        } else { // aeronautical or imperial
+            heightMin = 2500;
+            heightMax = 75000;
+            heightStep = 5;
+        }
+        $('#HEIGHT_LIMIT, #HEIGHT_LIMIT_num').attr({min: heightMin, max: heightMax, step: heightStep});
+        // Clamp value if out of bounds
+        var hVal = parseInt($('#HEIGHT_LIMIT').val());
+        if (hVal < heightMin || hVal > heightMax || isNaN(hVal)) {
+            $('#HEIGHT_LIMIT').val(heightMin);
+            $('#HEIGHT_LIMIT_num').val(heightMin);
+        }
+        // RANGE
+        var rangeMin, rangeMax, rangeStep;
+        switch(units) {
+            case 1: // metric
+                rangeMin = 0.9;
+                rangeMax = 37;
+                rangeStep = 0.1;
+            break;
+            case 2: // imperial
+                rangeMin = 0.6;
+                rangeMax = 23;
+                rangeStep = 0.1;
+            break;
+            default: // aeronautical or anything else
+                rangeMin = 0.5;
+                rangeMax = 20;
+                rangeStep = 0.1;
+        }
+        $('#RANGE, #RANGE_num').attr({min: rangeMin, max: rangeMax, step: rangeStep});
+        var rVal = parseFloat($('#RANGE').val());
+        if (rVal < rangeMin || rVal > rangeMax || isNaN(rVal)) {
+            $('#RANGE').val(rangeMin);
+            $('#RANGE_num').val(rangeMin);
+        }
+    }
+    $('#UNITS').on('change', function() {
+        updateLimits();
+    });
+    // Initial call
+    updateLimits();
     // Colors tab logic
     $('.color-select').on('change', function() {
         var v = $(this).val();
@@ -635,6 +722,121 @@ $(document).ready(function() {
     }
     $('#applyBtn').on('click', function() {
         let form = $('#configForm')[0];
+        let errors = [];
+        // Programmer's note: uncomment these if you decide to check these settings later
+        // do some basic input verification
+        // // Height Limit
+        // let heightLimit = parseInt(form.HEIGHT_LIMIT.value);
+        // if (isNaN(heightLimit) || heightLimit < 2500 || heightLimit > 75000) {
+        //     errors.push('Height Limit must be between 2500 and 75000.');
+        // }
+        // // Range
+        // let range = parseFloat(form.RANGE.value);
+        // if (isNaN(range) || range < 0.5 || range > 20) {
+        //     errors.push('Range must be between 0.5 and 20.');
+        // }
+        // // Brightness
+        // let brightness = parseInt(form.BRIGHTNESS.value);
+        // if (isNaN(brightness) || brightness < 0 || brightness > 100) {
+        //     errors.push('Brightness must be between 0 and 100.');
+        // }
+        // // Secondary Brightness
+        // if (form.BRIGHTNESS_2) {
+        //     let brightness2 = parseInt(form.BRIGHTNESS_2.value);
+        //     if (isNaN(brightness2) || brightness2 < 0 || brightness2 > 100) {
+        //         errors.push('Secondary Brightness must be between 0 and 100.');
+        //     }
+        // }
+        // // Active Plane Display Brightness
+        // if ($('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE').is(':checked')) {
+        //     let apdb = parseInt(form.ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value);
+        //     if (isNaN(apdb) || apdb < 0 || apdb > 100) {
+        //         errors.push('Active Plane Display Brightness must be between 0 and 100.');
+        //     }
+        // }
+        // // Flyby Staleness
+        // let flybyStaleness = parseInt(form.FLYBY_STALENESS.value);
+        // if (isNaN(flybyStaleness) || flybyStaleness < 2 || flybyStaleness > 1440) {
+        //     errors.push('Flyby Staleness must be between 2 and 1440.');
+        // }
+        // // Location Timeout
+        // let locationTimeout = parseInt(form.LOCATION_TIMEOUT.value);
+        // if (isNaN(locationTimeout) || locationTimeout < 15 || locationTimeout > 60) {
+        //     errors.push('Location Timeout must be between 15 and 60.');
+        // }
+        // // GPIO Slowdown
+        // let gpioSlowdown = parseInt(form.GPIO_SLOWDOWN.value);
+        // if (isNaN(gpioSlowdown) || gpioSlowdown < 0 || gpioSlowdown > 4) {
+        //     errors.push('GPIO Slowdown must be between 0 and 4.');
+        // }
+        // // LED PWM Bits
+        // if (form.LED_PWM_BITS) {
+        //     let ledPwmBits = parseInt(form.LED_PWM_BITS.value);
+        //     if (isNaN(ledPwmBits) || ledPwmBits < 1 || ledPwmBits > 11) {
+        //         errors.push('LED PWM Bits must be between 1 and 11.');
+        //     }
+        // }
+
+        // API Daily Limit
+        if (form.API_DAILY_LIMIT.value) {
+            let apiDailyLimit = parseInt(form.API_DAILY_LIMIT.value);
+            if (isNaN(apiDailyLimit) || apiDailyLimit < 1 || apiDailyLimit > 10000) {
+                errors.push('API Daily Limit must be between 1 and 10000.');
+            }
+        }
+        // API Cost Limit
+        if (form.API_COST_LIMIT.value) {
+            let apiCostLimit = parseFloat(form.API_COST_LIMIT.value);
+            if (isNaN(apiCostLimit) || apiCostLimit < 0.01 || apiCostLimit > 10000) {
+                errors.push('API Cost Limit must be between 0.01 and 10000.');
+            }
+        }
+        // Custom dump1090 location (basic URL check)
+        if (form.CUSTOM_DUMP1090_LOCATION.value && !/^https?:\/\/.+/.test(form.CUSTOM_DUMP1090_LOCATION.value)) {
+            errors.push('Custom dump1090 location must be a valid URL starting with http:// or https://');
+        }
+        // Custom dump978 location (basic URL check)
+        if (form.CUSTOM_DUMP978_LOCATION.value && !/^https?:\/\/.+/.test(form.CUSTOM_DUMP978_LOCATION.value)) {
+            errors.push('Custom dump978 location must be a valid URL starting with http:// or https://');
+        }
+        // Follow This Aircraft (hex check)
+        if (form.FOLLOW_THIS_AIRCRAFT.value && !/^[0-9a-fA-F]{1,6}$/.test(form.FOLLOW_THIS_AIRCRAFT.value)) {
+            errors.push('Follow This Aircraft must be a valid ICAO hex ID (6 hex digits).');
+        }
+        if (form.FOLLOW_THIS_AIRCRAFT.value && (form.FOLLOW_THIS_AIRCRAFT.value).length != 6) {
+            errors.push('Follow This Aircraft must be exactly 6 characters.')
+        }
+        // Brightness Switch Time
+        if (form.BRIGHTNESS_SWITCH_TIME_Sunrise && form.BRIGHTNESS_SWITCH_TIME_Sunset) {
+            let sunrise = form.BRIGHTNESS_SWITCH_TIME_Sunrise.value;
+            let sunset = form.BRIGHTNESS_SWITCH_TIME_Sunset.value;
+            // Check for valid HH:MM format
+            let timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
+            if (!timeRegex.test(sunrise)) {
+                errors.push('Sunrise time must be in HH:MM format (00:00 to 23:59).');
+            }
+            if (!timeRegex.test(sunset)) {
+                errors.push('Sunset time must be in HH:MM format (00:00 to 23:59).');
+            }
+            // Check that sunrise != sunset
+            if (sunrise && sunset && sunrise === sunset) {
+                errors.push('Sunrise and Sunset times must be different.');
+            }
+            // Check that sunrise does not occur after sunset
+            if (sunrise && sunset && timeRegex.test(sunrise) && timeRegex.test(sunset)) {
+                let sunriseParts = sunrise.split(':');
+                let sunsetParts = sunset.split(':');
+                let sunriseMinutes = parseInt(sunriseParts[0], 10) * 60 + parseInt(sunriseParts[1], 10);
+                let sunsetMinutes = parseInt(sunsetParts[0], 10) * 60 + parseInt(sunsetParts[1], 10);
+                if (sunriseMinutes > sunsetMinutes) {
+                    errors.push('Sunrise time must occur before Sunset time.');
+                }
+            }
+        }
+        if (errors.length > 0) {
+            alert('Please correct the following errors before saving:\n\n' + errors.join('\n'));
+            return;
+        }
         let data = {};
         data['UNITS'] = parseInt(form.UNITS.value);
         data['HEIGHT_LIMIT'] = parseInt(form.HEIGHT_LIMIT.value);

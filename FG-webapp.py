@@ -15,8 +15,10 @@ import queue
 import subprocess
 import requests
 import psutil
+import socket
+from time import sleep
 
-VERSION = "v.0.6.5 --- 2025-08-06"
+VERSION = "v.0.7.0 --- 2025-08-22"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -37,6 +39,11 @@ SERVICE_PATH = '/etc/systemd/system/flightgazer.service'
 # as now this working directory `web-app` no longer exists.
 INIT_PATH = os.path.join(os.path.dirname(os.getcwd()), 'FlightGazer-init.sh')
 UPDATE_PATH = os.path.join(os.path.dirname(__file__), '..', 'update.sh')
+CURRENT_IP = '' # local IP address of the system
+HOSTNAME = socket.gethostname()
+localpages = {}
+
+webapp_session = requests.session()
 
 yaml = YAML()
 yaml.preserve_quotes = True
@@ -173,6 +180,97 @@ def get_version():
     except Exception:
         return 'Unknown'
 
+def get_ip() -> None:
+    """ Gets us our local IP. Pulled exactly as is from the main FlightGazer script.
+    Modifies the global `CURRENT_IP` """
+    global CURRENT_IP
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        s.connect(('10.254.254.254', 1)) # doesn't even need to connect
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = ""
+    finally:
+        s.close()
+    CURRENT_IP = IP
+
+def local_webpage_prober() -> dict:
+    """ Probes what webpages are available running locally on this system.
+    Probes these key locations:
+    - Find adsb.im
+        - Either at root IP address or at port 1099
+
+    Note: if adsb.im is found, we don't search for tar1090 and graphs1090 as those are already linked
+    within adsb.im's pages.
+
+    - Find tar1090
+        - Either at /tar1090 or port 8080
+    - Find graphs1090
+        - Either at /graphs1090 or port 8542
+    - Port 8888
+        - The Display Emulator
+    Returns a dict, with the key-value pairs being the link name and URL.
+    """
+    pages = {}
+    def webpage_title(input: str) -> str | None:
+        """ Get the title of a webpage given `input` as a string. """
+        try:
+            response = webapp_session.get(input, timeout=0.5, allow_redirects=True)
+            # get the webpage title; https://stackoverflow.com/a/47236359
+            resp_body = response.text
+            title = re.search('(?<=<title>).+?(?=</title>)', resp_body, re.DOTALL).group().strip()
+            return title
+        except:
+            return None
+    # find adsb.im
+    adsbim = f"http://{CURRENT_IP}"
+    local_page = webpage_title(adsbim)
+    if local_page:
+        if "Feeder Homepage" in local_page:
+            pages.update({"System Configuration, Aircraft Map, and Stats": adsbim})
+        elif "PiAware" in local_page: # FlightAware's PiAware is running here
+            pages.update({"FlightAware PiAware page": adsbim})
+    else:
+        adsbim = f"http://{CURRENT_IP}:1099"
+        local_page = webpage_title(adsbim)
+        if local_page and "Feeder Homepage" in local_page:
+            pages.update({"System Configuration, Aircraft Map, and Stats": adsbim})
+    # try to find the display emulator
+    display_emulator = f"http://{CURRENT_IP}:8888"
+    rgbemulatorpage = webpage_title(display_emulator)
+    if rgbemulatorpage:
+        if "RGBME" in rgbemulatorpage:
+            pages.update({"RGBMatrixEmulator": display_emulator})
+        else:
+            display_emulator = f"http://localhost:8888"
+            rgbemulatorpage = webpage_title(display_emulator)
+            if rgbemulatorpage and "RGBME" in rgbemulatorpage:
+                pages.update({"RGBMatrixEmulator": display_emulator})
+    # find the rest of our stuff since adsb.im isn't available to us
+    if pages.get("System Configuration, Aircraft Map, and Stats") is None:
+        tar1090location = f"http://{CURRENT_IP}/tar1090"
+        tar1090page = webpage_title(tar1090location)
+        if tar1090page:
+            if "tar1090" in tar1090page:
+                pages.update({"tar1090 Tracking Interface": tar1090location})
+        else:
+            tar1090location = f"http://{CURRENT_IP}:8080"
+            tar1090page = webpage_title(tar1090location)
+            if tar1090page and "tar1090" in tar1090page:
+                pages.update({"tar1090 Tracking Interface": tar1090location})
+        graphs1090location = f"http://{CURRENT_IP}/graphs1090"
+        graphs1090page = webpage_title(graphs1090location)
+        if graphs1090page:
+            if "graphs1090" in graphs1090page:
+                pages.update({"graphs1090 Statistics Interface": graphs1090location})
+        else:
+            graphs1090location = f"http://{CURRENT_IP}:8542"
+            graphs1090page = webpage_title(graphs1090location)
+            if graphs1090page and "graphs1090" in graphs1090page:
+                pages.update({"graphs1090 Statistics Interface": graphs1090location})
+    return pages
+
 def match_commandline(command_search: str, process_name: str) -> int | None:
     """ Taken directly from `FlightGazer.py` but modified to only return the PID. 
     This must only be used when it's known that a single instance is running. """
@@ -264,13 +362,43 @@ def remove_ansi_escape(input: str) -> str:
     https://stackoverflow.com/a/14693789 """
     return ANSI_ESCAPE.sub('', input)
 
+# ========= Initialization Stuff =========
+get_ip()
+def probing_thread() -> None:
+    """ Probes available webpages: does an initial burst every
+    15 seconds for 5 minutes at startup (to wait for the other pages to start),
+    then updates once a day thereafter.
+    Modifies the `localpages` global. """
+    global localpages
+    initial_count = 0
+    while True:
+        localpages = local_webpage_prober()
+        initial_count += 1
+        if initial_count <= 20:
+            sleep(15)
+            get_ip()
+        else:
+            sleep(86400)
+
+def update_ip() -> None:
+    """ Check if the IP changes (every hour) """
+    while True:
+        # note we sleep first to let the probing thread
+        # update the IP when doing its initial burst
+        sleep(3600)
+        get_ip()
+
+threading.Thread(target=probing_thread, name='local-webpage-searcher', daemon=True).start()
+threading.Thread(target=update_ip, name='IP-watcher', daemon=True).start()
+
 # ========= Root Route =========
 
 @app.route('/')
 def landing_page():
     version = get_version()
     status = get_flightgazer_status()
-    return render_template('landing.html', version=version, status=status)
+    # Pass localpages to the template
+    return render_template('landing.html', version=version, status=status, localpages=localpages)
 
 # ========= Service Control Routes =========
 

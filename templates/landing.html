@@ -7,18 +7,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
-        body { background: #181818; color: #fff; padding-bottom: 64px; }
+        body { background: #181818; color: #fff; padding-bottom: 72px; }
         .logo-container { text-align: center; margin-top: 64px; }
         .logo-img { max-width: 340px; width: 100%; height: auto; }
         .version-text { text-align: center; font-size: 1em; margin: 12px 0 32px 0; }
         .main-btns { display: flex; flex-direction: column; align-items: center; gap: 22px; margin-top: 10px; }
         .main-btns .btn { min-width: 260px; font-size: 1.15em; }
+        .quick-access-btns { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px; }
+        .quick-access-btns .btn { width: 260px; }
     </style>
 </head>
 <body>
     {% set status_color = '#3ecf4a' if status == 'running' else ('#888' if status == 'stopped' else '#e53935') %}
     <div class="logo-container">
-        <a href="https://github.com/WeegeeNumbuh1/FlightGazer" target="_blank">
+        <a href="https://github.com/WeegeeNumbuh1/FlightGazer" target="_blank" rel="noopener noreferrer" title="View the project on GitHub">
         <img src="{{ url_for('static', filename='FlightGazer-logo.png') }}" alt="FlightGazer Logo" class="logo-img">
         </a>
     </div>
@@ -30,6 +32,9 @@
             {% elif status == 'manually running' %}FlightGazer has been started manually
             {% else %}FlightGazer status error (check the logs){% endif %}
         </span>
+        <div id="serviceStatus" style="position: relative;margin: auto;width: 50%;">
+            <span id="serviceStatusMsg" style="color:#ffd700;text-align: center;"></span>
+        </div>
     </div>
     <div class="version-text">
         Version {{ version }}
@@ -40,11 +45,18 @@
         <a href="{{ url_for('updates_page') }}" class="btn btn-secondary">Check for Updates</a>
         <a href="{{ url_for('startup_options') }}" class="btn btn-secondary">Change Startup Options</a>
     </div>
+    <div class="quick-access-btns" style="margin-top:32px; text-align:center;">
+        {% if localpages %}
+            Quick links (opens a new tab)<br>
+            {% for label, url in localpages.items() %}
+                <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary" style="margin:6px 8px; min-width:220px;">{{ label }}</a>
+            {% endfor %}
+        {% endif %}
+    </div>
     <div id="serviceControlBtns" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
-        <button id="startServiceBtn" class="btn btn-success me-2">Start</button>
-        <button id="restartServiceBtn" class="btn btn-warning me-2">Restart</button>
-        <button id="stopServiceBtn" class="btn btn-danger">Stop</button>
-        <span id="serviceStatusMsg" style="margin-left:16px;color:#ffd700;"></span>
+        <button id="startServiceBtn" class="btn btn-success me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Start</button>
+        <button id="restartServiceBtn" class="btn btn-warning me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Restart</button>
+        <button id="stopServiceBtn" class="btn btn-danger" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Stop</button>
     </div>
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
     <button id="bookmarkBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:absolute;top:18px;left:24px;z-index:9;">⭐</button>
