@@ -15,13 +15,14 @@
         .main-btns .btn { min-width: 260px; font-size: 1.15em; }
         .quick-access-btns { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px; }
         .quick-access-btns .btn { width: 260px; }
+        .footer { text-align: left; position: fixed; bottom: 24px; left: 24px; font-size: 0.5em; color:rgba(169, 169, 169, 0.6)}
     </style>
 </head>
 <body>
     {% set status_color = '#3ecf4a' if status == 'running' else ('#888' if status == 'stopped' else '#e53935') %}
     <div class="logo-container">
         <a href="https://github.com/WeegeeNumbuh1/FlightGazer" target="_blank" rel="noopener noreferrer" title="View the project on GitHub">
-        <img src="{{ url_for('static', filename='FlightGazer-logo.png') }}" alt="FlightGazer Logo" class="logo-img">
+            <img src="{{ url_for('static', filename='FlightGazer-logo.png') }}" alt="FlightGazer Logo" class="logo-img">
         </a>
     </div>
     <div class="status-indicator" style="text-align:center; margin-top:10px; margin-bottom:2px;">
@@ -38,6 +39,10 @@
     </div>
     <div class="version-text">
         Version {{ version }}
+    </div>
+    <div class="footer">
+        <!-- web-app <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer" title="View the source code">v.{{ webapp_version }}</a>
+        <br><i>Made by WeegeeNumbuh1</i> -->
     </div>
     <div class="main-btns">
         <a href="{{ url_for('config_page') }}" class="btn btn-primary">Configure Settings</a>
@@ -145,18 +150,11 @@
         });
     };
     document.getElementById("bookmarkBtn").addEventListener("click", function() {
-        if (window.sidebar && window.sidebar.addPanel) { // Firefox
-            window.sidebar.addPanel(document.title, window.location.href, "");
-        } else if(window.external && ('AddFavorite' in window.external)) { // IE (who's still using this in current year)
-            window.external.AddFavorite(location.href,document.title);
-        } else if(window.opera && window.print) { // Opera
-            this.title=document.title;
-        return true;
-            } else { // webkit - safari/chrome/anything else really
-        alert('This is the \"Add to Bookmarks\" button! Once bookmarked, you can visit this page without having to remember the URL or port number.\n\n\
+        alert('This is the FlightGazer-webapp, made by WeegeeNumbuh1.\nYou\'re running version: v.{{ webapp_version }}\n\n\
+To see the source code, click the FlightGazer logo.\n\n\
+It\'s recommended to bookmark this page for easy access.\n\
 - If you\'re on a computer, press ' + (navigator.userAgent.toLowerCase().indexOf('mac') != - 1 ? 'Command/Cmd' : 'CTRL') + ' + D to bookmark this page.\n\
-- If you\'re using a mobile device, open your browser\'s menu and select the option to bookmark this page.');
-    }
+- If you\'re using a mobile device, open your browser\'s menu and select the option to bookmark this page.')
   });
     function updateStatusIndicator() {
         fetch(statusURL).then(r => r.json()).then(data => {

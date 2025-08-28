@@ -18,7 +18,7 @@ import psutil
 import socket
 from time import sleep
 
-VERSION = "v.0.7.0 --- 2025-08-22"
+VERSION = "v.0.8.0 --- 2025-08-27"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -29,6 +29,7 @@ os.environ['SCRIPT_NAME'] = '/flightgazer'
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')
 COLORS_PATH = os.path.join(os.path.dirname(__file__), '..', 'setup', 'colors.py')
 VERSION_PATH = os.path.join(os.path.dirname(__file__), '..', 'version')
+WEBAPP_VERSION_PATH = os.path.join(os.path.dirname(__file__), 'version-webapp')
 LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-log.log')
 MIGRATE_LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'settings_migrate.log')
 FLYBY_STATS_PATH = os.path.join(os.path.dirname(__file__), '..', 'flybys.csv')
@@ -176,6 +177,13 @@ def save_color_config(colors):
 def get_version():
     try:
         with open(VERSION_PATH, 'r', encoding='utf-8') as f:
+            return f.read().strip()
+    except Exception:
+        return 'Unknown'
+
+def get_webapp_version():
+    try:
+        with open(WEBAPP_VERSION_PATH, 'r', encoding='utf-8') as f:
             return f.read().strip()
     except Exception:
         return 'Unknown'
@@ -396,9 +404,10 @@ threading.Thread(target=update_ip, name='IP-watcher', daemon=True).start()
 @app.route('/')
 def landing_page():
     version = get_version()
+    webapp_version = get_webapp_version()
     status = get_flightgazer_status()
     # Pass localpages to the template
-    return render_template('landing.html', version=version, status=status, localpages=localpages)
+    return render_template('landing.html', version=version, status=status, localpages=localpages, webapp_version=webapp_version)
 
 # ========= Service Control Routes =========
 
