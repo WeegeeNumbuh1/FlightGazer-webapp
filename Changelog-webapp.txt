@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.8.1 - 2025-08-29
+    - Added images to the Color configuration tab
+
 v.0.8.0 - 2025-08-27
     - Configuration page improvements:
         - There are now images for the display layouts when in the Screen Output tab

@@ -18,7 +18,7 @@ import psutil
 import socket
 from time import sleep
 
-VERSION = "v.0.8.0 --- 2025-08-27"
+VERSION = "v.0.8.1 --- 2025-08-29"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'

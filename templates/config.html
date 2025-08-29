@@ -424,7 +424,10 @@
         <div class="tab-pane fade" id="colors" role="tabpanel">
         <div class="help-text"><i>Tip: To hide screen elements, select 'BLACK'.</i></div>
         <div class="mt-3">
-            <h5>Clock Colors</h5>
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h5>Clock Colors</h5>
+                <img src="{{ url_for('static', filename='FG-clock.png') }}" class="inline-image">
+            </div>
             {% for var, label in [
             ('clock_color', 'Clock'),
             ('seconds_color', 'Seconds'),
@@ -458,7 +461,10 @@
             {% endfor %}
         </div>
         <div class="mt-3">
-            <h5>Plane Readout Colors</h5>
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h5>Plane Readout Colors</h5>
+                <img src="{{ url_for('static', filename='FG-plane-readout.png') }}" class="inline-image">
+            </div>
             {% for var, label in [
             ('callsign_color', 'Callsign'),
             ('distance_color', 'Distance'),
@@ -483,7 +489,11 @@
             {% endfor %}
         </div>
         <div class="mt-3">
-            <h5>Journey Colors</h5>
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h5>Journey Colors</h5>
+                <img src="{{ url_for('static', filename='FG-default-journey-journey.png') }}" class="inline-image">
+                <img src="{{ url_for('static', filename='FG-journey-plus-journey.png') }}" class="inline-image">
+            </div>
             {% for var, label in [
             ('origin_color', 'Origin'),
             ('destination_color', 'Destination'),
@@ -507,7 +517,10 @@
             {% endfor %}
         </div>
         <div class="mt-3">
-            <h5>Journey Plus Colors</h5>
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h5>Journey Plus Colors</h5>
+                <img src="{{ url_for('static', filename='FG-journey-plus-colors.png') }}" class="inline-image">
+            </div>
             {% for var, label in [
             ('time_header_color', 'Time Header'),
             ('time_readout_color', 'Time Readout'),
@@ -531,7 +544,10 @@
             {% endfor %}
         </div>
         <div class="mt-3">
-            <h5>Enhanced Readout Colors</h5>
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h5>Enhanced Readout Colors</h5>
+                <img src="{{ url_for('static', filename='FG-enhanced-readout-colors.png') }}" class="inline-image">
+            </div>
             {% for var, label in [
             ('latitude_color', 'Latitude'),
             ('longitude_color', 'Longitude'),
@@ -556,7 +572,11 @@
             {% endfor %}
         </div>
         <div class="mt-3">
-            <h5>Scrolling Info Line</h5>
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h5>Scrolling Info Line</h5>
+                <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-JourneyPlus.png') }}" class="inline-image">
+                <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-EnhancedReadout.png') }}" class="inline-image">
+            </div>
             {% for var, label in [
             ('marquee_color_journey_plus', 'Marquee (Journey Plus)'),
             ('marquee_color_enhanced_readout', 'Marquee (Enhanced Readout)')
@@ -579,7 +599,10 @@
             {% endfor %}
         </div>
         <div class="mt-3">
-            <h5>Stats at the Bottom</h5>
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h5>Stats at the Bottom</h5>
+                <img src="{{ url_for('static', filename='FG-bottom-stats.png') }}" class="inline-image">
+            </div>
             {% for var, label in [
             ('altitude_heading_color', 'Altitude Heading'),
             ('altitude_color', 'Altitude'),
@@ -606,7 +629,10 @@
             {% endfor %}
         </div>
         <div class="mt-3">
-            <h5>Plane Count Indicator</h5>
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h5>Plane Count Indicator</h5>
+                <img src="{{ url_for('static', filename='FG-plane-count-indicator.png') }}" class="inline-image">
+            </div>
             {% for var, label in [
             ('plane_count_color', 'Plane Count'),
             ('switch_progress_color', 'Switch Progress')
