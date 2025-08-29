@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.8.2 - 2025-08-29
+    - On the landing page, the tar1090 and graphs1090 links are generated, even when using adsb.im
+    - Changed the local webpage checking (for the landing page) to be less aggressive
+
 v.0.8.1 - 2025-08-29
     - Added images to the Color configuration tab
 

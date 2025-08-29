@@ -18,7 +18,7 @@ import psutil
 import socket
 from time import sleep
 
-VERSION = "v.0.8.1 --- 2025-08-29"
+VERSION = "v.0.8.2 --- 2025-08-29"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -208,10 +208,6 @@ def local_webpage_prober() -> dict:
     Probes these key locations:
     - Find adsb.im
         - Either at root IP address or at port 1099
-
-    Note: if adsb.im is found, we don't search for tar1090 and graphs1090 as those are already linked
-    within adsb.im's pages.
-
     - Find tar1090
         - Either at /tar1090 or port 8080
     - Find graphs1090
@@ -255,28 +251,27 @@ def local_webpage_prober() -> dict:
             rgbemulatorpage = webpage_title(display_emulator)
             if rgbemulatorpage and "RGBME" in rgbemulatorpage:
                 pages.update({"RGBMatrixEmulator": display_emulator})
-    # find the rest of our stuff since adsb.im isn't available to us
-    if pages.get("System Configuration, Aircraft Map, and Stats") is None:
-        tar1090location = f"http://{CURRENT_IP}/tar1090"
+    # find the rest of our stuff
+    tar1090location = f"http://{CURRENT_IP}/tar1090"
+    tar1090page = webpage_title(tar1090location)
+    if tar1090page:
+        if "tar1090" in tar1090page:
+            pages.update({"tar1090 Tracking Interface": tar1090location})
+    else:
+        tar1090location = f"http://{CURRENT_IP}:8080"
         tar1090page = webpage_title(tar1090location)
-        if tar1090page:
-            if "tar1090" in tar1090page:
-                pages.update({"tar1090 Tracking Interface": tar1090location})
-        else:
-            tar1090location = f"http://{CURRENT_IP}:8080"
-            tar1090page = webpage_title(tar1090location)
-            if tar1090page and "tar1090" in tar1090page:
-                pages.update({"tar1090 Tracking Interface": tar1090location})
-        graphs1090location = f"http://{CURRENT_IP}/graphs1090"
+        if tar1090page and "tar1090" in tar1090page:
+            pages.update({"tar1090 Tracking Interface": tar1090location})
+    graphs1090location = f"http://{CURRENT_IP}/graphs1090"
+    graphs1090page = webpage_title(graphs1090location)
+    if graphs1090page:
+        if "graphs1090" in graphs1090page:
+            pages.update({"graphs1090 Statistics Interface": graphs1090location})
+    else:
+        graphs1090location = f"http://{CURRENT_IP}:8542"
         graphs1090page = webpage_title(graphs1090location)
-        if graphs1090page:
-            if "graphs1090" in graphs1090page:
-                pages.update({"graphs1090 Statistics Interface": graphs1090location})
-        else:
-            graphs1090location = f"http://{CURRENT_IP}:8542"
-            graphs1090page = webpage_title(graphs1090location)
-            if graphs1090page and "graphs1090" in graphs1090page:
-                pages.update({"graphs1090 Statistics Interface": graphs1090location})
+        if graphs1090page and "graphs1090" in graphs1090page:
+            pages.update({"graphs1090 Statistics Interface": graphs1090location})
     return pages
 
 def match_commandline(command_search: str, process_name: str) -> int | None:
@@ -374,16 +369,20 @@ def remove_ansi_escape(input: str) -> str:
 get_ip()
 def probing_thread() -> None:
     """ Probes available webpages: does an initial burst every
-    15 seconds for 5 minutes at startup (to wait for the other pages to start),
+    30 seconds for 5 minutes at startup (to wait for the other pages to start),
+    then once every 15 minutes for the next hour,
     then updates once a day thereafter.
     Modifies the `localpages` global. """
     global localpages
-    initial_count = 0
+    run_count = 0
     while True:
         localpages = local_webpage_prober()
-        initial_count += 1
-        if initial_count <= 20:
-            sleep(15)
+        run_count += 1
+        if run_count <= 10:
+            sleep(30)
+            get_ip()
+        elif 11 <= run_count < 15:
+            sleep(900)
             get_ip()
         else:
             sleep(86400)
