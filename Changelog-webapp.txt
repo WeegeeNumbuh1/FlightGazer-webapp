@@ -5,6 +5,15 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.9.0 - 2025-08-31
+    - Add a collapsible menu for the download buttons in the Details page
+    - The initialization log can now be downloaded
+    - Improved the Screen Layout help text further
+    - Show device name and IP address in the landing page
+    - Tweak update page to hide background elements when the update is running
+    - Tweak the local webpage checking a little
+    - Renamed the adsbim link
+
 v.0.8.2 - 2025-08-29
     - On the landing page, the tar1090 and graphs1090 links are generated, even when using adsb.im
     - Changed the local webpage checking (for the landing page) to be less aggressive

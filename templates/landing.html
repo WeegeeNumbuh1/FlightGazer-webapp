@@ -16,6 +16,7 @@
         .quick-access-btns { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px; }
         .quick-access-btns .btn { width: 260px; }
         .footer { text-align: left; position: fixed; bottom: 24px; left: 24px; font-size: 0.5em; color:rgba(169, 169, 169, 0.6)}
+        .small-status {text-align: center; font-size: 0.6em; color:grey;}
     </style>
 </head>
 <body>
@@ -33,6 +34,9 @@
             {% elif status == 'manually running' %}FlightGazer has been started manually
             {% else %}FlightGazer status error (check the logs){% endif %}
         </span>
+        <div style="position: relative;margin: auto;width: 50%;">
+            <span class="small-status" id="device-info"></span>
+        </div>
         <div id="serviceStatus" style="position: relative;margin: auto;width: 50%;">
             <span id="serviceStatusMsg" style="color:#ffd700;text-align: center;"></span>
         </div>
@@ -156,6 +160,7 @@ It\'s recommended to bookmark this page for easy access.\n\
 - If you\'re on a computer, press ' + (navigator.userAgent.toLowerCase().indexOf('mac') != - 1 ? 'Command/Cmd' : 'CTRL') + ' + D to bookmark this page.\n\
 - If you\'re using a mobile device, open your browser\'s menu and select the option to bookmark this page.')
   });
+    document.getElementById("device-info").innerText = 'Running on {{ hostname }} at {{ ip_address }}'
     function updateStatusIndicator() {
         fetch(statusURL).then(r => r.json()).then(data => {
             let status = data.status;

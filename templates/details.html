@@ -16,11 +16,16 @@
 <div class="container py-4">
     <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
     <h2 class="mb-4">Details and Logs</h2>
-    <div class="mb-2 d-flex flex-wrap gap-2">
+    <details style="padding-bottom: 24px;"><summary>Show/Hide Download buttons</summary>
+    <div class="mb-2 d-flex flex-wrap gap-2" style="padding-top: 16px;">
         <a href="{{ url_for('download_json') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Live Details</a>
         <a href="{{ url_for('download_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Main Log</a>
         <a href="{{ url_for('download_migrate_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Migration Log</a>
+        <a href="{{ url_for('download_init_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Initialization Log</a>
         <a href="{{ url_for('download_flybys_csv') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Hourly Data</a>
+    </div>
+    </details>
+    <div class="mb-2 d-flex flex-wrap gap-2">
         <button id="refreshDetailsBtn" class="btn btn-sm btn-warning" type="button"><span style="font-size:1.1em;">&#x21bb;</span> Refresh</button>
         <button id="scrollToBottomBtn" class="btn btn-sm btn-success" type="button"><span style="font-size:1.1em;">&#x21d3;</span> Scroll to Bottom</button>
     </div>

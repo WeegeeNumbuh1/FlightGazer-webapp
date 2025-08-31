@@ -17,8 +17,9 @@ import requests
 import psutil
 import socket
 from time import sleep
+import io
 
-VERSION = "v.0.8.2 --- 2025-08-29"
+VERSION = "v.0.9.0 --- 2025-08-31"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -232,14 +233,14 @@ def local_webpage_prober() -> dict:
     local_page = webpage_title(adsbim)
     if local_page:
         if "Feeder Homepage" in local_page:
-            pages.update({"System Configuration, Aircraft Map, and Stats": adsbim})
+            pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
         elif "PiAware" in local_page: # FlightAware's PiAware is running here
             pages.update({"FlightAware PiAware page": adsbim})
     else:
         adsbim = f"http://{CURRENT_IP}:1099"
         local_page = webpage_title(adsbim)
         if local_page and "Feeder Homepage" in local_page:
-            pages.update({"System Configuration, Aircraft Map, and Stats": adsbim})
+            pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
     # try to find the display emulator
     display_emulator = f"http://{CURRENT_IP}:8888"
     rgbemulatorpage = webpage_title(display_emulator)
@@ -370,7 +371,7 @@ get_ip()
 def probing_thread() -> None:
     """ Probes available webpages: does an initial burst every
     30 seconds for 5 minutes at startup (to wait for the other pages to start),
-    then once every 15 minutes for the next hour,
+    then once every 10 minutes for the next hour,
     then updates once a day thereafter.
     Modifies the `localpages` global. """
     global localpages
@@ -381,8 +382,8 @@ def probing_thread() -> None:
         if run_count <= 10:
             sleep(30)
             get_ip()
-        elif 11 <= run_count < 15:
-            sleep(900)
+        elif 11 <= run_count < 17:
+            sleep(600)
             get_ip()
         else:
             sleep(86400)
@@ -405,8 +406,16 @@ def landing_page():
     version = get_version()
     webapp_version = get_webapp_version()
     status = get_flightgazer_status()
+    hostname = HOSTNAME
+    ip_address = CURRENT_IP
     # Pass localpages to the template
-    return render_template('landing.html', version=version, status=status, localpages=localpages, webapp_version=webapp_version)
+    return render_template('landing.html',
+                           version=version,
+                           status=status,
+                           localpages=localpages,
+                           webapp_version=webapp_version,
+                           hostname = hostname,
+                           ip_address = ip_address)
 
 # ========= Service Control Routes =========
 
@@ -602,8 +611,10 @@ def download_migrate_log():
     except Exception as e:
         return f'Log file not found: {e}', 404
 
+init_log_cache = None
 @app.route('/details/init_log')
 def details_init_log():
+    global init_log_cache
     try:
         # Fetch logs for FlightGazer-init.sh via journalctl (unit: flightgazer.service or fallback to grep script name)
         result = subprocess.run([
@@ -615,13 +626,29 @@ def details_init_log():
                 'journalctl', '--no-pager', '--output=short-precise', '|', 'grep', 'FlightGazer-init.sh'
             ], capture_output=True, text=True, shell=True)
         log_content = result.stdout if result.returncode == 0 else '(No init log found)'
+        init_log_cache = log_content
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
         safe_content = log_content.replace('<', '&lt;').replace('>', '&gt;')
         html += f'<div class="logline">{safe_content}</div>'
         html += '</body></html>'
         return html
     except Exception as e:
+        init_log_cache = None
         return f'<span style="color:#f66;font-family:monospace;">Init log not found: {e}</span>', 404
+
+@app.route('/details/download_init_log')
+def download_init_log():
+    details_init_log()
+    if not init_log_cache or init_log_cache == '(No init log found)':
+        return 'Initialization log is not available:', 404
+    else:
+        try:
+            buffer = io.BytesIO()
+            buffer.write(init_log_cache.encode('utf-8'))
+            buffer.seek(0)
+            return send_file(buffer, mimetype='text/plain', as_attachment=True, download_name='FlightGazer-initialization.log')
+        except Exception as e:
+            return f'Initialization log is not available: {e}', 404
 
 @app.route('/details/download_flybys_csv')
 def download_flybys_csv():

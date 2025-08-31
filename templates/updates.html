@@ -35,7 +35,7 @@
             <h5>Changes Since Current Version</h5>
             <a target="_blank" rel="noopener noreferrer" href="https://github.com/WeegeeNumbuh1/FlightGazer/raw/refs/heads/main/Changelog.txt">Read the full Changelog (opens a new tab)</a>
             <iframe id="changelogFrame" style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
-            <div class="mt-3 mb-2" style="display:flex;align-items:center;gap:16px;">
+            <div id="confirm-update" class="mt-3 mb-2" style="display:flex;align-items:center;gap:16px;">
                 <button id="updateNowBtn" class="btn btn-warning">Update Now</button>
                 <label style="margin-bottom:0;display:flex;align-items:center;gap:6px;">
                     <input type="checkbox" id="resetConfigCheckbox" style="margin-bottom:0;">
@@ -50,7 +50,7 @@
     </div>
     <div id="updateProgressPage" style="display:none;position:fixed;top:0;left:0;width:100vw;height:77vh;background:#181818;z-index:1000;padding-right: 12px;padding-left: 12px;">
         <button id="backToHomeBtn" class="btn btn-info" style="position:absolute;top:24px;left:24px;display:none;z-index:1100;">&larr; Back to Home</button>
-        <h3 style="text-align:center;margin-top:48px;">Update Progress</h3>
+        <h3 style="text-align:center;margin-top:64px;">Update Progress</h3>
         <h4 style="text-align:center">Please wait, don't refresh the page or go back until "Back to Home" appears.</h4>
         <iframe id="updateOutputFrameFull" style="display:block;margin:32px auto 0 auto;width:90vw;height:78vh;background:#222;color:#fff;font-family:monospace;border-radius:12px;border:none;padding-bottom: 5vh;"></iframe>
     </div>
@@ -159,6 +159,12 @@ document.getElementById('updateNowBtn').onclick = function() {
     if (!window.confirm('Are you sure you want to update FlightGazer?')) return;
     // Hide main content, show progress page
     document.querySelector('.container').style.display = 'none';
+    let updatediv = document.getElementById('confirm-update');
+    updatediv.style.visibility = "hidden";
+    updatediv.style.display = "none";
+    let changelogsec = document.getElementById('changelogSection');
+    changelogsec.style.visibility = "hidden";
+    changelogsec.style.display = "none";
     document.getElementById('updateProgressPage').style.display = '';
     let doc = document.getElementById('updateOutputFrameFull').contentDocument;
     doc.open();
