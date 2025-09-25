@@ -19,7 +19,7 @@ import socket
 from time import sleep
 import io
 
-VERSION = "v.0.9.0 --- 2025-08-31"
+VERSION = "v.0.9.1 --- 2025-09-24"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'

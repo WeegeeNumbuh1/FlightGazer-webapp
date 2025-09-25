@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlightGazer - Home</title>
+    <title>FlightGazer - Home ({{ hostname }} at {{ ip_address }})</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
@@ -63,12 +63,12 @@
         {% endif %}
     </div>
     <div id="serviceControlBtns" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
-        <button id="startServiceBtn" class="btn btn-success me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Start</button>
-        <button id="restartServiceBtn" class="btn btn-warning me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Restart</button>
-        <button id="stopServiceBtn" class="btn btn-danger" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Stop</button>
+        <button id="startServiceBtn" class="btn btn-success me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Start FlightGazer">Start</button>
+        <button id="restartServiceBtn" class="btn btn-warning me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Restart FlightGazer">Restart</button>
+        <button id="stopServiceBtn" class="btn btn-danger" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Stop FlightGazer">Stop</button>
     </div>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
-    <button id="bookmarkBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:absolute;top:18px;left:24px;z-index:9;">⭐</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;" title="Change Theme">☀️🌙</button>
+    <button id="bookmarkBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:absolute;top:18px;left:24px;z-index:9;" title="About">⭐</button>
     <script>
     const statusURL = "{{ url_for('service_status') }}";
     const serviceRestart = "{{ url_for('restart_flightgazer') }}";
@@ -118,6 +118,7 @@
     document.getElementById('startServiceBtn').onclick = function() {
         confirmAction('Start FlightGazer service?', function() {
             disableServiceBtns();
+            document.getElementById('serviceStatusMsg').innerText = 'Starting...';
             fetch(serviceStart, {method:'POST'}).then(r => r.json()).then(data => {
                 if (data.status === 'already_running') {
                     alert('FlightGazer is already running.');
@@ -132,9 +133,10 @@
     document.getElementById('restartServiceBtn').onclick = function() {
         confirmAction('Restart FlightGazer service?', function() {
             disableServiceBtns();
+            document.getElementById('serviceStatusMsg').innerText = 'Restarting...';
             fetch(serviceRestart, {method:'POST'}).then(r => r.json()).then(data => {
                 if (data.status === 'success') {
-                    document.getElementById('serviceStatusMsg').innerText = 'Service restarted.';
+                    document.getElementById('serviceStatusMsg').innerText = 'Service successfully restarted.';
                 } else {
                     document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
                 }
@@ -144,6 +146,7 @@
     document.getElementById('stopServiceBtn').onclick = function() {
         confirmAction('Stop FlightGazer service?', function() {
             disableServiceBtns();
+            document.getElementById('serviceStatusMsg').innerText = 'Stopping...';
             fetch(serviceStop, {method:'POST'}).then(r => r.json()).then(data => {
                 if (data.status === 'stopped') {
                     document.getElementById('serviceStatusMsg').innerText = 'Service stopped.';
@@ -183,9 +186,33 @@ It\'s recommended to bookmark this page for easy access.\n\
             document.querySelector('.status-indicator span + span').innerText = statusText;
         });
     }
-    setInterval(updateStatusIndicator, 10000);
-    // Initial call
-    updateStatusIndicator();
+    let statusPollingInterval;
+
+    function startStatusPolling() {
+        if (!statusPollingInterval) {
+            updateStatusIndicator();
+            statusPollingInterval = setInterval(updateStatusIndicator, 10000);
+        }
+    }
+
+    function stopStatusPolling() {
+        if (statusPollingInterval) {
+            clearInterval(statusPollingInterval);
+            statusPollingInterval = null;
+        }
+    }
+
+    // Handle page visibility changes
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopStatusPolling();
+        } else {
+            startStatusPolling();
+        }
+    });
+
+    // Initial call and start polling
+    startStatusPolling();
     </script>
 </body>
 </html>
