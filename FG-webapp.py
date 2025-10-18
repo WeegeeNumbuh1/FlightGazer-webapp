@@ -19,7 +19,7 @@ import socket
 from time import sleep
 import io
 
-VERSION = "v.0.10.0 --- 2025-10-18"
+VERSION = "v.0.10.1 --- 2025-10-18"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -249,12 +249,12 @@ def local_webpage_prober() -> dict:
     display_emulator = f"http://{CURRENT_IP}:8888"
     rgbemulatorpage = webpage_title(display_emulator)
     if rgbemulatorpage:
-        if "RGBME" in rgbemulatorpage:
+        if any(map(rgbemulatorpage.__contains__, ["FlightGazer", "RGBME"])):
             pages.update({"RGBMatrixEmulator": display_emulator})
         else:
             display_emulator = f"http://localhost:8888"
             rgbemulatorpage = webpage_title(display_emulator)
-            if rgbemulatorpage and "RGBME" in rgbemulatorpage:
+            if rgbemulatorpage and any(map(rgbemulatorpage.__contains__, ["FlightGazer", "RGBME"])):
                 pages.update({"RGBMatrixEmulator": display_emulator})
     # find the rest of our stuff
     tar1090location = f"http://{CURRENT_IP}/tar1090"

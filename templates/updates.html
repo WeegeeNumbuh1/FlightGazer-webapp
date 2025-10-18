@@ -217,7 +217,7 @@ function pollUpdateOutputIframeFull() {
         }
         updateRunning = data.running;
         if (updateRunning) {
-            setTimeout(pollUpdateOutputIframeFull, 250);
+            setTimeout(pollUpdateOutputIframeFull, 500);
         } else {
             document.getElementById('backToHomeBtn').style.display = '';
         }

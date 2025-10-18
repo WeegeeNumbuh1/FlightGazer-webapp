@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.10.1 - 2025-10-18
+    - Fix logic for finding the RGBMatrixEmulator page caused by change done with FlightGazer v.8.3.1
+
 v.0.10.0 - 2025-10-18
     - Added new Help & Reference page to explain display layout and provide project-related links
     - Adjusted text shown on Update page
