@@ -2,7 +2,7 @@
 reading the logs, checking for updates, and modifying startup options.
 This won't run if FlightGazer isn't installed on the system as it depends on
 FlightGazer's virtual environment. (should be handled via the install script).
-Disclosures: most of this was vibe-coded, but does contain manual edits to make sure
+Disclosures: most of this was initially vibe-coded, but does contain manual edits to make sure
 it actually works (mostly) and that the actual web pages aren't too janky. """
 
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
@@ -19,7 +19,7 @@ import socket
 from time import sleep
 import io
 
-VERSION = "v.0.9.1 --- 2025-09-24"
+VERSION = "v.0.10.0 --- 2025-10-18"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -43,6 +43,7 @@ INIT_PATH = os.path.join(os.path.dirname(os.getcwd()), 'FlightGazer-init.sh')
 UPDATE_PATH = os.path.join(os.path.dirname(__file__), '..', 'update.sh')
 CURRENT_IP = '' # local IP address of the system
 HOSTNAME = socket.gethostname()
+RUNNING_ADSBIM = False
 localpages = {}
 
 webapp_session = requests.session()
@@ -217,6 +218,7 @@ def local_webpage_prober() -> dict:
         - The Display Emulator
     Returns a dict, with the key-value pairs being the link name and URL.
     """
+    global RUNNING_ADSBIM
     pages = {}
     def webpage_title(input: str) -> str | None:
         """ Get the title of a webpage given `input` as a string. """
@@ -234,6 +236,7 @@ def local_webpage_prober() -> dict:
     if local_page:
         if "Feeder Homepage" in local_page:
             pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
+            RUNNING_ADSBIM = True
         elif "PiAware" in local_page: # FlightAware's PiAware is running here
             pages.update({"FlightAware PiAware page": adsbim})
     else:
@@ -241,6 +244,7 @@ def local_webpage_prober() -> dict:
         local_page = webpage_title(adsbim)
         if local_page and "Feeder Homepage" in local_page:
             pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
+            RUNNING_ADSBIM = True
     # try to find the display emulator
     display_emulator = f"http://{CURRENT_IP}:8888"
     rgbemulatorpage = webpage_title(display_emulator)
@@ -276,7 +280,7 @@ def local_webpage_prober() -> dict:
     return pages
 
 def match_commandline(command_search: str, process_name: str) -> int | None:
-    """ Taken directly from `FlightGazer.py` but modified to only return the PID. 
+    """ Taken directly from `FlightGazer.py` but modified to only return the PID.
     This must only be used when it's known that a single instance is running. """
     list_of_processes = []
     # iterate over all running processes
@@ -875,6 +879,11 @@ def check_for_updates():
         'latest_version': remote_ver,
         'changelog': changelog_to_show
     })
+
+# ========= Help/Reference html ==========
+@app.route('/reference')
+def reference_guide():
+    return render_template('reference.html', is_adsbim=RUNNING_ADSBIM)
 
 # ========= Debugging =========
 if __name__ == '__main__':

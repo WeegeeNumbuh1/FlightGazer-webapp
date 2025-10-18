@@ -16,14 +16,23 @@
     <div class="container py-4">
         <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
         <h2 class="mb-4">Check for Updates</h2>
-        <h5>ℹ️ If FlightGazer is working fine for you, there should be no need to update.</h5>
+        <h5>Updates can include:</h5>
         <ul>
-            <li>If you like using the most up-to-date versions, ignore the above message.</li>
-            <li>If it's been a long time since you've checked this webpage, it doesn't hurt to check what's new.</li>
-            <li>If you're having an issue, you can press the "Check Now" button below. An update might fix it.<br>
-                Additionally, you might need to check the <i>Also Reset Configuration to Default</i> option to make sure it's not a configuration issue. You'll have to reconfigure your settings if you reset.</li>
-            <li>Once you press the "Check Now" button, you might need to scroll down to see the "Update Now" button at the bottom of the page.</li>
+            <li>Bug &amp; issue fixes</li>
+            <li>New or better functionality</li>
+            <li>Performance improvements</li>
+            <li>Support for future changes</li>
         </ul>
+        <details><summary>If you're having an issue...</summary>
+            <ul>
+                <li>Press the "Check Now" button below. An update might fix it.<br>
+                <ul>
+                <li>Additionally, you might need to check the <i>Also Reset Configuration to Default</i> option to make sure it's not a configuration issue. You'll have to reconfigure your settings if you reset.</li>
+                <li>If you still have an issue, <a href="{{ url_for('reference_guide') }}" target="_blank">send a bug report</a>.
+                </li></ul>
+            </ul>
+        </details>
+        It's recommended to use the latest version available, especially if it's been awhile since you last checked.<br>
     </div>
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
     <div class="container py-4">
@@ -147,7 +156,7 @@ function pollUpdateOutputIframe() {
         }
         updateRunning = data.running;
         if (updateRunning) {
-            setTimeout(pollUpdateOutputIframe, 250);
+            setTimeout(pollUpdateOutputIframe, 500);
         } else {
             // Show back to home button when update completes
             let btn = document.getElementById('backToHomeBtn');

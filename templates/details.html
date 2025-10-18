@@ -20,9 +20,9 @@
     <div class="mb-2 d-flex flex-wrap gap-2" style="padding-top: 16px;">
         <a href="{{ url_for('download_json') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Live Details</a>
         <a href="{{ url_for('download_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Main Log</a>
-        <a href="{{ url_for('download_migrate_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Migration Log</a>
         <a href="{{ url_for('download_init_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Initialization Log</a>
         <a href="{{ url_for('download_flybys_csv') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Hourly Data</a>
+        <a href="{{ url_for('download_migrate_log') }}" class="btn btn-sm btn-secondary" download><span style="font-size:1.1em;">&#128190;</span> Download Migration Log</a>
     </div>
     </details>
     <div class="mb-2 d-flex flex-wrap gap-2">
@@ -34,16 +34,16 @@
             <button class="nav-link active" id="live-tab" data-bs-toggle="tab" data-bs-target="#live" type="button" role="tab">Live Details</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">Main Log</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="migrate-log-tab" data-bs-toggle="tab" data-bs-target="#migrate-log" type="button" role="tab">Migration Log</button>
+            <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">⭐ Main Log</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="init-log-tab" data-bs-toggle="tab" data-bs-target="#init-log" type="button" role="tab">Initialization Log</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="flybys-csv-tab" data-bs-toggle="tab" data-bs-target="#flybys-csv" type="button" role="tab">Hourly Data</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="migrate-log-tab" data-bs-toggle="tab" data-bs-target="#migrate-log" type="button" role="tab">Migration Log</button>
         </li>
     </ul>
     <div class="tab-content" id="detailsTabsContent" style="background:#222; border-radius:0 0 8px 8px; padding:24px 18px; min-height:420px;">
@@ -52,16 +52,16 @@
             <div id="liveDetailsTabContent" style="margin-top:18px;"></div>
         </div>
         <div class="tab-pane fade" id="logs" role="tabpanel">
-            <iframe id="logFrame" src="{{ url_for('details_log_html') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+            <iframe id="logFrame" src="{{ url_for('details_log_html') }}" style="width:100%; min-height:320px; height:calc(92vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
         <div class="tab-pane fade" id="migrate-log" role="tabpanel">
-            <iframe id="migrateLogFrame" src="{{ url_for('details_migrate_log') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+            <iframe id="migrateLogFrame" src="{{ url_for('details_migrate_log') }}" style="width:100%; min-height:320px; height:calc(92vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
         <div class="tab-pane fade" id="init-log" role="tabpanel">
-            <iframe id="initLogFrame" src="{{ url_for('details_init_log') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+            <iframe id="initLogFrame" src="{{ url_for('details_init_log') }}" style="width:100%; min-height:320px; height:calc(92vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
         <div class="tab-pane fade" id="flybys-csv" role="tabpanel">
-            <iframe id="flybysCsvFrame" src="{{ url_for('details_flybys_csv') }}" style="width:100%; min-height:320px; height:calc(100vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+            <iframe id="flybysCsvFrame" src="{{ url_for('details_flybys_csv') }}" style="width:100%; min-height:320px; height:calc(92vh - 260px); border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
     </div>
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
@@ -120,7 +120,7 @@ function loadLiveDetails() {
         // Build tab content
         let content = '<div class="tab-content" id="liveDetailsTabsContent2" style="background:#222; border-radius:0 0 8px 8px; padding:0; min-height:320px;">';
         keys.forEach(function(key, idx) {
-            content += `<div class="tab-pane fade${idx===0?' show active':''}" id="livekey-${key}" role="tabpanel"><iframe class="liveJsonFrame" style="width:100%;min-height:320px;height:calc(100vh - 260px);border:none;background:#222;"></iframe></div>`;
+            content += `<div class="tab-pane fade${idx===0?' show active':''}" id="livekey-${key}" role="tabpanel"><iframe class="liveJsonFrame" style="width:100%;min-height:320px;height:calc(88vh - 260px);border:none;background:#222;"></iframe></div>`;
         });
         content += '</div>';
         $('#liveDetailsTabsContainer').html(nav);

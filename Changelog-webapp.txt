@@ -5,6 +5,13 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.10.0 - 2025-10-18
+    - Added new Help & Reference page to explain display layout and provide project-related links
+    - Adjusted text shown on Update page
+    - Reordered the tabs in the Details and Logs page
+    - Improved layout when reading logs on the Details and Logs page
+    - Releases with FlightGazer v.8.4.0
+
 v.0.9.1 - 2025-09-24
     - Add message when starting, restarting, or stopping the service
     - Homepage now lists the device name and IP address the webapp is running from in the title
