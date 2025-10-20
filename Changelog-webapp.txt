@@ -5,6 +5,13 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.10.2 - 2025-10-22
+    - Add output reference and troubleshooting guide to the Help & Reference page
+    - Adjusted layout slightly on Details and Logs page
+    - Added additional tips in the Configuration page
+    - Updated update and uninstalled scripts
+    - Releases with FlightGazer v.9.0.0
+
 v.0.10.1 - 2025-10-18
     - Fix logic for finding the RGBMatrixEmulator page caused by change done with FlightGazer v.8.3.1
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 {
 # Uninstall script for FlightGazer's web interface
-# Last updated: v.0.4.0
+# Last updated: v.0.10.2
 # by: WeegeeNumbuh1
 BASEDIR=$(cd `dirname -- $0` && pwd)
 GREEN='\033[0;32m'
@@ -57,7 +57,7 @@ if command -v lighttpd >/dev/null 2>&1; then
 fi
 
 echo "> Removing files..."
-rm -rf ${BASEDIR}
+rm -rf "$BASEDIR"
 echo -e "${GREEN}>>> FlightGazer web interface fully removed from your system.${NC}"
 echo ""
 exit 0

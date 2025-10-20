@@ -23,8 +23,9 @@
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
 </div>
 <div class="container py-4">
-    <h4>Display Layout</h4>
+    <h4>Display Layout Reference</h4>
 <details><summary><b>Expand/Collapse</b></summary>
+    <div class="help-text"><i>Valid for FlightGazer v.8.1.0 and newer.</i></div>
 <table cellpadding="16">
 <thead>
 </thead>
@@ -57,7 +58,129 @@
 </table>
 </details>
 </div>
-<div  class="container py-4">
+<div class="container py-4">
+    <h4>Output Reference &amp; Troubleshooting</h4>
+    <details><summary><b>Expand/Collapse</b></summary>
+        <div class="help-text"><i>Valid for FlightGazer v.9.0.0 and newer.</i></div>
+    <table cellpadding="8">
+    <thead>
+    <tr>
+        <th><h5>Output</h5></th>
+        <th><h5>Meaning / Cause</h5></th>
+        <th><h5>Remedy / Information</h5></th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><p><b>Show Even More Info</b></p>"LADD Aircraft"</td>
+            <td><ul><li>Limiting Aircraft Data Displayed - <i>"Please don't track me."</i></li></ul></td>
+            <td><ul><li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More Information</a></li></ul></td>
+        <tr>
+        <tr>
+            <td><p><b>Show Even More Info</b></p>"PIA Aircraft"</td>
+            <td><ul><li>(U.S. only) Privacy ICAO Address - <i>"Good luck figuring out who I am."</i></li></ul></td>
+            <td><ul><li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank" rel="noopener noreferrer">More Information</a></li></ul></td>
+        <tr>
+            <td>
+                <p><b>Clock</b></p>
+<pre>
+FLYBY  TRKG  RNGE
+N/A    N/A   N/A </pre>
+<i>- or -</i>
+<pre>
+FLYBY  TRKG  RNGE
+123    N/A   N/A </pre>
+            </td>
+            <td>
+                <ul>
+                    <li>Failed to connect to receiver at startup.</li>
+                    <li>Communication with the receiver has temporarily stopped due to instability.</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Receiver service (<code>dump1090</code>) is not running/stopped. Check for errors for that service.</li>
+                    <li>The current system may be overloaded. Check on the system.</li>
+                    <li>If operating on a remote instance of <code>dump1090</code>, check the network or remote system.</li>
+                    <li>Additionally, check the FlightGazer logs.</li>
+                    <li>After fixing the underlying issue, restart FlightGazer.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p><b>Clock</b></p>
+<pre>
+FLYBY  TRKG  RNGE
+N/A    123   N/A </pre>
+            </td>
+            <td><ul><li>Location is not set in receiver.</li></ul></td>
+            <td><ul><li>Set your location for <code>dump1090</code>. Then, restart FlightGazer.</li>
+            <li>Advanced: if using a GPS receiver on the system, check to see if the service is running and has obtained a GPS fix.</li></ul></td>
+        </tr>
+        <tr>
+            <td>
+                <p><b>Journey</b></p>
+                <code>--- ▶ ---</code>
+            </td>
+            <td>
+                <ul>
+                <li>Waiting for API to send a result.</li>
+                <li>API is not in use.</li>
+                <li>An API limit has been reached.</li>
+                <li>Aircraft is on the ground.</li>
+                </ul>
+            </td>
+            <td>
+                <ul><li>Normal occurrence.</li></ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p><b>Journey</b></p>
+                <code>N/A ▶ ---</code>
+            </td>
+            <td>
+                <ul>
+                <li>Aircraft blocked from tracking.</li>
+                <li>Aircraft detected before API was able to.</li>
+            </td>
+            <td><ul><li>For aircraft that are not blocked from tracking: try using a smaller RANGE.</li></ul></td>
+        </tr>
+        <tr>
+            <td>
+                <p><b>Journey</b></p>
+                <code>latitude ▶ longitude</code>
+            </td>
+            <td><ul><li>API returned a result that could not be associated with an airport.</li></ul></td>
+            <td><ul><li>Rare, but normal occurrence.</li></ul></td>
+        </tr>
+        <tr>
+            <td>
+                <p><b>Journey</b></p>
+                <code>!API ▶ FAIL</code>
+            </td>
+            <td><ul><li>API call for this flight failed.</li></ul></td>
+            <td>
+                <ul>
+                <li>API service may be down, wait until the service is restored.</li>
+                <li>You may have an issue with your API key. Contact FlightAware.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p><b>Journey</b></p>
+                <code>!CON ▶ FAIL</code>
+            </td>
+            <td><ul><li>Could not connect to the API.</li></ul></td>
+            <td><ul><li>Check your network connection.</li></ul></td>
+        </tr>
+    </tbody>
+</table>
+</details>
+</div>
+<div class="container py-4">
     <h4>Tips &amp; Tricks</h4>
     <details><summary><b>Expand/Collapse</b></summary>
     <!-- <h5><a href="{{ url_for('config_page') }}" target="_blank" rel="noopener noreferrer">Configure your settings</a> (opens a new tab).</h5> -->
