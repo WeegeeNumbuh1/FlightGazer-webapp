@@ -50,13 +50,14 @@
         <!-- General Tab -->
         <div class="tab-pane fade show active" id="general" role="tabpanel">
             <div class="help-text">
-                <b>Good starting points:</b>
+                <details><summary><b>Tip: Good starting points...</b></summary>
                 <ul>
-                    <li><i>"If I can hear it, I want to track it."</i> ▶ 15000ft, 2nmi (This works well for most locations.)</li>
-                    <li><i>"If I can see the contrails, I want to track it."</i> ▶ 50000ft, 5nmi</li>
-                    <li><i>"It's very quiet around here."</i> ▶ 50000ft, 10nmi</li>
-                    <li><i>"I can see the runway lights from my backyard."</i> ▶ 5000ft, 1.5nmi</li>
+                    <li><i>"If I can hear it, I want to track it."</i><ul><li>15000ft, 2nmi (This works well for most locations.)</li></ul></li>
+                    <li><i>"If I can see the contrails, I want to track it."</i><ul><li>50000ft, 5nmi</li></ul></li>
+                    <li><i>"It's very quiet around here."</i><ul><li>50000ft, 10nmi</li></ul></li>
+                    <li><i>"I can see the runway lights from my backyard."</i><ul><li>5000ft, 1.5nmi</li></ul></li>
                 </ul>
+                </summary>
             </div>
             <div class="mt-3">
                 <label for="units" class="form-label setting-label">Units</label>
@@ -138,7 +139,8 @@
             <div class="mt-3">
                 <label class="form-label setting-label">API Schedule</label>
                 <div class="help-text">
-                    Set hours when the API can be used.<br>
+                    Set hours when the API can be used. Recommended so you can stretch your API limits further (ex: not using the API when asleep or at work)<br>
+                    A checkmark indicates the API can be used at the specified day and hour.<br>
                     If this setting is disabled, the API can be used at all times.<br>
                     <i>On mobile screens, you might need to scroll to the right →</i>
                 </div>
@@ -187,7 +189,7 @@
                             <li>The direction the aircraft is traveling over the ground (0° = North, 90° = East, etc.)</li>
                         </ul>
                     </li>
-                    <li>Vertical speed (example: <code>V+1234</code>)
+                    <li>Vertical Speed (example: <code>V+1234</code>)
                         <ul>
                             <li>The rate of climb or descent (default: feet/min; meters/min if using Metric)</li>
                         </ul>
@@ -210,11 +212,7 @@
                 <div class="help-text">
                     Replaces the default journey (origin/destination) readout with:
                     <ul>
-                        <li>Aircraft coordinates
-                            <ul>
-                                <li>Latitude and longitude</li>
-                            </ul>
-                        </li>
+                        <li>Aircraft coordinates (latitude and longitude)</li>
                         <li>Track</li>
                         <li>Vertical Speed</li>
                     </ul>
@@ -290,7 +288,7 @@
                 <div class="help-text">Select the main readout in the center section of the clock display.</div>
                 <select class="form-select" id="CLOCK_CENTER_ROW_ROW1" name="CLOCK_CENTER_ROW_ROW1">
                     <option value="0" {% if config.CLOCK_CENTER_ROW.ROW1 == 0 %}selected{% endif %}>Don't use</option>
-                    <option value="1" {% if config.CLOCK_CENTER_ROW.ROW1 == 1 %}selected{% endif %}>Sunset/Sunrise</option>
+                    <option value="1" {% if config.CLOCK_CENTER_ROW.ROW1 == 1 %}selected{% endif %}>Sunrise/Sunset</option>
                     <option value="2" {% if config.CLOCK_CENTER_ROW.ROW1 == 2 %}selected{% endif %}>ADS-B receiver stats</option>
                     <option value="3" {% if config.CLOCK_CENTER_ROW.ROW1 == 3 %}selected{% endif %}>Extended calendar info</option>
                 </select>
@@ -298,12 +296,12 @@
             <div class="mt-3">
                 <label for="CLOCK_CENTER_ROW_ROW2" class="form-label setting-label">Clock Center Row 2</label>
                 <div class="help-text">
-                    If this isn't set to "Don't use", add an additional line of info in the center section of the clock display.<br>
+                    Add an additional line of info in the center section of the clock display.<br>
                     If the above setting is set to "Don't use" and this setting is set, this will force the use of a smaller font on the clock display.
                 </div>
                 <select class="form-select" id="CLOCK_CENTER_ROW_ROW2" name="CLOCK_CENTER_ROW_ROW2">
                     <option value="0" {% if config.CLOCK_CENTER_ROW.ROW2 == 0 %}selected{% endif %}>Don't use</option>
-                    <option value="1" {% if config.CLOCK_CENTER_ROW.ROW2 == 1 %}selected{% endif %}>Sunset/Sunrise</option>
+                    <option value="1" {% if config.CLOCK_CENTER_ROW.ROW2 == 1 %}selected{% endif %}>Sunrise/Sunset</option>
                     <option value="2" {% if config.CLOCK_CENTER_ROW.ROW2 == 2 %}selected{% endif %}>ADS-B receiver stats</option>
                     <option value="3" {% if config.CLOCK_CENTER_ROW.ROW2 == 3 %}selected{% endif %}>Extended calendar info</option>
                 </select>
@@ -388,8 +386,8 @@
                 <label for="FLYBY_STALENESS" class="form-label setting-label">Flyby Staleness</label>
                 <div class="help-text">
                     Time in minutes before a flyby is considered new.<br>
-                    Affects the daily flyby count and number of API calls in a day.<br>
-                    <i>If you're near an airport, setting this lower than 60 can give you more accurate results.</i><br>
+                    A lower value may raise the daily flyby count and number of API calls in a day.<br>
+                    <i>If you're near an airport, setting this lower than 60 can give you more accurate API results, especially for general aviation.</i><br>
                     <i>Default: 60</i>
                 </div>
                 <div class="input-group">
@@ -401,7 +399,7 @@
             <div class="mt-3">
                 <label for="LOCATION_TIMEOUT" class="form-label setting-label">Location Timeout</label>
                 <div class="help-text">
-                    Time in seconds before an aircraft's location is considered stale and is discarded from the total tracking count.<br>
+                    Time in seconds before an aircraft's last location is considered stale and is discarded from the total tracking count.<br>
                     <i>Default: 60</i>
                 </div>
                 <div class="input-group">

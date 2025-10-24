@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.10.3 - 2025-10-24
+    - Config help text tweaks
+
 v.0.10.2 - 2025-10-22
     - Add output reference and troubleshooting guide to the Help & Reference page
     - Adjusted layout slightly on Details and Logs page
