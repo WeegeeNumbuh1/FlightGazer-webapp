@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.11.1 - 2025-10-28
+    - Improved handling when the state file is not able to be read (ex: FlightGazer is not running)
+    - When downloading logs, the date and time are appended at the end of the filename
+
 v.0.11.0 - 2025-10-28
     - Add support for features added in FlightGazer v.9.1.0
     - Add support for detecting Skystats and Planefence

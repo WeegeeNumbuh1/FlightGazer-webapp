@@ -18,8 +18,9 @@ import psutil
 import socket
 from time import sleep
 import io
+import datetime
 
-VERSION = "v.0.11.0 --- 2025-10-28"
+VERSION = "v.0.11.1 --- 2025-10-28"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -391,6 +392,10 @@ def remove_ansi_escape(input: str) -> str:
     https://stackoverflow.com/a/14693789 """
     return ANSI_ESCAPE.sub('', input)
 
+def append_date_now() -> str:
+    """ Returns a string of the current local time, in ISO8601 format, compatible with filesystems """
+    return datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S")
+
 # ========= Initialization Stuff =========
 get_ip()
 def probing_thread() -> None:
@@ -549,16 +554,16 @@ def details_page():
 @app.route('/details/live')
 def details_live():
     json_path = CURRENT_STATE_JSON_PATH
-    if not os.path.exists(json_path): # for debug
+    if not os.path.exists(json_path) and os.name == 'nt': # for debug
         json_path = os.path.join(os.path.dirname(__file__), '..', 'current_state.json')
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         return jsonify(data)
     except FileNotFoundError:
-        return jsonify({'error': 'Current state file could not be found.'}), 404
+        return jsonify({'Info': 'Current state file could not be found. FlightGazer may not be running or the setting to write a state file is disabled. Please check the other logs.'})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'Error': f'Could not load state file: {e}'})
 
 @app.route('/details/download_json')
 def download_json():
@@ -566,7 +571,7 @@ def download_json():
     if not os.path.exists(json_path): # for debug
         json_path = os.path.join(os.path.dirname(__file__), '..', 'current_state.json')
     try:
-        return send_file(json_path, mimetype='application/json', as_attachment=True, download_name='FlightGazer-current_state.json')
+        return send_file(json_path, mimetype='application/json', as_attachment=True, download_name=f'FlightGazer-current_state_[{append_date_now()}].json')
     except Exception as e:
         return f'JSON file not found: {e}', 404
 
@@ -584,7 +589,7 @@ def download_log():
     if not os.path.exists(LOG_PATH):
         raise FileNotFoundError
     try:
-        return send_file(LOG_PATH, mimetype='text/plain', as_attachment=True, download_name='FlightGazer-log.log')
+        return send_file(LOG_PATH, mimetype='text/plain', as_attachment=True, download_name=f'FlightGazer-log_[{append_date_now()}].log')
     except Exception as e:
         return f'Log file not found: {e}', 404
 
@@ -632,7 +637,7 @@ def download_migrate_log():
     if not os.path.exists(MIGRATE_LOG_PATH):
         return 'settings_migrate.log not found', 404
     try:
-        return send_file(MIGRATE_LOG_PATH, mimetype='text/plain', as_attachment=True, download_name='settings_migrate.log')
+        return send_file(MIGRATE_LOG_PATH, mimetype='text/plain', as_attachment=True, download_name=f'FlightGazer-settings_migrate_[{append_date_now()}].log')
     except Exception as e:
         return f'Log file not found: {e}', 404
 
