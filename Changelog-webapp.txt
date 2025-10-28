@@ -5,6 +5,13 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.11.0 - 2025-10-28
+    - Add support for features added in FlightGazer v.9.1.0
+    - Add support for detecting Skystats and Planefence
+    - Fix the auto-scroll to the bottom behavior when running the update
+    - Add alert that warns if a user navigates away from a running update
+    - Additional tweaks to the Reference page
+
 v.0.10.3 - 2025-10-24
     - Config help text tweaks
 

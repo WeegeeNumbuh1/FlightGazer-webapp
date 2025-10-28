@@ -182,6 +182,9 @@ It\'s recommended to bookmark this page for easy access.\n\
             } else if (status === 'failed') {
                 statusColor = '#e53935';
                 statusText = 'FlightGazer status error (check the logs)';
+            } else if (status === 'degraded') {
+                statusColor = '#ffd710';
+                statusText = 'FlightGazer is degraded (check the logs)';
             }
             document.querySelector('.status-indicator span').style.background = statusColor;
             document.querySelector('.status-indicator span + span').innerText = statusText;

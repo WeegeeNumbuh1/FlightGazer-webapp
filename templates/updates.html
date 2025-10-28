@@ -101,6 +101,18 @@
     let updatePrompted = false;
     let updateLines = [];
     let changelogContent = '';
+
+    // Add navigation warning when update is running
+    window.addEventListener('beforeunload', function(e) {
+        if (updateRunning) {
+            e.preventDefault();
+            // Most browsers will show their own message instead of this custom one,
+            // but we set it anyway for browsers that might use it
+            e.returnValue = 'An update is in progress. Are you sure you want to leave?';
+            return e.returnValue;
+        }
+    });
+
     document.getElementById('checkUpdatesBtn').onclick = function() {
         document.getElementById('versionInfo').innerText = 'Checking...';
         fetch(updatesCheckUrl, {method:'POST'}).then(r => r.json()).then(data => {
@@ -174,6 +186,9 @@ document.getElementById('updateNowBtn').onclick = function() {
     let changelogsec = document.getElementById('changelogSection');
     changelogsec.style.visibility = "hidden";
     changelogsec.style.display = "none";
+    let checknowbtn = document.getElementById('checkUpdatesBtn');
+    checknowbtn.style.visibility = "hidden";
+    checknowbtn.style.display = "none";
     document.getElementById('updateProgressPage').style.display = '';
     let doc = document.getElementById('updateOutputFrameFull').contentDocument;
     doc.open();
@@ -188,7 +203,6 @@ document.getElementById('updateNowBtn').onclick = function() {
     }).then(r => r.json()).then(data => {
         if (data.status === 'started') {
             pollUpdateOutputIframeFull();
-            //setTimeout(() => sendUpdateInput('y'), 1200); // auto-confirm
         } else {
             let doc = document.getElementById('updateOutputFrameFull').contentDocument;
             doc.open();
@@ -209,10 +223,14 @@ function pollUpdateOutputIframeFull() {
                 doc.close();
                 lastUpdateOutput = newText;
                 // Auto-scroll to bottom
-                setTimeout(function() {
-                    let pre = doc.getElementById('updatePre');
-                    if (pre) pre.scrollTop = pre.scrollHeight;
-                }, 50);
+                // doc.scrollTop = doc.scrollHeight // option 1, kinda works
+                const preElement = doc.getElementById('updatePre');
+                preElement.scrollIntoView(false) // should basically work all the time (tested: chromium & mozilla)
+                // online guides have failed me here:
+                // const preElement = doc.getElementById('updatePre');
+                // if (preElement) {
+                //     preElement.scrollTop = preElement.scrollHeight;
+                // }
             }
         }
         updateRunning = data.running;

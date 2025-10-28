@@ -19,7 +19,7 @@ import socket
 from time import sleep
 import io
 
-VERSION = "v.0.10.3 --- 2025-10-24"
+VERSION = "v.0.11.0 --- 2025-10-28"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -35,6 +35,7 @@ LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-log.log')
 MIGRATE_LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'settings_migrate.log')
 FLYBY_STATS_PATH = os.path.join(os.path.dirname(__file__), '..', 'flybys.csv')
 CURRENT_STATE_JSON_PATH = '/run/FlightGazer/current_state.json'
+BAD_STATE_SEMAPHORE = '/run/FlightGazer/not_good'
 SERVICE_PATH = '/etc/systemd/system/flightgazer.service'
 # Get the main FlightGazer path rather than using a relational path.
 # If the latter approach is used and this web-app is uninstalled, it will break the service
@@ -45,6 +46,7 @@ CURRENT_IP = '' # local IP address of the system
 HOSTNAME = socket.gethostname()
 RUNNING_ADSBIM = False
 localpages = {}
+is_posix = True if os.name == 'posix' else False
 
 webapp_session = requests.session()
 
@@ -216,6 +218,11 @@ def local_webpage_prober() -> dict:
         - Either at /graphs1090 or port 8542
     - Port 8888
         - The Display Emulator
+    - Port 5173
+        - Skystats
+    - Port 8088
+        - Planefence
+
     Returns a dict, with the key-value pairs being the link name and URL.
     """
     global RUNNING_ADSBIM
@@ -228,8 +235,12 @@ def local_webpage_prober() -> dict:
             resp_body = response.text
             title = re.search('(?<=<title>).+?(?=</title>)', resp_body, re.DOTALL).group().strip()
             return title
-        except:
+        except Exception:
             return None
+    def match_title(input: None | str, title: str) -> bool:
+        if input and title in input:
+            return True
+        return False
     # find adsb.im
     adsbim = f"http://{CURRENT_IP}"
     local_page = webpage_title(adsbim)
@@ -239,44 +250,44 @@ def local_webpage_prober() -> dict:
             RUNNING_ADSBIM = True
         elif "PiAware" in local_page: # FlightAware's PiAware is running here
             pages.update({"FlightAware PiAware page": adsbim})
+        # else: # something else is running here, link it anyway
+        #     pages.update({f"{local_page}"[:100]: adsbim})
     else:
         adsbim = f"http://{CURRENT_IP}:1099"
         local_page = webpage_title(adsbim)
-        if local_page and "Feeder Homepage" in local_page:
+        if match_title(local_page, "Feeder Homepage"):
             pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
             RUNNING_ADSBIM = True
     # try to find the display emulator
-    display_emulator = f"http://{CURRENT_IP}:8888"
-    rgbemulatorpage = webpage_title(display_emulator)
-    if rgbemulatorpage:
-        if any(map(rgbemulatorpage.__contains__, ["FlightGazer", "RGBME"])):
-            pages.update({"RGBMatrixEmulator": display_emulator})
-        else:
-            display_emulator = f"http://localhost:8888"
-            rgbemulatorpage = webpage_title(display_emulator)
-            if rgbemulatorpage and any(map(rgbemulatorpage.__contains__, ["FlightGazer", "RGBME"])):
-                pages.update({"RGBMatrixEmulator": display_emulator})
+    display_emulator = [f"http://{CURRENT_IP}:8888", "http://localhost:8888"]
+    for url in display_emulator:
+        rgbemulatorpage = webpage_title(url)
+        if rgbemulatorpage and any(map(rgbemulatorpage.__contains__, ["FlightGazer", "RGBME"])):
+            pages.update({"RGBMatrixEmulator": url})
+            break
     # find the rest of our stuff
-    tar1090location = f"http://{CURRENT_IP}/tar1090"
-    tar1090page = webpage_title(tar1090location)
-    if tar1090page:
-        if "tar1090" in tar1090page:
-            pages.update({"tar1090 Tracking Interface": tar1090location})
-    else:
-        tar1090location = f"http://{CURRENT_IP}:8080"
-        tar1090page = webpage_title(tar1090location)
-        if tar1090page and "tar1090" in tar1090page:
-            pages.update({"tar1090 Tracking Interface": tar1090location})
-    graphs1090location = f"http://{CURRENT_IP}/graphs1090"
-    graphs1090page = webpage_title(graphs1090location)
-    if graphs1090page:
-        if "graphs1090" in graphs1090page:
-            pages.update({"graphs1090 Statistics Interface": graphs1090location})
-    else:
-        graphs1090location = f"http://{CURRENT_IP}:8542"
-        graphs1090page = webpage_title(graphs1090location)
-        if graphs1090page and "graphs1090" in graphs1090page:
-            pages.update({"graphs1090 Statistics Interface": graphs1090location})
+    tar1090location = [f"http://{CURRENT_IP}/tar1090", f"http://{CURRENT_IP}:8080"]
+    for url in tar1090location:
+        tar1090page = webpage_title(url)
+        if match_title(tar1090page, "tar1090"):
+            pages.update({"tar1090 Tracking Interface": url})
+            break
+
+    graphs1090location = [f"http://{CURRENT_IP}/graphs1090", f"http://{CURRENT_IP}:8542"]
+    for url in graphs1090location:
+        graphs1090page = webpage_title(url)
+        if match_title(graphs1090page, "graphs1090"):
+            pages.update({"graphs1090 Statistics Interface": url})
+            break
+
+    skystatslocation = f"http://{CURRENT_IP}:5173"
+    skystatspage = webpage_title(skystatslocation)
+    if match_title(skystatspage, "Skystats"):
+        pages.update({"Skystats": skystatslocation})
+    planefencelocation = f"http://{CURRENT_IP}:8088"
+    planefencepage = webpage_title(planefencelocation)
+    if match_title(planefencepage, "Planefence"):
+        pages.update({"Planefence": planefencelocation})
     return pages
 
 def match_commandline(command_search: str, process_name: str) -> int | None:
@@ -307,6 +318,10 @@ current_flightgazer_pid = None
 current_flightgazer_process = None
 manually_running = False
 
+def flightgazer_bad_state():
+    """ Check if FlightGazer is running in a bad state or has failed """
+    return is_posix and os.path.exists(BAD_STATE_SEMAPHORE)
+
 def get_flightgazer_status():
     """ Poll the service status """
     global current_flightgazer_pid, current_flightgazer_process, manually_running
@@ -334,7 +349,10 @@ def get_flightgazer_status():
                     else:
                         current_flightgazer_process = None
                         manually_running = False
-                        return 'stopped'
+                        if flightgazer_bad_state():
+                            return 'failed'
+                        else:
+                            return 'stopped'
                 else:
                     current_flightgazer_pid = None
                     current_flightgazer_process = None
@@ -353,10 +371,13 @@ def get_flightgazer_status():
                     manually_running = False
                     return 'failed'
         else:
-            if not manually_running:
-                return 'running'
+            if flightgazer_bad_state():
+                return 'degraded'
             else:
-                return 'manually running'
+                if not manually_running:
+                    return 'running'
+                else:
+                    return 'manually running'
 
     except Exception:
         current_flightgazer_pid = None
