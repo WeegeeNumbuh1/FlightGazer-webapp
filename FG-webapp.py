@@ -20,7 +20,7 @@ from time import sleep
 import io
 import datetime
 
-VERSION = "v.0.11.1 --- 2025-10-28"
+VERSION = "v.0.11.2 --- 2025-10-28"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -676,7 +676,7 @@ def download_init_log():
             buffer = io.BytesIO()
             buffer.write(init_log_cache.encode('utf-8'))
             buffer.seek(0)
-            return send_file(buffer, mimetype='text/plain', as_attachment=True, download_name='FlightGazer-initialization.log')
+            return send_file(buffer, mimetype='text/plain', as_attachment=True, download_name=f'FlightGazer-initialization_[{append_date_now()}].log')
         except Exception as e:
             return f'Initialization log is not available: {e}', 404
 
