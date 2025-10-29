@@ -74,7 +74,7 @@ const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
         document.getElementById('startupStatus').innerText = 'Applying changes...';
         fetch(setStartupOptionsUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({flags: checked})}).then(r => r.json()).then(data => {
             if (data.status === 'success') {
-                document.getElementById('startupStatus').innerText = 'Startup options updated and systemd reloaded.';
+                document.getElementById('startupStatus').innerText = 'Startup options updated and systemd reloaded. A service restart is required to see the changes.';
             } else {
                 document.getElementById('startupStatus').innerText = data.error || 'Error.';
             }

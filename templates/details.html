@@ -10,6 +10,7 @@
         body { background: #181818; color: #fff; }
         .centered { text-align: center; margin-top: 60px; }
         .back-btn { margin-top: 40px; }
+        .faint-text { font-size: 0.9em; color: #666; margin-bottom: 0.25em; font-style: italic; }
     </style>
 </head>
 <body>
@@ -29,6 +30,7 @@
         <button id="refreshDetailsBtn" class="btn btn-sm btn-warning" type="button"><span style="font-size:1.1em;">&#x21bb;</span> Refresh All</button>
         <button id="scrollToBottomBtn" class="btn btn-sm btn-success" type="button"><span style="font-size:1.1em;">&#x21d3;</span> Scroll to Bottom</button>
     </div>
+    <div id="timestamp" class="faint-text">Data as of: [N/A]</div>
     <ul class="nav nav-tabs" id="detailsTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="live-tab" data-bs-toggle="tab" data-bs-target="#live" type="button" role="tab">Live Details</button>
@@ -43,7 +45,7 @@
             <button class="nav-link" id="flybys-csv-tab" data-bs-toggle="tab" data-bs-target="#flybys-csv" type="button" role="tab">Hourly Data</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="migrate-log-tab" data-bs-toggle="tab" data-bs-target="#migrate-log" type="button" role="tab">Migration Log</button>
+            <button class="nav-link" id="migrate-log-tab" data-bs-toggle="tab" data-bs-target="#migrate-log" type="button" role="tab">Migration History</button>
         </li>
     </ul>
     <div class="tab-content" id="detailsTabsContent" style="background:#222; border-radius:0 0 8px 8px; padding:24px 18px; min-height:420px;">
@@ -70,6 +72,15 @@
 <script src="{{ url_for('static', filename='jquery-3.6.0-min.js') }}"></script>
 <script>
 const detailsLiveUrl = "{{ url_for('details_live') }}";
+var timestamps = {jsonTime: ''};
+function timestampNow() {
+    return new Date().toLocaleString();
+}
+function showTimestamp(target) {
+    let property = target
+    let s = window.timestamps[property]
+    document.getElementById('timestamp').innerText = "Data as of: " + s;
+}
 function renderJson(obj, indent=0) {
     let html = '';
     if (typeof obj === 'object' && obj !== null) {
@@ -133,33 +144,45 @@ function loadLiveDetails() {
                 doc.open();
                 doc.write(renderJsonIframeContent(data[key]));
                 doc.close();
-                // Scroll to bottom
-                // setTimeout(function() {
-                //     try { frame.contentWindow.scrollTo(0, doc.body.scrollHeight); } catch(e) {}
-                // }, 200);
             }
         });
     }).fail(function(xhr) {
         $('#liveDetailsTabsContainer').html('<span style="color:#f66;font-family:monospace">Failed to load details: ' + xhr.statusText + '</span>');
         $('#liveDetailsTabContent').html('');
     });
+    timestamps.jsonTime = timestampNow();
+    showTimestamp('jsonTime');
 }
 $(document).ready(function() {
     function refreshAll() {
         loadLiveDetails();
         // Reload log iframes
         let logFrame = document.getElementById('logFrame');
-        if (logFrame) logFrame.contentWindow.location.reload();
+        if (logFrame) {
+            logFrame.contentWindow.location.reload();
+        }
         let migrateLogFrame = document.getElementById('migrateLogFrame');
-        if (migrateLogFrame) migrateLogFrame.contentWindow.location.reload();
+        if (migrateLogFrame) {
+            migrateLogFrame.contentWindow.location.reload();
+        }
         let initLogFrame = document.getElementById('initLogFrame');
-        if (initLogFrame) initLogFrame.contentWindow.location.reload();
+        if (initLogFrame) {
+            initLogFrame.contentWindow.location.reload();
+        }
         let flybysCsvFrame = document.getElementById('flybysCsvFrame');
-        if (flybysCsvFrame) flybysCsvFrame.contentWindow.location.reload();
+        if (flybysCsvFrame) {
+            flybysCsvFrame.contentWindow.location.reload();
+        }
     }
     loadLiveDetails();
-    $('#live-tab').on('shown.bs.tab', function() { loadLiveDetails(); });
-    $('#refreshDetailsBtn').on('click', function() { refreshAll(); });
+    // $('#live-tab').on('shown.bs.tab', function() {
+    //     // loadLiveDetails();
+    //     showTimestamp('jsonTime');
+    // });
+    $('#refreshDetailsBtn').on('click', function() {
+            refreshAll();
+        }
+    );
     // Auto-scroll log iframes to bottom when loaded
     function scrollAllLogFramesToBottom() {
         ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame'].forEach(function(id) {

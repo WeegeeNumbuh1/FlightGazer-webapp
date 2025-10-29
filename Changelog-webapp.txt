@@ -5,6 +5,20 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.12.0 - 2025-10-29
+    - Details page improvements:
+        - Live Details tab no longer refreshes upon navigation to the tab from other tabs
+        - There's now a time stamp on when the data was accessed
+        - When downloading the state file it now reflects what is currently being displayed and not
+          the state of the file itself when the download button is pressed
+        - The keys in the Live Details page are no longer sorted alphabetically
+        - When viewing the flybys csv, the header is now sticky
+        - Improved the csv rendering from the backend
+        - Further improved handling state file errors with better descriptions of the errors
+        - More descriptive text for cases when the other logs cannot be read
+    - Make API schedule table scrollable
+    - Removed ability to see/configure the WRITE_STATE and FLYBY_STATS_ENABLED settings
+
 v.0.11.2 - 2025-10-28
     - When downloading the initialization log, the date and time is appended as well
 

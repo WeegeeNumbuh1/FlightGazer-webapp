@@ -20,7 +20,7 @@ from time import sleep
 import io
 import datetime
 
-VERSION = "v.0.11.2 --- 2025-10-28"
+VERSION = "v.0.12.0 --- 2025-10-29"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -55,6 +55,7 @@ yaml = YAML()
 yaml.preserve_quotes = True
 
 app = Flask(__name__)
+app.json.sort_keys = False
 
 @app.route('/favicon.ico')
 def favicon():
@@ -504,7 +505,7 @@ def update_config():
         'CLOCK_24HR', 'ALTERNATIVE_FONT', 'DISPLAY_SWITCH_PROGRESS_BAR',
         'ENABLE_TWO_BRIGHTNESS', 'USE_SUNRISE_SUNSET',
         'PREFER_LOCAL', 'HAT_PWM_ENABLED',
-        'FASTER_REFRESH', 'FLYBY_STATS_ENABLED', 'WRITE_STATE'
+        'FASTER_REFRESH', # 'FLYBY_STATS_ENABLED', 'WRITE_STATE'
     ]
     # List of all numeric settings that may be missing
     numeric_keys = [
@@ -551,29 +552,83 @@ def update_config():
 def details_page():
     return render_template('details.html')
 
+current_state_json_cache: str | dict | None = None
 @app.route('/details/live')
 def details_live():
+    global current_state_json_cache
     json_path = CURRENT_STATE_JSON_PATH
     if not os.path.exists(json_path) and os.name == 'nt': # for debug
         json_path = os.path.join(os.path.dirname(__file__), '..', 'current_state.json')
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+            f.seek(0)
+            current_json = f.read()
+        current_state_json_cache = current_json
         return jsonify(data)
-    except FileNotFoundError:
-        return jsonify({'Info': 'Current state file could not be found. FlightGazer may not be running or the setting to write a state file is disabled. Please check the other logs.'})
+    except FileNotFoundError as e:
+        response_json = {
+            'Info':
+            {
+                'status': 'Current state file could not be found.',
+                'what_to_do': 'FlightGazer may not be running or the setting to write a state file is disabled. Please check the other logs.'
+            },
+             'More_Info':
+            {
+                'error_description': f'{e.__class__.__name__}: {e}',
+                'timestamp': append_date_now()
+            }
+        }
+        current_state_json_cache = response_json
+        return jsonify(response_json)
+    except json.decoder.JSONDecodeError as e:
+        response_json = {
+            'Info':
+            {
+                'status': f'The state file is currently blank or could not be decoded.',
+                'what_to_do': 'Please refresh again in a few moments. If this message does not go away, please check the other logs.',
+            },
+            'More_Info':
+            {
+                'error_description': f'{e.__class__.__name__}: {e}',
+                'timestamp': append_date_now()
+            }
+        }
+        current_state_json_cache = response_json
+        return jsonify(response_json)
     except Exception as e:
-        return jsonify({'Error': f'Could not load state file: {e}'})
+        response_json = {
+            'Error':
+             {
+                'status': f'Could not load state file. {e.__class__.__name__}:{e}',
+                'timestamp': append_date_now()
+            }
+        }
+        current_state_json_cache = response_json
+        return jsonify(response_json)
 
 @app.route('/details/download_json')
 def download_json():
     json_path = CURRENT_STATE_JSON_PATH
     if not os.path.exists(json_path): # for debug
         json_path = os.path.join(os.path.dirname(__file__), '..', 'current_state.json')
+    if not current_state_json_cache:
+        details_live()
     try:
-        return send_file(json_path, mimetype='application/json', as_attachment=True, download_name=f'FlightGazer-current_state_[{append_date_now()}].json')
-    except Exception as e:
-        return f'JSON file not found: {e}', 404
+        buffer = io.BytesIO()
+        if isinstance(current_state_json_cache, dict): # handle case when downloading the error codes
+            cache_reencode = json.dumps(current_state_json_cache)
+            buffer.write(cache_reencode.encode('utf-8'))
+            buffer.seek(0)
+        else:
+            buffer.write(current_state_json_cache.encode('utf-8'))
+            buffer.seek(0)
+        return send_file(buffer, mimetype='application/json', as_attachment=True, download_name=f'FlightGazer-current_state_[{append_date_now()}].json')
+    except Exception: # just fall back on downloading the file directly
+        try:
+            return send_file(json_path, mimetype='application/json', as_attachment=True, download_name=f'FlightGazer-current_state_[{append_date_now()}].json')
+        except Exception as e:
+            return f'JSON file not found: {e}', 404
 
 @app.route('/details/log')
 def details_log():
@@ -614,12 +669,12 @@ def details_log_html():
         html += '</body></html>'
         return html
     except Exception as e:
-        return f'<span style="color:#f66;font-family:monospace">Log file not found: {e}</span>', 404
+        return f'<span style="color:#f66;font-family:monospace">Log file not found: {e.__class__.__name__}: {e}</span>', 404
 
 @app.route('/details/migrate_log')
 def details_migrate_log():
     if not os.path.exists(MIGRATE_LOG_PATH):
-        return '<div style="color:#f66;font-family:monospace;padding:12px;">settings_migrate.log not found.</div>', 404
+        return '<div style="color:#f66;font-family:monospace;padding:12px;">Migration history log not found or an update has not been done yet.</div>', 404
     try:
         with open(MIGRATE_LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
             content = f.read()
@@ -630,12 +685,12 @@ def details_migrate_log():
         html += '</body></html>'
         return html
     except Exception as e:
-        return f'<span style="color:#f66;font-family:monospace">Log file not found: {e}</span>', 404
+        return f'<span style="color:#f66;font-family:monospace">Log file not found.<br>{e.__class__.__name__}: {e}</span>', 404
 
 @app.route('/details/download_migrate_log')
 def download_migrate_log():
     if not os.path.exists(MIGRATE_LOG_PATH):
-        return 'settings_migrate.log not found', 404
+        return 'Migration history log not found or an update has not been done yet.', 404
     try:
         return send_file(MIGRATE_LOG_PATH, mimetype='text/plain', as_attachment=True, download_name=f'FlightGazer-settings_migrate_[{append_date_now()}].log')
     except Exception as e:
@@ -645,6 +700,9 @@ init_log_cache = None
 @app.route('/details/init_log')
 def details_init_log():
     global init_log_cache
+    if not is_posix:
+        init_log_cache = None
+        return f'<span style="color:#f66;font-family:monospace;">Initialization log is unavailable on this system.</span>', 404
     try:
         # Fetch logs for FlightGazer-init.sh via journalctl (unit: flightgazer.service or fallback to grep script name)
         result = subprocess.run([
@@ -664,7 +722,7 @@ def details_init_log():
         return html
     except Exception as e:
         init_log_cache = None
-        return f'<span style="color:#f66;font-family:monospace;">Init log not found: {e}</span>', 404
+        return f'<span style="color:#f66;font-family:monospace;">Initialization log not found or unavailable on this system.<br>{e.__class__.__name__}: {e}</span>', 404
 
 @app.route('/details/download_init_log')
 def download_init_log():
@@ -696,22 +754,31 @@ def details_flybys_csv():
     try:
         with open(FLYBY_STATS_PATH, 'r', encoding='utf-8', errors='replace') as f:
             lines = f.readlines()
-        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #444;padding:4px 8px;} th{background:#222;color:#ffd700;} tr:nth-child(even){background:#222;} tr:nth-child(odd){background:#181818;} caption{color:#ffd700;font-weight:bold;margin-bottom:8px;}</style></head><body>'
+        html_ = []
+        html_.append(
+            '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} '
+            'table{border-collapse:collapse;width:100%;} th,td{border:1px solid #444;padding:4px 8px;} '
+            'th{position:sticky;top:0;z-index:1;background:#222;color:#ffd700;} '
+            'tr:nth-child(even){background:#222;} tr:nth-child(odd){background:#181818;} '
+            'caption{color:#ffd700;font-weight:bold;margin-bottom:8px;}</style></head><body>'
+        )
         if lines:
-            html += '<table>'
+            html_.append('<table>')
             for i, line in enumerate(lines):
                 cells = [c.strip() for c in line.strip().split(',')]
                 if i == 0:
-                    html += '<tr>' + ''.join(f'<th>{c}</th>' for c in cells) + '</tr>'
+                    cols = ''.join(f'<th>{c}</th>' for c in cells)
+                    html_.append(f'<tr>{cols}</tr>')
                 else:
-                    html += '<tr>' + ''.join(f'<td>{c}</td>' for c in cells) + '</tr>'
-            html += '</table>'
+                    cols = ''.join(f'<td>{c}</td>' for c in cells)
+                    html_.append(f'<tr>{cols}</tr>')
+            html_.append('</table>')
         else:
-            html += '<div style="color:#aaa">(No data in flybys.csv)</div>'
-        html += '</body></html>'
-        return html
+            html_.append('<div style="color:#aaa">(No data in flybys.csv)</div>')
+        html_.append('</body></html>')
+        return ''.join(html_)
     except Exception as e:
-        return f'<span style="color:#f66;font-family:monospace">CSV file not found: {e}</span>', 404
+        return f'<span style="color:#f66;font-family:monospace">File could not be loaded.<br>{e.__class__.__name__}: {e}</span>', 404
 
 # ========= Startup Control Routes =========
 
@@ -791,13 +858,14 @@ class UpdateRunner(threading.Thread):
         global update_running
         update_running = True
         # Always run with bash, pass script path and any flags
-        self.proc = subprocess.Popen(['bash'] + self.script_args,
-                                     stdin=subprocess.PIPE,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.STDOUT,
-                                     text=True,
-                                     bufsize=1
-                                     )
+        self.proc = subprocess.Popen(
+            ['bash'] + self.script_args,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
         output_history = []
         while True:
             line = self.proc.stdout.readline()
@@ -886,8 +954,10 @@ def check_for_updates():
             if remote_ver_ != remote_ver:
                 remote_ver = remote_ver_
                 remote_changelog = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt', timeout=10).text
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': f'Failed to fetch remote files due to a connection issue. Check the network. Details ---> {e}'}), 500
     except Exception as e:
-        return jsonify({'error': f'Failed to fetch remote files: {e}'}), 500
+        return jsonify({'error': f'Failed to fetch remote files due to an internal error. Details ---> {e.__class__.__name__}: {e}'}), 500
     local_ver = get_version()
     # Truncate changelog to only show entries newer than local version
     lines = remote_changelog.splitlines()
@@ -914,4 +984,6 @@ def reference_guide():
 # ========= Debugging =========
 if __name__ == '__main__':
     if os.name == 'nt':
+        import importlib.metadata
+        print(f"Running Flask version: {importlib.metadata.version('flask')}")
         app.run(debug=True, port=9898)
