@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         body { background: #181818; color: #fff; padding-bottom: 72px; }
-        .logo-container { text-align: center; margin-top: 64px; }
+        .logo-container { text-align: center; margin-top: 24px; }
         .logo-img { max-width: 340px; width: 100%; height: auto; }
         .version-text { text-align: center; font-size: 1em; margin: 12px 0 32px 0; }
         .main-btns { display: flex; flex-direction: column; align-items: center; gap: 22px; margin-top: 10px; }
@@ -20,6 +20,10 @@
     </style>
 </head>
 <body>
+    <div id="top-buttons" class="container py-4">
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:1.5rem;right:0.75rem;z-index:10;" title="Change Theme">☀️🌙</button>
+    <button id="bookmarkBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:absolute;top:1.5rem;left:0.75rem;z-index:9;" title="About">⭐</button>
+    </div>
     {% set status_color = '#3ecf4a' if status == 'running' else ('#888' if status == 'stopped' else '#e53935') %}
     <div class="logo-container">
         <a href="https://github.com/WeegeeNumbuh1/FlightGazer" target="_blank" rel="noopener noreferrer" title="View the project on GitHub">
@@ -34,10 +38,10 @@
             {% elif status == 'manually running' %}FlightGazer has been started manually
             {% else %}FlightGazer status error (check the logs){% endif %}
         </span>
-        <div style="position: relative;margin: auto;width: 50%;">
+        <div style="position: relative;margin: auto;width: 60%;">
             <span class="small-status" id="device-info"></span>
         </div>
-        <div id="serviceStatus" style="position: relative;margin: auto;width: 50%;">
+        <div id="serviceStatus" style="position: relative;margin: auto;width: 60%;">
             <span id="serviceStatusMsg" style="color:#ffd700;text-align: center;"></span>
         </div>
     </div>
@@ -68,8 +72,6 @@
         <button id="restartServiceBtn" class="btn btn-warning me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Restart FlightGazer">Restart</button>
         <button id="stopServiceBtn" class="btn btn-danger" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Stop FlightGazer">Stop</button>
     </div>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;" title="Change Theme">☀️🌙</button>
-    <button id="bookmarkBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:absolute;top:18px;left:24px;z-index:9;" title="About">⭐</button>
     <script>
     const statusURL = "{{ url_for('service_status') }}";
     const serviceRestart = "{{ url_for('restart_flightgazer') }}";
@@ -122,6 +124,7 @@
             document.getElementById('serviceStatusMsg').innerText = 'Starting...';
             fetch(serviceStart, {method:'POST'}).then(r => r.json()).then(data => {
                 if (data.status === 'already_running') {
+                    document.getElementById('serviceStatusMsg').innerText = 'FlightGazer is already running.';
                     alert('FlightGazer is already running.');
                 } else if (data.status === 'started') {
                     document.getElementById('serviceStatusMsg').innerText = 'Service started.';

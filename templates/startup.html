@@ -15,6 +15,7 @@
 <body>
 <div class="container py-4">
     <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:relative;z-index:10;">☀️🌙</button>
     <h2 class="mb-4">Change Startup Options</h2>
     <h4>⚠️ Only enable these if you know what you're doing! ⚠️</h4>
     <h5>(Default is leaving these all unchecked)</h5>
@@ -23,7 +24,6 @@
         <button type="button" id="applyStartupBtn" class="btn btn-success">Apply</button>
         <span id="startupStatus" style="margin-left:16px;color:#ffd700;"></span>
     </form>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
 </div>
 <script>
 const startupOptionsUrl = "{{ url_for('get_startup_options') }}";

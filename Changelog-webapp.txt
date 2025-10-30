@@ -5,6 +5,12 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.12.1 - 2025-10-30
+    - When reading the flyby stats, the latest 1000 lines are read instead of the whole file
+      for both client-side responsiveness and reducing the need to scroll through so many rows
+    - Minor layout tweaks for all pages
+    - Fixed minor UI glitch on the landing page when starting the service and it's already running
+
 v.0.12.0 - 2025-10-29
     - Details page improvements:
         - Live Details tab no longer refreshes upon navigation to the tab from other tabs

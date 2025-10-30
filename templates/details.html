@@ -16,6 +16,7 @@
 <body>
 <div class="container py-4">
     <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:relative;z-index:10;">☀️🌙</button>
     <h2 class="mb-4">Details and Logs</h2>
     <details style="padding-bottom: 24px;"><summary>Show/Hide <b>Download</b> buttons</summary>
     <div class="mb-2 d-flex flex-wrap gap-2" style="padding-top: 16px;">
@@ -66,7 +67,6 @@
             <iframe id="flybysCsvFrame" src="{{ url_for('details_flybys_csv') }}" style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
         </div>
     </div>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
 </div>
 <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery-3.6.0-min.js') }}"></script>

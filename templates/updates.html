@@ -15,6 +15,7 @@
 <body>
     <div class="container py-4">
         <a href="{{ url_for('landing_page') }}" class="btn btn btn-info">&larr; Back to Home</a>
+        <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:relative;z-index:10;">☀️🌙</button>
         <h2 class="mb-4">Check for Updates</h2>
         <h5>Updates can include:</h5>
         <ul>
@@ -34,7 +35,6 @@
         </details>
         It's recommended to use the latest version available, especially if it's been awhile since you last checked.<br>
     </div>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
     <div class="container py-4">
         <div class="mb-3">
             <button id="checkUpdatesBtn" class="btn btn-success">Check Now</button>

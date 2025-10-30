@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
-        body { background: #181818; color: #fff; }
+        body { background: #181818; color: #fff; padding-bottom: 72px; }
         .centered { text-align: center; margin-top: 60px; }
         .back-btn { margin-top: 40px; }
         .help-text { font-size: 0.95em; color: #666; margin-bottom: 0.5em; }
@@ -18,9 +18,11 @@
 <body>
 <div class="container py-4">
     <button id="closeWindow" class="btn btn btn-info">Close this tab/window</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:relative;z-index:10;">☀️🌙</button>
     <h2 class="mb-4">Help and Reference Guide</h2>
     <div id="subheader" class="help-text"></div>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:absolute;top:18px;right:24px;z-index:10;">☀️🌙</button>
+</div>
+<div id="bottomRightAnchor" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
 </div>
 <div class="container py-4">
     <h4>Display Layout Reference</h4>
@@ -62,6 +64,7 @@
     <h4>Output Reference &amp; Troubleshooting</h4>
     <details><summary><b>Expand/Collapse</b></summary>
         <div class="help-text"><i>Valid for FlightGazer v.9.0.0 and newer.</i></div>
+    <div style="overflow-x: auto;">
     <table cellpadding="8">
     <thead>
     <tr>
@@ -169,6 +172,7 @@ N/A    123   N/A </pre>
             <td>
                 <ul>
                 <li>API service may be down, wait until the service is restored.</li>
+                <li>You might have been rate limited. If this keeps happening, try using a smaller RANGE.</li>
                 <li>You may have an issue with your API key. Contact FlightAware.</li>
                 </ul>
             </td>
@@ -183,6 +187,7 @@ N/A    123   N/A </pre>
         </tr>
     </tbody>
 </table>
+</div>
 </details>
 </div>
 <div class="container py-4">

@@ -440,13 +440,15 @@ def landing_page():
     hostname = HOSTNAME
     ip_address = CURRENT_IP
     # Pass localpages to the template
-    return render_template('landing.html',
-                           version=version,
-                           status=status,
-                           localpages=localpages,
-                           webapp_version=webapp_version,
-                           hostname = hostname,
-                           ip_address = ip_address)
+    return render_template(
+        'landing.html',
+        version=version,
+        status=status,
+        localpages=localpages,
+        webapp_version=webapp_version,
+        hostname = hostname,
+        ip_address = ip_address
+    )
 
 # ========= Service Control Routes =========
 
@@ -764,6 +766,12 @@ def details_flybys_csv():
         )
         if lines:
             html_.append('<table>')
+            csv_len = len(lines)
+            if csv_len > 1001: # header + 1000 entries
+                lines_ = lines[-1000:]
+                lines_.insert(0, lines[0])
+                lines = lines_
+                html_.append(f'<i>Showing the latest 1000 lines (out of {csv_len}).</i><br>Download the file for complete data.<br><br>')
             for i, line in enumerate(lines):
                 cells = [c.strip() for c in line.strip().split(',')]
                 if i == 0:
