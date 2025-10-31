@@ -36,6 +36,7 @@
             {% if status == 'running' %}FlightGazer is running
             {% elif status == 'stopped' %}FlightGazer is not running
             {% elif status == 'manually running' %}FlightGazer has been started manually
+            {% elif status == 'degraded' %}FlightGazer is degraded (check the logs)
             {% else %}FlightGazer status error (check the logs){% endif %}
         </span>
         <div style="position: relative;margin: auto;width: 60%;">
@@ -161,8 +162,8 @@
         });
     };
     document.getElementById("bookmarkBtn").addEventListener("click", function() {
-        alert('This is the FlightGazer-webapp, made by WeegeeNumbuh1.\nYou\'re running version: v.{{ webapp_version }}\n\n\
-To see the source code, click the FlightGazer logo.\n\n\
+        alert('This is the FlightGazer-webapp (v.{{ webapp_version }}), made by WeegeeNumbuh1.\n\n\
+To see the source code, click the FlightGazer logo on this page.\n\n\
 It\'s recommended to bookmark this page for easy access.\n\
 - If you\'re on a computer, press ' + (navigator.userAgent.toLowerCase().indexOf('mac') != - 1 ? 'Command/Cmd' : 'CTRL') + ' + D to bookmark this page.\n\
 - If you\'re using a mobile device, open your browser\'s menu and select the option to bookmark this page.')

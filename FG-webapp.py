@@ -20,7 +20,7 @@ from time import sleep
 import io
 import datetime
 
-VERSION = "v.0.12.0 --- 2025-10-29"
+VERSION = "v.0.12.2 --- 2025-10-31"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
