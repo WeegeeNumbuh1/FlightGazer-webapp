@@ -20,7 +20,7 @@ from time import sleep
 import io
 import datetime
 
-VERSION = "v.0.12.2 --- 2025-10-31"
+VERSION = "v.0.12.3 --- 2025-11-06"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -335,6 +335,7 @@ def get_flightgazer_status():
             if result2.returncode == 1: # no failures
                 if ((result.returncode == 0 and result.stdout.strip() == 'active')
                     or result.stdout.strip() == 'activating'):
+                    # try to find the PID of the running instance
                     if current_flightgazer_pid is None:
                         current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
                         if current_flightgazer_pid is not None:
@@ -609,6 +610,21 @@ def details_live():
         current_state_json_cache = response_json
         return jsonify(response_json)
 
+@app.route('/data/current_state.json')
+def show_json():
+    """ Special endpoint if the end user wants to poll the current state of
+    FlightGazer via the webapp (basically the same as `download_json()` but doesn't
+    prompt for download) """
+    json_path = CURRENT_STATE_JSON_PATH
+    if not os.path.exists(json_path): # for debug
+        json_path = os.path.join(os.path.dirname(__file__), '..', 'current_state.json')
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return f'JSON file not found: {e}', 404
+
 @app.route('/details/download_json')
 def download_json():
     json_path = CURRENT_STATE_JSON_PATH
@@ -826,7 +842,7 @@ def set_startup_options():
         for i, line in enumerate(lines):
             if line.strip().startswith('ExecStart='):
                 # Always include -t, then add selected flags
-                new_line = f'ExecStart=bash {INIT_PATH} -t'
+                new_line = f'ExecStart=bash "{INIT_PATH}" -t'
                 for flag in selected_flags:
                     if flag != '-t':
                         new_line += f' {flag}'

@@ -28,6 +28,12 @@ http://<name-of-device-running-FlightGazer>.local/flightgazer
 # you can access the configuration page directly on port 9898/flightgazer
 ```
 
+### Polling FlightGazer's state
+In the same spirit like you can poll `dump1090` data, FlightGazer's running state can be polled at the following endpoint:
+```
+/data/current_state.json
+```
+
 ## Update
 Use the `install-FlightGazer-webapp.sh` file again once the web app is installed to check for updates and install the latest version here in this repo.<br>
 The `update.sh` script for FlightGazer also handles updating the web interface as well and this is the preferred method.

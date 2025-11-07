@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.12.3 - 2025-11-06
+    - Added new endpoint '/data/current_state.json' to allow direct polling of the state file
+    - When updating the FlightGazer service file, the directory is now enclosed in quotes
+
 v.0.12.2 - 2025-10-31
     - Fix landing page never showing the "degraded state" status message
 
