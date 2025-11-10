@@ -23,7 +23,7 @@ import datetime
 import logging
 import importlib.metadata
 
-VERSION = "v.0.13.1 --- 2025-11-09"
+VERSION = "v.0.13.2 --- 2025-11-09"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -313,7 +313,7 @@ def local_webpage_prober() -> dict:
     for url in skystatslocation:
         skystatspage = webpage_title(url)
         if match_title(skystatspage, "Skystats"):
-            pages.update({"Skystats": skystatslocation})
+            pages.update({"Skystats": url})
             break
 
     planefencelocation = f"http://{CURRENT_IP}:8088"

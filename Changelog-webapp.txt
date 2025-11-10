@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.13.2 - 2025-11-09
+    - Fix the fix
+
 v.0.13.1 - 2025-11-09
     - Fix broken Skystats links
 
