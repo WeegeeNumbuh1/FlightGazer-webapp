@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.13.1 - 2025-11-09
+    - Fix broken Skystats links
+
 v.0.13.0 - 2025-11-09
     - Added logging
     - Add some hardening when dealing with the startup configuration to prevent command injection style attacks
