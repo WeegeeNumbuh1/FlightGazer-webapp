@@ -193,7 +193,6 @@ N/A    123   N/A </pre>
 <div class="container py-4">
     <h4>Tips &amp; Tricks</h4>
     <details><summary><b>Expand/Collapse</b></summary>
-    <!-- <h5><a href="{{ url_for('config_page') }}" target="_blank" rel="noopener noreferrer">Configure your settings</a> (opens a new tab).</h5> -->
     <ul>
     <li><b>Turning off the screen at night</b></li>
 <i>Configure Settings → Brightness</i><br><br>
@@ -213,8 +212,15 @@ Simply set the display element to 'BLACK'<br><br>
 <li><b>Extending the life of the physical display</b></li>
 The display is a wear item.<br>
 Over time, some of the pixels may become dimmer or their ability to reproduce accurate color is hindered.<br>
-To delay this effect, lower the brightness of the display.
+To delay this effect, lower the brightness of the display.<br><br>
 
+<li><b>Accessing FlightGazer's data/state programmatically</b></li>
+Visit the <code>/data/current_state.json</code> endpoint to poll FlightGazer's current state.<br>
+You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack) to access running stats and other information like aircraft details and more.<br><br>
+
+<li><b>Viewing FlightGazer in a terminal</b></li>
+Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this system.<br>
+You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br>
 </ul>
     </details>
 </div>

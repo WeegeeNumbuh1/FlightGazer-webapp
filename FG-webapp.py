@@ -8,6 +8,7 @@ it actually works (mostly) and that the actual web pages aren't too janky. """
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
 from ruamel.yaml import YAML
 import os
+import sys
 import re
 import json
 import threading
@@ -19,8 +20,10 @@ import socket
 from time import sleep
 import io
 import datetime
+import logging
+import importlib.metadata
 
-VERSION = "v.0.12.3 --- 2025-11-06"
+VERSION = "v.0.13.0 --- 2025-11-09"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -48,14 +51,31 @@ HOSTNAME = socket.gethostname()
 RUNNING_ADSBIM = False
 localpages = {}
 is_posix = True if os.name == 'posix' else False
+try:
+    FLASK_VER = importlib.metadata.version('flask')
+except Exception:
+    FLASK_VER = "Unknown"
 
 webapp_session = requests.session()
 
 yaml = YAML()
 yaml.preserve_quotes = True
 
+main_logger = logging.getLogger("FlightGazer-webapp")
+# set root logger to write out to file but not stdout
+logging.basicConfig(
+    stream=sys.stdout,
+    format='%(asctime)s.%(msecs)03d - %(name)s %(threadName)s | %(levelname)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    encoding='utf-8',
+    level=logging.INFO,
+)
+
 app = Flask(__name__)
 app.json.sort_keys = False
+main_logger.info(f"This is the FlightGazer-webapp, version {VERSION}")
+main_logger.info(f"Running from {os.getcwd()} on {HOSTNAME}")
+main_logger.info(f"Flask version: {FLASK_VER}")
 
 @app.route('/favicon.ico')
 def favicon():
@@ -76,6 +96,7 @@ def save_config(data):
         orig_stat = os.stat(CONFIG_PATH)
     with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
         yaml.dump(data, f)
+    main_logger.info("Updated main configuration")
     if orig_stat and os.name != 'nt':
         os.chown(CONFIG_PATH, orig_stat.st_uid, orig_stat.st_gid)
 
@@ -177,17 +198,18 @@ def save_color_config(colors):
                         lines[i] = f'{var} = graphics.Color({r}, {g}, {b})\n'
     with open(COLORS_PATH, 'w', encoding='utf-8') as f:
         f.writelines(lines)
+    main_logger.info("Updated color configuration")
     if orig_stat and os.name != 'nt':
         os.chown(COLORS_PATH, orig_stat.st_uid, orig_stat.st_gid)
 
-def get_version():
+def get_version() -> str:
     try:
         with open(VERSION_PATH, 'r', encoding='utf-8') as f:
             return f.read().strip()
     except Exception:
         return 'Unknown'
 
-def get_webapp_version():
+def get_webapp_version() -> str:
     try:
         with open(WEBAPP_VERSION_PATH, 'r', encoding='utf-8') as f:
             return f.read().strip()
@@ -198,6 +220,7 @@ def get_ip() -> None:
     """ Gets us our local IP. Pulled exactly as is from the main FlightGazer script.
     Modifies the global `CURRENT_IP` """
     global CURRENT_IP
+    ip_now = CURRENT_IP
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(0)
     try:
@@ -207,6 +230,10 @@ def get_ip() -> None:
         IP = ""
     finally:
         s.close()
+    if not ip_now and IP:
+        main_logger.info(f"Current IP: {IP}")
+    if ip_now and IP != ip_now:
+        main_logger.info(f"IP address changed: {ip_now} -> {IP}")
     CURRENT_IP = IP
 
 def local_webpage_prober() -> dict:
@@ -220,8 +247,8 @@ def local_webpage_prober() -> dict:
         - Either at /graphs1090 or port 8542
     - Port 8888
         - The Display Emulator
-    - Port 5173
-        - Skystats
+    - Find Skystats
+        - Either at /skystats or port 5173
     - Port 8088
         - Planefence
 
@@ -282,10 +309,13 @@ def local_webpage_prober() -> dict:
             pages.update({"graphs1090 Statistics Interface": url})
             break
 
-    skystatslocation = f"http://{CURRENT_IP}:5173"
-    skystatspage = webpage_title(skystatslocation)
-    if match_title(skystatspage, "Skystats"):
-        pages.update({"Skystats": skystatslocation})
+    skystatslocation = [f"http://{CURRENT_IP}/skystats", f"http://{CURRENT_IP}:5173"]
+    for url in skystatslocation:
+        skystatspage = webpage_title(skystatslocation)
+        if match_title(skystatspage, "Skystats"):
+            pages.update({"Skystats": skystatslocation})
+            break
+
     planefencelocation = f"http://{CURRENT_IP}:8088"
     planefencepage = webpage_title(planefencelocation)
     if match_title(planefencepage, "Planefence"):
@@ -327,6 +357,22 @@ def flightgazer_bad_state():
 def get_flightgazer_status():
     """ Poll the service status """
     global current_flightgazer_pid, current_flightgazer_process, manually_running
+    if not os.path.exists(SERVICE_PATH): # just for convenience when not running on linux (debugging on Windows)
+        try:
+            current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
+            if current_flightgazer_pid is not None:
+                if not current_flightgazer_process:
+                    main_logger.info(f"Detected FlightGazer's PID: {current_flightgazer_pid}")
+                    current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
+                manually_running = True
+                return 'manually running'
+            else:
+                return 'stopped'
+        except Exception:
+            current_flightgazer_pid = None
+            manually_running = False
+            return 'failed'
+
     try:
         # if the previous poll showed that no existing PID for FlightGazer is running, run through this
         if current_flightgazer_process is None or not current_flightgazer_process.is_running():
@@ -339,6 +385,7 @@ def get_flightgazer_status():
                     if current_flightgazer_pid is None:
                         current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
                         if current_flightgazer_pid is not None:
+                            main_logger.info(f"Detected FlightGazer's PID: {current_flightgazer_pid}")
                             # The main process of FlightGazer is running (not in the systemd startup phase)
                             current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
                             manually_running = False
@@ -346,6 +393,7 @@ def get_flightgazer_status():
                 elif result.returncode == 3 or result.stdout.strip() == 'inactive':
                     current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
                     if current_flightgazer_pid is not None:
+                        main_logger.info(f"Detected a manual instance of FlightGazer, PID: {current_flightgazer_pid}")
                         current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
                         manually_running = True
                         return 'manually running'
@@ -365,6 +413,7 @@ def get_flightgazer_status():
                 # case when it is manually running and a service restart was attempted (it will always fail)
                 current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
                 if current_flightgazer_pid is not None:
+                    main_logger.info(f"Detected a manual instance of FlightGazer, PID: {current_flightgazer_pid}")
                     current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
                     manually_running = True
                     return 'manually running'
@@ -397,6 +446,30 @@ def remove_ansi_escape(input: str) -> str:
 def append_date_now() -> str:
     """ Returns a string of the current local time, in ISO8601 format, compatible with filesystems """
     return datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S")
+
+remote_ver = None
+remote_changelog = None
+def update_fetcher() -> None:
+    """ Checks and fetches changelog from the repo.
+    Modifies the globals `remote_ver` and `remote_changelog`.
+    You must encapsulate this function in a try-except block. """
+    global remote_ver, remote_changelog
+    # Fetch remote version and changelog
+    main_logger.info("Update check requested")
+    ver_file = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version'
+    new_changelog = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt'
+    if remote_ver is None:
+        remote_ver = requests.get(ver_file, timeout=10).text.strip()
+        remote_changelog = requests.get(new_changelog, timeout=10).text
+        main_logger.info(f"Version available online: {remote_ver}")
+    else:
+        remote_ver_ = requests.get(ver_file, timeout=10).text.strip()
+        if remote_ver_ != remote_ver:
+            main_logger.info(f"Version available online: {remote_ver}")
+            remote_ver = remote_ver_
+            remote_changelog = requests.get(new_changelog, timeout=10).text
+        else:
+            main_logger.info("Cache still valid; no updates since last checked")
 
 # ========= Initialization Stuff =========
 get_ip()
@@ -457,31 +530,42 @@ def landing_page():
 def restart_flightgazer():
     try:
         # Restart the systemd service
+        main_logger.info("FlightGazer service restart requested")
         subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True)
+        main_logger.info("FlightGazer service restart successful")
         return jsonify({'status': 'success'})
     except Exception as e:
+        main_logger.exception("FlightGazer service restart failed.")
         return jsonify({'status': 'error', 'error': str(e)})
 
 @app.route('/service/start', methods=['POST'])
 def start_flightgazer_service():
-    import subprocess
     try:
         status = get_flightgazer_status()
         if status == 'running':
             return jsonify({'status': 'already_running'})
         # Start the service in the background
-        subprocess.Popen(['systemctl', 'start', 'flightgazer'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        main_logger.info("FlightGazer service start requested")
+        subprocess.Popen(
+            ['systemctl', 'start', 'flightgazer'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        main_logger.info("FlightGazer service start successful")
         return jsonify({'status': 'started'})
     except Exception as e:
+        main_logger.exception("FlightGazer service start failed.")
         return jsonify({'status': 'error', 'error': str(e)})
 
 @app.route('/service/stop', methods=['POST'])
 def stop_flightgazer_service():
-    import subprocess
     try:
+        main_logger.info("FlightGazer service stop requested")
         subprocess.run(['systemctl', 'stop', 'flightgazer'], check=True)
+        main_logger.info("FlightGazer service stop successful")
         return jsonify({'status': 'stopped'})
     except Exception as e:
+        main_logger.exception("FlightGazer service stop failed")
         return jsonify({'status': 'error', 'error': str(e)})
 
 @app.route('/service/status')
@@ -496,7 +580,13 @@ def config_page():
     config = load_config()
     predefined_colors, predefined_colors_rgb = get_predefined_colors()
     color_config = get_color_config()
-    return render_template('config.html', config=config, predefined_colors=predefined_colors, predefined_colors_rgb=predefined_colors_rgb, color_config=color_config)
+    return render_template(
+        'config.html',
+        config=config,
+        predefined_colors=predefined_colors,
+        predefined_colors_rgb=predefined_colors_rgb,
+        color_config=color_config
+    )
 
 @app.route('/update', methods=['POST'])
 def update_config():
@@ -574,7 +664,9 @@ def details_live():
             'Info':
             {
                 'status': 'Current state file could not be found.',
-                'what_to_do': 'FlightGazer may not be running or the setting to write a state file is disabled. Please check the other logs.'
+                'what_to_do': ('FlightGazer may not be running or '
+                               'the setting to write a state file is disabled. '
+                               'Please check the other logs.')
             },
              'More_Info':
             {
@@ -589,7 +681,8 @@ def details_live():
             'Info':
             {
                 'status': f'The state file is currently blank or could not be decoded.',
-                'what_to_do': 'Please refresh again in a few moments. If this message does not go away, please check the other logs.',
+                'what_to_do': ('Please refresh again in a few moments. '
+                               'If this message does not go away, please check the other logs.')
             },
             'More_Info':
             {
@@ -634,6 +727,7 @@ def download_json():
         details_live()
     try:
         buffer = io.BytesIO()
+        main_logger.info("FlightGazer current state download requested")
         if isinstance(current_state_json_cache, dict): # handle case when downloading the error codes
             cache_reencode = json.dumps(current_state_json_cache)
             buffer.write(cache_reencode.encode('utf-8'))
@@ -641,10 +735,20 @@ def download_json():
         else:
             buffer.write(current_state_json_cache.encode('utf-8'))
             buffer.seek(0)
-        return send_file(buffer, mimetype='application/json', as_attachment=True, download_name=f'FlightGazer-current_state_[{append_date_now()}].json')
+        return send_file(
+            buffer,
+            mimetype='application/json',
+            as_attachment=True,
+            download_name=f'FlightGazer-current_state_[{append_date_now()}].json'
+        )
     except Exception: # just fall back on downloading the file directly
         try:
-            return send_file(json_path, mimetype='application/json', as_attachment=True, download_name=f'FlightGazer-current_state_[{append_date_now()}].json')
+            return send_file(
+                json_path,
+                mimetype='application/json',
+                as_attachment=True,
+                download_name=f'FlightGazer-current_state_[{append_date_now()}].json'
+            )
         except Exception as e:
             return f'JSON file not found: {e}', 404
 
@@ -662,7 +766,13 @@ def download_log():
     if not os.path.exists(LOG_PATH):
         raise FileNotFoundError
     try:
-        return send_file(LOG_PATH, mimetype='text/plain', as_attachment=True, download_name=f'FlightGazer-log_[{append_date_now()}].log')
+        main_logger.info("FlightGazer log download requested")
+        return send_file(
+            LOG_PATH,
+            mimetype='text/plain',
+            as_attachment=True,
+            download_name=f'FlightGazer-log_[{append_date_now()}].log'
+        )
     except Exception as e:
         return f'Log file not found: {e}', 404
 
@@ -710,7 +820,13 @@ def download_migrate_log():
     if not os.path.exists(MIGRATE_LOG_PATH):
         return 'Migration history log not found or an update has not been done yet.', 404
     try:
-        return send_file(MIGRATE_LOG_PATH, mimetype='text/plain', as_attachment=True, download_name=f'FlightGazer-settings_migrate_[{append_date_now()}].log')
+        main_logger.info("Migration log download requested")
+        return send_file(
+            MIGRATE_LOG_PATH,
+            mimetype='text/plain',
+            as_attachment=True,
+            download_name=f'FlightGazer-settings_migrate_[{append_date_now()}].log'
+        )
     except Exception as e:
         return f'Log file not found: {e}', 404
 
@@ -752,7 +868,13 @@ def download_init_log():
             buffer = io.BytesIO()
             buffer.write(init_log_cache.encode('utf-8'))
             buffer.seek(0)
-            return send_file(buffer, mimetype='text/plain', as_attachment=True, download_name=f'FlightGazer-initialization_[{append_date_now()}].log')
+            main_logger.info("FlightGazer init log download requested")
+            return send_file(
+                buffer,
+                mimetype='text/plain',
+                as_attachment=True,
+                download_name=f'FlightGazer-initialization_[{append_date_now()}].log'
+            )
         except Exception as e:
             return f'Initialization log is not available: {e}', 404
 
@@ -761,7 +883,13 @@ def download_flybys_csv():
     if not os.path.exists(FLYBY_STATS_PATH):
         return 'flybys.csv not found', 404
     try:
-        return send_file(FLYBY_STATS_PATH, mimetype='text/csv', as_attachment=True, download_name='flybys.csv')
+        main_logger.info("Flybys stats file download requested")
+        return send_file(
+            FLYBY_STATS_PATH,
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name='flybys.csv'
+        )
     except Exception as e:
         return f'CSV file not found: {e}', 404
 
@@ -819,6 +947,8 @@ STARTUP_OPTIONS = [
 
 @app.route('/startup/options')
 def get_startup_options():
+    if not os.path.exists(SERVICE_PATH):
+        return jsonify({'error': 'Service file does not exist. FlightGazer might not be installed.'}), 500
     # Read current flags from ExecStart in service file
     try:
         with open(SERVICE_PATH, 'r', encoding='utf-8') as f:
@@ -834,27 +964,66 @@ def get_startup_options():
 
 @app.route('/startup/set', methods=['POST'])
 def set_startup_options():
+    if not os.path.exists(SERVICE_PATH):
+        return jsonify({'error': 'Service file does not exist. FlightGazer might not be installed.'}), 500
+
+    main_logger.info("Service file change requested")
     data = request.json
     selected_flags = data.get('flags', [])
+    # Validate that all flags are in the allowed options list
+    allowed_flags = {opt['flag'] for opt in STARTUP_OPTIONS}
+    allowed_flags.add('-t')  # always add this
+
+    if not all(flag in allowed_flags for flag in selected_flags):
+        main_logger.error("Invalid startup flags passed to service config")
+        return jsonify({'error': 'Invalid startup flags detected'}), 400
+
     try:
         with open(SERVICE_PATH, 'r', encoding='utf-8') as f:
             lines = f.readlines()
+
+        # validate service file contains expected format
+        if not any(line.strip().startswith('ExecStart=') for line in lines):
+            main_logger.error("Invalid service file format")
+            return jsonify({'error': 'Invalid service file format'}), 500
+
         for i, line in enumerate(lines):
             if line.strip().startswith('ExecStart='):
-                # Always include -t, then add selected flags
+                # construct command with strict path validation
+                if not os.path.isfile(INIT_PATH):
+                    main_logger.error("Could not find initialization script")
+                    return jsonify({'error': 'Initialization script not found'}), 500
+
+                # build command with validated flags
                 new_line = f'ExecStart=bash "{INIT_PATH}" -t'
                 for flag in selected_flags:
-                    if flag != '-t':
+                    if flag in allowed_flags and flag != '-t':
                         new_line += f' {flag}'
                 new_line += '\n'
                 lines[i] = new_line
+
+        # validate final command doesn't contain sus characters
+        if any(char in new_line for char in ';&|$()`'):
+            main_logger.error("Invalid characters found in service file commands")
+            return jsonify({'error': 'Invalid characters in command'}), 400
+
         with open(SERVICE_PATH, 'w', encoding='utf-8') as f:
             f.writelines(lines)
-        # Run systemctl daemon-reload
-        import subprocess
-        subprocess.run(['systemctl', 'daemon-reload'], check=True)
+
+        # run systemctl daemon-reload with subprocess security
+        subprocess.run(['systemctl', 'daemon-reload'],
+                     check=True,
+                     shell=False,
+                     timeout=15)
+
+        main_logger.info("Service file successfully updated")
         return jsonify({'status': 'success'})
+
+    except subprocess.TimeoutExpired:
+        main_logger.error("Service file reload timed out")
+        return jsonify({'error': 'Command timed out'}), 500
     except Exception as e:
+        main_logger.exception("Uncaught error in service file update")
         return jsonify({'error': str(e)}), 500
 
 # ========= Updates Handling Routes and Functions =========
@@ -914,6 +1083,7 @@ class UpdateRunner(threading.Thread):
                     self.proc.terminate()
                     update_running = False
                     break
+        main_logger.info("FlightGazer update process has finished")
         # Drain remaining output
         for line in self.proc.stdout:
             output_history.append(line)
@@ -928,6 +1098,7 @@ def start_update():
     if request.is_json:
         data = request.get_json()
         reset_config = data.get('reset_config', False)
+    main_logger.info("Starting FlightGazer update process")
     with update_lock:
         if update_running:
             return jsonify({'status':'already_running'})
@@ -963,33 +1134,22 @@ def send_update_input():
 #     except Exception:
 #         return ''
 
-remote_ver = None
-remote_changelog = None
 @app.route('/updates/check', methods=['POST'])
 def check_for_updates():
-    global remote_ver, remote_changelog
-    # Fetch remote version and changelog
     try:
-        if remote_ver is None:
-            remote_ver = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version', timeout=10).text.strip()
-            remote_changelog = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt', timeout=10).text
-        else:
-            remote_ver_ = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version', timeout=10).text.strip()
-            if remote_ver_ != remote_ver:
-                remote_ver = remote_ver_
-                remote_changelog = requests.get('https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt', timeout=10).text
+        update_fetcher()
     except requests.exceptions.RequestException as e:
+        main_logger.error(f"Update checker failed to fetch remote files. {e}")
         return jsonify({'error': f'Failed to fetch remote files due to a connection issue. Check the network. Details ---> {e}'}), 500
     except Exception as e:
+        main_logger.exception("Could not fetch remote files.")
         return jsonify({'error': f'Failed to fetch remote files due to an internal error. Details ---> {e.__class__.__name__}: {e}'}), 500
     local_ver = get_version()
     # Truncate changelog to only show entries newer than local version
     lines = remote_changelog.splitlines()
     truncated = []
-    found = False
-    for i, line in enumerate(lines):
+    for line in lines:
         if line.strip().startswith(f'v.{local_ver} '):
-            found = True
             break
         truncated.append(line)
     # If found, only show lines above current version
@@ -1000,14 +1160,16 @@ def check_for_updates():
         'changelog': changelog_to_show
     })
 
-# ========= Help/Reference html ==========
+# ========= Help/Reference html =========
 @app.route('/reference')
 def reference_guide():
     return render_template('reference.html', is_adsbim=RUNNING_ADSBIM)
 
+# ========= Misc =========
+if os.path.exists(VERSION_PATH):
+    main_logger.info(f"Found FlightGazer ({get_version()})")
+
 # ========= Debugging =========
 if __name__ == '__main__':
     if os.name == 'nt':
-        import importlib.metadata
-        print(f"Running Flask version: {importlib.metadata.version('flask')}")
         app.run(debug=True, port=9898)
