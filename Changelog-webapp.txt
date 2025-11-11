@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.13.3 - 2025-11-11
+    - Added support for FlightGazer v.9.4.0
+
 v.0.13.2 - 2025-11-09
     - Fix the fix
 

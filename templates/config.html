@@ -414,6 +414,16 @@
             </div>
             <div class="mt-3">
                 <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="NO_GROUND_TRACKING" name="NO_GROUND_TRACKING" {% if config.NO_GROUND_TRACKING %}checked{% endif %}>
+                    <label class="form-check-label setting-label" for="NO_GROUND_TRACKING">No Ground Tracking</label>
+                </div>
+                    <div class="help-text">If an aircraft reports that it's on the ground, do not track/stop tracking it.<br>
+                    If using <code>NO_FILTER</code> mode, this setting is ignored.<br>
+                    <i>Default: Disabled</i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="PREFER_LOCAL" name="PREFER_LOCAL" {% if config.PREFER_LOCAL %}checked{% endif %}>
                     <label class="form-check-label setting-label" for="PREFER_LOCAL">Prefer Local</label>
                 </div>
@@ -1013,8 +1023,9 @@ $(document).ready(function() {
         data['PREFER_LOCAL'] = form.PREFER_LOCAL && form.PREFER_LOCAL.checked;
         data['HAT_PWM_ENABLED'] = form.HAT_PWM_ENABLED && form.HAT_PWM_ENABLED.checked;
         data['FASTER_REFRESH'] = form.FASTER_REFRESH && form.FASTER_REFRESH.checked;
-        data['FLYBY_STATS_ENABLED'] = form.FLYBY_STATS_ENABLED && form.FLYBY_STATS_ENABLED.checked;
-        data['WRITE_STATE'] = form.WRITE_STATE && form.WRITE_STATE.checked;
+        data['NO_GROUND_TRACKING'] = form.NO_GROUND_TRACKING && form.NO_GROUND_TRACKING.checked;
+        // data['FLYBY_STATS_ENABLED'] = form.FLYBY_STATS_ENABLED && form.FLYBY_STATS_ENABLED.checked;
+        // data['WRITE_STATE'] = form.WRITE_STATE && form.WRITE_STATE.checked;
         data['BRIGHTNESS'] = parseInt(form.BRIGHTNESS.value);
         if ($('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE').is(':checked')) {
             data['ACTIVE_PLANE_DISPLAY_BRIGHTNESS'] = parseInt(form.ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value);

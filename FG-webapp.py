@@ -23,7 +23,7 @@ import datetime
 import logging
 import importlib.metadata
 
-VERSION = "v.0.13.2 --- 2025-11-09"
+VERSION = "v.0.13.3 --- 2025-11-11"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -598,7 +598,7 @@ def update_config():
         'CLOCK_24HR', 'ALTERNATIVE_FONT', 'DISPLAY_SWITCH_PROGRESS_BAR',
         'ENABLE_TWO_BRIGHTNESS', 'USE_SUNRISE_SUNSET',
         'PREFER_LOCAL', 'HAT_PWM_ENABLED',
-        'FASTER_REFRESH', # 'FLYBY_STATS_ENABLED', 'WRITE_STATE'
+        'FASTER_REFRESH', 'NO_GROUND_TRACKING', # 'FLYBY_STATS_ENABLED', 'WRITE_STATE'
     ]
     # List of all numeric settings that may be missing
     numeric_keys = [
@@ -607,30 +607,30 @@ def update_config():
     ]
     # Update config with posted data
     for key, value in data.items():
-        if key == 'API_SCHEDULE':
-            config['API_SCHEDULE']['ENABLED'] = value['ENABLED']
-            for day in ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']:
-                config['API_SCHEDULE'][day]['0-11'] = value[day]['0-11']
-                config['API_SCHEDULE'][day]['12-23'] = value[day]['12-23']
-        elif key == 'BRIGHTNESS_SWITCH_TIME':
-            config['BRIGHTNESS_SWITCH_TIME']['Sunrise'] = value['Sunrise']
-            config['BRIGHTNESS_SWITCH_TIME']['Sunset'] = value['Sunset']
-        elif key == 'CLOCK_CENTER_ROW':
-            config['CLOCK_CENTER_ROW']['ROW1'] = value['ROW1']
-            config['CLOCK_CENTER_ROW']['ROW2'] = value['ROW2']
-        elif key == 'colors':
-            # Do not add colors to config dict
-            pass
-        else:
-            config[key] = value
-    # Ensure all checkboxes are set (False if missing)
+        match key:
+            case 'API_SCHEDULE':
+                config['API_SCHEDULE']['ENABLED'] = value['ENABLED']
+                for day in ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']:
+                    config['API_SCHEDULE'][day]['0-11'] = value[day]['0-11']
+                    config['API_SCHEDULE'][day]['12-23'] = value[day]['12-23']
+            case 'BRIGHTNESS_SWITCH_TIME':
+                config['BRIGHTNESS_SWITCH_TIME']['Sunrise'] = value['Sunrise']
+                config['BRIGHTNESS_SWITCH_TIME']['Sunset'] = value['Sunset']
+            case 'CLOCK_CENTER_ROW':
+                config['CLOCK_CENTER_ROW']['ROW1'] = value['ROW1']
+                config['CLOCK_CENTER_ROW']['ROW2'] = value['ROW2']
+            case 'colors':
+                # Do not add colors to config dict
+                pass
+            case _:
+                config[key] = value
+    # skip entries that don't have an associated key
     for key in bool_keys:
         if key not in data:
-            config[key] = False
-    # Ensure all numeric fields are set (0 if missing)
+            continue
     for key in numeric_keys:
         if key not in data:
-            config[key] = 0
+            continue
     # Remove any lingering 'colors' key from config dict if present
     if 'colors' in config:
         del config['colors']
