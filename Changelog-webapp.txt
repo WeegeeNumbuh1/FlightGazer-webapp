@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.13.4 - 2025-11-15
+    - Update config page help text and some settings limits for FlightGazer v.9.5.0
+    - Improved text formatting for the help text
+
 v.0.13.3 - 2025-11-11
     - Added support for FlightGazer v.9.4.0
 

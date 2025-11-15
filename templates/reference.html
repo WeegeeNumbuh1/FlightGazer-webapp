@@ -13,6 +13,7 @@
         .help-text { font-size: 0.95em; color: #666; margin-bottom: 0.5em; }
         .inline-image { max-width: 256px; }
         .table-padding { padding: 16px; }
+        .monospace { font-family: monospace; }
     </style>
 </head>
 <body>
@@ -48,13 +49,13 @@
     <td><img src="{{ url_for('static', filename='FG_journey-plus-annotated.png') }}" alt="FlightGazer journey plus" class="inline-image"></td>
 </tr>
 <tr>
-    <td><b>Journey Plus</b><br>1.	Scrolling marquee (enabled with <code>Show Even More Info</code>) or aircraft ground track and vertical speed<br>2.	Ground track of the aircraft (or RSSI of signal when <code>Show Even More Info</code> is disabled)<br></td>
+    <td><b>Journey Plus</b><br>1.	Scrolling marquee (enabled with <span class="monospace">Show Even More Info</span>) or aircraft ground track and vertical speed<br>2.	Ground track of the aircraft (or RSSI of signal when <span class="monospace">Show Even More Info</span> is disabled)<br></td>
 </tr>
 <tr>
     <td><img src="{{ url_for('static', filename='FG_enhanced-readout-annotated.png') }}" alt="FlightGazer enhanced readout" class="inline-image"></td>
 </tr>
 <tr>
-<td><b>Enhanced Readout</b><br>1.	Current position of the aircraft<br>2.	Ground track of the aircraft<br>3.	Current vertical speed of the aircraft<br>4.	RSSI – (Received Signal Strength Index) how strong of a signal from the aircraft as detected by the receiver (in dBFS)</td>
+<td><b>Enhanced Readout</b><br>1.	Current position of the aircraft<br>2.	Ground track of the aircraft<br>3.	Current vertical speed of the aircraft<br>4.	RSSI – (Received Signal Strength Index) how strong of a signal from the aircraft as detected by the receiver (in <a href="https://en.wikipedia.org/wiki/DBFS" target="_blank" rel="noopener noreferrer">dBFS</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -153,7 +154,7 @@ N/A    123   N/A </pre>
                 <li>Aircraft blocked from tracking.</li>
                 <li>Aircraft detected before API was able to.</li>
             </td>
-            <td><ul><li>For aircraft that are not blocked from tracking: try using a smaller RANGE.</li></ul></td>
+            <td><ul><li>For aircraft that are not blocked from tracking: try using a lower <span class="monospace">FLYBY_STALENESS</span> value.</li></ul></td>
         </tr>
         <tr>
             <td>
@@ -172,7 +173,7 @@ N/A    123   N/A </pre>
             <td>
                 <ul>
                 <li>API service may be down, wait until the service is restored.</li>
-                <li>You might have been rate limited. If this keeps happening, try using a smaller RANGE.</li>
+                <li>You might have been rate limited. If this keeps happening, try using a smaller <span class="monospace">RANGE</span>.</li>
                 <li>You may have an issue with your API key. Contact FlightAware.</li>
                 </ul>
             </td>
@@ -196,13 +197,14 @@ N/A    123   N/A </pre>
     <ul>
     <li><b>Turning off the screen at night</b></li>
 <i>Configure Settings → Brightness</i><br><br>
-Enable <code>Dynamic Brightness</code> and set <code>Secondary Brightness</code> to <code>0</code><br>
-If you don't want it to turn off at sunset, disable <code>Use Sunrise/Sunset</code> then set <code>Brightness Switch Time</code>.<br>
+Enable <span class="monospace">Dynamic Brightness</span> and set <span class="monospace">Secondary Brightness</span> to <code>0</code><br>
+If you don't want it to turn off at sunset, disable <span class="monospace">Use Sunrise/Sunset</span> then set <span class="monospace">Brightness Switch Time</span>.<br>
 <i>Note: FlightGazer will still be running *and* driving the screen, even with a brightness of 0.</i><br><br>
 
 <li><b>Only turn on the screen when there's an aircraft nearby (no clock)</b></li>
 <i>Configure Settings → Brightness</i><br><br>
-Set <code>Brightness</code> to <code>0</code> and disable <code>Dynamic Brightness</code>.<br>Enable and set <code>Active Plane Display Brightness</code> to the desired value.<br>
+Set <span class="monospace">Brightness</span> to <code>0</code> and disable <span class="monospace">Dynamic Brightness</span>.<br>
+Enable and set <span class="monospace">Active Plane Display Brightness</span> to the desired value.<br>
 <i>Note: If you use <code>NO_FILTER</code> mode and follow this tip, the display will remain blank.</i><br><br>
 
 <li><b>Hiding elements on the display</b></li>

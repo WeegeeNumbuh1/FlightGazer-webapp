@@ -16,6 +16,7 @@
         .setting-label { font-weight: 600; font-size: 1.08em; color: #7b86ff; }
         .form-range { background-color: #0e0e0e2e; }
         .inline-image { max-width: 256px; }
+        .monospace { font-family: monospace; }
     </style>
 </head>
 <body>
@@ -185,7 +186,7 @@
                     <label class="form-check-label setting-label" for="JOURNEY_PLUS">Journey Plus</label>
                 </div>
                 <div class="help-text">
-                    A hybrid between <code>Enhanced Readout</code> and the default journey (origin/destination) display.<br>
+                    A hybrid between <span class="monospace">Enhanced Readout</span> and the default journey (origin/destination) display.<br>
                     Adds:<br>
                     <ul>
                     <li>Track (example: <code>T▼180°</code>)
@@ -234,9 +235,9 @@
                     <label class="form-check-label setting-label" for="ENHANCED_READOUT_AS_FALLBACK">Enhanced Readout as Fallback</label>
                 </div>
                 <div class="help-text">
-                    Switch to <code>Enhanced Readout</code> if API is unavailable or any of the API limits are reached.<br>
+                    Switch to <span class="monospace">Enhanced Readout</span> if API is unavailable or any of the API limits are reached.<br>
                     When the API can be used again, the display will switch back to the other layouts.<br>
-                    Only works when <code>Enhanced Readout</code> is disabled.<br>
+                    Only works when <span class="monospace">Enhanced Readout</span> is disabled.<br>
                     This setting is recommended to be left enabled unless you prefer the other layouts even when route information is unavailable.</div>
             </div>
             <div class="mt-3">
@@ -248,8 +249,8 @@
                 </div>
                 <div class="help-text">
                     Display additional info such as aircraft type, airline, owner, and journey details as a scrolling marquee/ticker.<br>
-                    Only works with the <code>Journey Plus</code> or <code>Enhanced Readout</code> modes.<br>
-                    When using <code>Journey Plus</code> :
+                    Only works with the <span class="monospace">Journey Plus</span> or <span class="monospace">Enhanced Readout</span> modes.<br>
+                    When using <span class="monospace">Journey Plus</span> :
                 <ul>
                     <li>Replaces the center readout (Vertical Speed is unavailable)</li>
                     <li>Replaces RSSI with Track in the bottom right</li>
@@ -274,7 +275,7 @@
                 </div>
                 <div class="help-text">
                     Use a less squared-off font for the majority of the display's output.<br>
-                    Helps when trying to distingush characters such as '0' vs 'O' or 'S' vs '5'.
+                    Helps when trying to distingush characters such as '<span class="monospace">0</span>' vs '<span class="monospace">O</span>' or '<span class="monospace">S</span>' vs '<span class="monospace">5</span>'.
                 </div>
             </div>
             <div class="mt-3">
@@ -329,7 +330,7 @@
                 </div>
                 <div class="help-text">
                     Use a different brightness when tracking an aircraft. Toggle to enable and set value.<br>
-                    This setting is unaffected by <code>Dynamic Brightness</code>.
+                    This setting is unaffected by <span class="monospace">Dynamic Brightness</span>.
                 </div>
                 <div class="input-group">
                     <input type="range" class="form-range" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}>
@@ -389,14 +390,14 @@
             <div class="mt-3">
                 <label for="FLYBY_STALENESS" class="form-label setting-label">Flyby Staleness</label>
                 <div class="help-text">
-                    Time in minutes before a flyby is considered new.<br>
-                    A lower value may raise the daily flyby count and number of API calls in a day.<br>
-                    <i>If you're near an airport, setting this lower than 60 can give you more accurate API results, especially for general aviation.</i><br>
-                    <i>Default: 60</i>
+                    If the same aircraft appears again before this time (in minutes), do not consider it as a new flyby and assume the last API results still apply (if the API is enabled).<br>
+                    A lower value may raise the daily flyby count and number of API calls in a day, but is useful if you live very close to an airport/runway.<br>
+                    <i>The default value works well for both general aviation and multi-hop commercial flights.</i><br>
+                    <i>Default: 30</i>
                 </div>
                 <div class="input-group">
-                    <input type="range" class="form-range" min="2" max="1440" id="FLYBY_STALENESS" name="FLYBY_STALENESS" value="{{ config.FLYBY_STALENESS }}" oninput="FLYBY_STALENESS_num.value = this.value">
-                    <input type="number" class="form-control" min="2" max="1440" id="FLYBY_STALENESS_num" value="{{ config.FLYBY_STALENESS }}" style="max-width:100px; margin-left:8px;" oninput="FLYBY_STALENESS.value = this.value; FLYBY_STALENESS_value.value = this.value">
+                    <input type="range" class="form-range" min="2" max="720" id="FLYBY_STALENESS" name="FLYBY_STALENESS" value="{{ config.FLYBY_STALENESS }}" oninput="FLYBY_STALENESS_num.value = this.value">
+                    <input type="number" class="form-control" min="2" max="720" id="FLYBY_STALENESS_num" value="{{ config.FLYBY_STALENESS }}" style="max-width:100px; margin-left:8px;" oninput="FLYBY_STALENESS.value = this.value; FLYBY_STALENESS_value.value = this.value">
                     <!-- <output id="FLYBY_STALENESS_value" style="margin-left:8px;">{{ config.FLYBY_STALENESS }}</output> -->
                 </div>
             </div>
@@ -438,7 +439,7 @@
                 <div class="help-text">
                     URL of your dump1090 install if it's in a different location or on a different network device.<br>
                     Leave this blank to not use this feature.<br>
-                    <i>Example: http://localhost/custom_name_here</i> or <i>http://192.168.xxx.xxx:8080 (no trailing /)</i>
+                    <i>Example: <span class="monospace">http://localhost/custom_name_here</span></i> or <i><span class="monospace">http://192.168.xxx.xxx:8080</span> (no trailing <span class="monospace">/</span>)</i>
                 </div>
                 <input type="text" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION" value="{{ config.CUSTOM_DUMP1090_LOCATION }}" style="font-family: monospace;">
             </div>
@@ -447,7 +448,7 @@
                 <div class="help-text">
                     URL of your dump978 install if it's in a different location or on a different network device.<br>
                     Leave this blank to not use this feature.<br>
-                    <i>Example: http://192.168.xxx.xxx:8978</i>
+                    <i>Example: <span class="monospace">http://192.168.xxx.xxx:8978</span></i>
                 </div>
                 <input type="text" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION" value="{{ config.CUSTOM_DUMP978_LOCATION }}" style="font-family: monospace;">
             </div>
@@ -455,9 +456,9 @@
                 <label for="FOLLOW_THIS_AIRCRAFT" class="form-label setting-label">Follow This Aircraft</label>
                 <div class="help-text">
                     ICAO hex ID of a specific aircraft to follow. Leave this blank to not use this feature.<br>
-                    When this aircraft enters the reception area for your ADS-B receiver (not the values set by <code>Height Limit</code> or <code>Range</code>),<br>
-                    FlightGazer will start tracking it as if it were inside your designated <code>Range</code>.<br>
-                    When tracking this aircraft, <code>Enhanced Readout</code> will be used regardless of the setting for that option<br>
+                    When this aircraft enters the reception area for your ADS-B receiver (not the values set by <span class="monospace">Height Limit</span> or <span class="monospace">Range</span>),<br>
+                    FlightGazer will start tracking it as if it were inside your designated <span class="monospace">Range</span>.<br>
+                    When tracking this aircraft, <span class="monospace">Enhanced Readout</span> will be used regardless of the setting for that option<br>
                     and will append a "*" on the aircraft's callsign. This does not disable API use when this aircraft is being tracked.
                 </div>
                 <input type="text" class="form-control" id="FOLLOW_THIS_AIRCRAFT" name="FOLLOW_THIS_AIRCRAFT" value="{{ config.FOLLOW_THIS_AIRCRAFT }}" style="font-family: monospace;" maxlength="6" pattern="[0-9a-fA-F]+">
