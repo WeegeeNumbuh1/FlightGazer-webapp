@@ -5,6 +5,11 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.14.0 - 2025-11-22
+    - Add support for additional options for FlightGazer v.9.6.0
+    - Add additional section in Reference page for clock center row abbreviations
+    - Add scrollback buttons for the Reference page sections and some config pages
+
 v.0.13.4 - 2025-11-15
     - Update config page help text and some settings limits for FlightGazer v.9.5.0
     - Improved text formatting for the help text

@@ -23,7 +23,7 @@ import datetime
 import logging
 import importlib.metadata
 
-VERSION = "v.0.13.4 --- 2025-11-15"
+VERSION = "v.0.14.0 --- 2025-11-22"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -599,6 +599,7 @@ def update_config():
         'ENABLE_TWO_BRIGHTNESS', 'USE_SUNRISE_SUNSET',
         'PREFER_LOCAL', 'HAT_PWM_ENABLED',
         'FASTER_REFRESH', 'NO_GROUND_TRACKING', # 'FLYBY_STATS_ENABLED', 'WRITE_STATE'
+        'CLOCK_CENTER_ROW_CYCLE'
     ]
     # List of all numeric settings that may be missing
     numeric_keys = [

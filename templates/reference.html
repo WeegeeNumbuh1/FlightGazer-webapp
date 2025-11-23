@@ -25,7 +25,7 @@
 </div>
 <div id="bottomRightAnchor" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
 </div>
-<div class="container py-4">
+<div class="container py-4" id="Display_Layout">
     <h4>Display Layout Reference</h4>
 <details><summary><b>Expand/Collapse</b></summary>
     <div class="help-text"><i>Valid for FlightGazer v.8.1.0 and newer.</i></div>
@@ -59,9 +59,10 @@
 </tr>
 </tbody>
 </table>
+<div style="margin-top: 24px; text-align: center;"><a href="#Display_Layout" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
 </details>
 </div>
-<div class="container py-4">
+<div class="container py-4" id="Output_Reference">
     <h4>Output Reference &amp; Troubleshooting</h4>
     <details><summary><b>Expand/Collapse</b></summary>
         <div class="help-text"><i>Valid for FlightGazer v.9.0.0 and newer.</i></div>
@@ -189,21 +190,204 @@ N/A    123   N/A </pre>
     </tbody>
 </table>
 </div>
+<div style="margin-top: 24px; text-align: center;"><a href="#Output_Reference" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
 </details>
 </div>
-<div class="container py-4">
+
+<div class="container py-4" id="Center_Row">
+    <h4>Clock Center Row &amp; Abbreviations</h4>
+    <details><summary><b>Expand/Collapse</b></summary>
+    <div class="help-text"><i>Valid for FlightGazer v.9.6.0 and newer.</i></div>
+<div style="margin: 20px 0; overflow-x: auto;">
+  <table cellpadding="8">
+    <thead>
+      <tr>
+        <th>Layout
+        </th>
+        <th>Description
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+            <code>▲--:-- ▼--:--</code>
+        </td>
+        <td>
+            Sunrise &amp; Sunset
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <code>G##.# N##.# L##%</code>
+        </td>
+        <td>
+            <code>G</code> = Receiver gain<br>
+            <code>N</code> = Noise (negative value, higher is better)<br>
+            <code>L</code> = Loud signals (percentage, lower is better)<br>
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <code>ABC wk## d###</code>
+        </td>
+        <td>
+            <code>ABC</code> = Month abbreviation<br>
+            <code>wk</code> = Week number of the year<br>
+            <code>d</code> = Day number of the year
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <code>##.#° ABCD ▼##</code>
+        </td>
+        <td>
+            Temperature (Celcius or Fahrenheit)<br>
+            <code>ABCD</code> = Prevailing weather condition<br>
+            Wind direction and speed (knots, mph, or m/s)
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <code>D##° V#.# C####</code>
+        </td>
+        <td>
+            <code>D</code> = Dew point<br>
+            <code>V</code> = Visibility (miles or kilometers)<br>
+            <code>C</code> = Estimated cloud base (feet or meters)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="help-text"><i>Weather data is for informational purposes only and not to be used for aviation.</i></div>
+  <details open><summary>Weather condition meanings</summary>
+    <div class="help-text"><i>Modifiers:</i><br>
+        <code>+</code> = Heavy<br>
+        <code>-</code> = Light<br>
+    </div>
+    <div style="overflow-x: auto;">
+    <table cellpadding="8">
+        <thead>
+        <tr>
+            <th>Weather<br>Abbreviation
+            </th>
+            <th>Description
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>TSTM</code> / <code>TSM</code>
+            </td>
+            <td>Thunderstorm
+            </td>
+        </tr>
+        <tr>
+            <td><code>DRZL</code> / <code>DZL</code>
+            </td>
+            <td>Drizzle
+            </td>
+        </tr>
+        <tr>
+            <td><code>RN</code>
+            </td>
+            <td>Rain
+            </td>
+        </tr>
+        <tr>
+            <td><code>FZRN</code>
+            </td>
+            <td>Freezing Rain
+            </td>
+        </tr>
+        <tr>
+            <td><code>SHWR</code> / <code>SHR</code>
+            </td>
+            <td>Rain Showers
+            </td>
+        </tr>
+        <tr>
+            <td><code>SNW</code>
+            </td>
+            <td>Snow
+            </td>
+        </tr>
+        <tr>
+            <td><code>RSMX</code>
+            </td>
+            <td>Mixed Rain and Snow
+            </td>
+        </tr>
+        <tr>
+            <td><code>SSHR</code>
+            </td>
+            <td>Snow Showers
+            </td>
+        </tr>
+        <tr>
+            <td><code>SMKE</code>
+            </td>
+            <td>Smoke
+            </td>
+        </tr>
+        <tr>
+            <td><code>SQLL</code>
+            </td>
+            <td>Squall
+            </td>
+        </tr>
+        <tr>
+            <td><code>CLR</code>
+            </td>
+            <td>Clear Sky
+            </td>
+        </tr>
+        <tr>
+            <td><code>cFEW</code>
+            </td>
+            <td>Few Clouds
+            </td>
+        </tr>
+        <tr>
+            <td><code>cSCT</code>
+            </td>
+            <td>Scattered Clouds
+            </td>
+        </tr>
+        <tr>
+            <td><code>cBKN</code>
+            </td>
+            <td>Broken Clouds
+            </td>
+        </tr>
+        <tr>
+            <td><code>OVRC</code>
+            </td>
+            <td>Overcast
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+  </details>
+</div>
+<div style="margin-top: 24px; text-align: center;"><a href="#Center_Row" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+</details>
+</div>
+
+<div class="container py-4" id="Neat_Tricks">
     <h4>Tips &amp; Tricks</h4>
     <details><summary><b>Expand/Collapse</b></summary>
     <ul>
     <li><b>Turning off the screen at night</b></li>
 <i>Configure Settings → Brightness</i><br><br>
-Enable <span class="monospace">Dynamic Brightness</span> and set <span class="monospace">Secondary Brightness</span> to <code>0</code><br>
+Enable <span class="monospace">Dynamic Brightness</span> and set <span class="monospace">Secondary Brightness</span> to <span class="monospace">0</span><br>
 If you don't want it to turn off at sunset, disable <span class="monospace">Use Sunrise/Sunset</span> then set <span class="monospace">Brightness Switch Time</span>.<br>
 <i>Note: FlightGazer will still be running *and* driving the screen, even with a brightness of 0.</i><br><br>
 
 <li><b>Only turn on the screen when there's an aircraft nearby (no clock)</b></li>
 <i>Configure Settings → Brightness</i><br><br>
-Set <span class="monospace">Brightness</span> to <code>0</code> and disable <span class="monospace">Dynamic Brightness</span>.<br>
+Set <span class="monospace">Brightness</span> to <span class="monospace">0</span> and disable <span class="monospace">Dynamic Brightness</span>.<br>
 Enable and set <span class="monospace">Active Plane Display Brightness</span> to the desired value.<br>
 <i>Note: If you use <code>NO_FILTER</code> mode and follow this tip, the display will remain blank.</i><br><br>
 
@@ -224,6 +408,7 @@ You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack)
 Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this system.<br>
 You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br>
 </ul>
+<div style="margin-top: 24px; text-align: center;"><a href="#Neat_Tricks" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
     </details>
 </div>
 <div class="container py-4">
