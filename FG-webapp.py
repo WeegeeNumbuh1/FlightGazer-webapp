@@ -23,7 +23,7 @@ import datetime
 import logging
 import importlib.metadata
 
-VERSION = "v.0.14.0 --- 2025-11-22"
+VERSION = "v.0.14.1 --- 2025-11-24"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -529,9 +529,17 @@ def landing_page():
 @app.route('/restart', methods=['POST'])
 def restart_flightgazer():
     try:
+        status = get_flightgazer_status()
+        if status == 'stopped':
+            subprocess.Popen(
+                ['systemctl', 'start', 'flightgazer'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
         # Restart the systemd service
-        main_logger.info("FlightGazer service restart requested")
-        subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True)
+        else:
+            main_logger.info("FlightGazer service restart requested")
+            subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True, timeout=15)
         main_logger.info("FlightGazer service restart successful")
         return jsonify({'status': 'success'})
     except Exception as e:

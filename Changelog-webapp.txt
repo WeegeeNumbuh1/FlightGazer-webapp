@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.14.1 - 2025-11-24
+    - When restarting the service, if the service is stopped, it will simply start the service
+    - Minor text tweaks in the config and Reference pages
+
 v.0.14.0 - 2025-11-22
     - Add support for additional options for FlightGazer v.9.6.0
     - Add additional section in Reference page for clock center row abbreviations
