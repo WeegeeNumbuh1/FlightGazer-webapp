@@ -5,6 +5,13 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.14.2 - 2025-11-27
+    - Add link to the system info page if running on adsb.im in the Reference page
+    - Improve color for hyperlinks and add external link icons
+    - Change some config tab labels for better clarity
+    - Rename references of "Imperial" units to "U.S. Customary"
+    - Other minor text tweaks for the Reference page
+
 v.0.14.1 - 2025-11-24
     - When restarting the service, if the service is stopped, it will simply start the service
     - Minor text tweaks in the config and Reference pages

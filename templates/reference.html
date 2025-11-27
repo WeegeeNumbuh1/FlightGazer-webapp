@@ -22,6 +22,7 @@
     <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:relative;z-index:10;">☀️🌙</button>
     <h2 class="mb-4">Help and Reference Guide</h2>
     <div id="subheader" class="help-text"></div>
+    <div id="sys-info-link" class="help-text"></div>
 </div>
 <div id="bottomRightAnchor" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
 </div>
@@ -43,19 +44,44 @@
     <td><img src="{{ url_for('static', filename='FG_default-journey-annotated.png') }}" alt="FlightGazer journey layout" class="inline-image"></td>
 </tr>
 <tr>
-    <td><b>Journey Readout</b><br>1.	Aircraft's callsign<br>2.	Aircraft's current distance and direction from your site<br>3.	Country of the aircraft<br>4.	Current altitude of the aircraft<br>5.	Current speed of the aircraft<br>6.	Time the aircraft has spent in the air<br>7.	Origin airport<br>8.	Destination airport<br>9.	Current count of aircraft in your specified tracking area<br>10.	UAT indicator (aircraft info is being sent over Universal Access Transceiver, 978MHz - U.S. Only)<br>11.	Progress bar indicating how long the current aircraft will be displayed<br></td>
+    <td><b>Journey Readout</b><br>
+        1.	Aircraft's callsign<br>
+        2.	Aircraft's current distance and direction from your site<br>
+        3.	Country of the aircraft<br>
+        4.	Current altitude of the aircraft<br>
+        5.	Current speed of the aircraft<br>
+        6.	Time the aircraft has spent in the air<br>
+        7.	Origin airport<br>
+        8.	Destination airport<br>
+        9.	Current count of aircraft in your specified tracking area<br>
+        10.	UAT indicator (aircraft info is being sent over Universal Access Transceiver, 978MHz - U.S. Only)<br>
+        11.	Progress bar indicating how long the current aircraft will be displayed<br>
+    </td>
 </tr>
 <tr>
     <td><img src="{{ url_for('static', filename='FG_journey-plus-annotated.png') }}" alt="FlightGazer journey plus" class="inline-image"></td>
 </tr>
 <tr>
-    <td><b>Journey Plus</b><br>1.	Scrolling marquee (enabled with <span class="monospace">Show Even More Info</span>) or aircraft ground track and vertical speed<br>2.	Ground track of the aircraft (or RSSI of signal when <span class="monospace">Show Even More Info</span> is disabled)<br></td>
+    <td><b>Journey Plus</b><br>
+        1.	Scrolling marquee (enabled with <span class="monospace">Show Even More Info</span>) or aircraft ground track and vertical speed<br>
+        2.	Ground track of the aircraft (or RSSI of signal when <span class="monospace">Show Even More Info</span> is disabled)<br></td>
 </tr>
 <tr>
     <td><img src="{{ url_for('static', filename='FG_enhanced-readout-annotated.png') }}" alt="FlightGazer enhanced readout" class="inline-image"></td>
 </tr>
 <tr>
-<td><b>Enhanced Readout</b><br>1.	Current position of the aircraft<br>2.	Ground track of the aircraft<br>3.	Current vertical speed of the aircraft<br>4.	RSSI – (Received Signal Strength Index) how strong of a signal from the aircraft as detected by the receiver (in <a href="https://en.wikipedia.org/wiki/DBFS" target="_blank" rel="noopener noreferrer">dBFS</a>)</td>
+<td><b>Enhanced Readout</b><br>
+    1.	Current position of the aircraft<br>
+    2.	Ground track of the aircraft<br>
+    3.	Current vertical speed of the aircraft<br>
+    4.	RSSI – (Received Signal Strength Index) how strong of a signal from the aircraft as detected by the receiver (in
+     <a href="https://en.wikipedia.org/wiki/DBFS" target="_blank" rel="noopener noreferrer">dBFS</a>
+     <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+        <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+            <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+        </g>
+    </svg>)</td>
 </tr>
 </tbody>
 </table>
@@ -77,29 +103,49 @@
     </thead>
     <tbody>
         <tr>
-            <td><p><b>Show Even More Info</b></p>"LADD Aircraft"</td>
+            <td><p><b>Show Even More Info</b></p>"<code>LADD Aircraft</code>"</td>
             <td><ul><li>Limiting Aircraft Data Displayed - <i>"Please don't track me."</i></li></ul></td>
-            <td><ul><li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More Information</a></li></ul></td>
+            <td><ul><li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More Information</a>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+            </svg></li></ul></td>
         </tr>
         <tr>
-            <td><p><b>Show Even More Info</b></p>"PIA Aircraft"</td>
+            <td><p><b>Show Even More Info</b></p>"<code>PIA Aircraft</code>"</td>
             <td><ul><li>(U.S. only) Privacy ICAO Address - <i>"Good luck figuring out who I am."</i></li></ul></td>
-            <td><ul><li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank" rel="noopener noreferrer">More Information</a></li></ul></td>
+            <td><ul><li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank" rel="noopener noreferrer">More Information</a>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+            </svg>
+            </li></ul></td>
         </tr>
         <tr>
-            <td><p><b>Show Even More Info</b></p>"TIS-B Contact"</td>
+            <td><p><b>Show Even More Info</b></p>"<code>TIS-B Contact</code>"</td>
             <td><ul><li>Traffic Information Service – Broadcast - broadcast information sent by ground stations corresponding to an aircraft; cannot be tied to a registration or aircraft type and is used for collision avoidance.</li></ul></td>
-            <td><ul><li><a href="https://en.wikipedia.org/wiki/Traffic_information_service_%E2%80%93_broadcast" target="_blank" rel="noopener noreferrer">More Information</a></li></ul></td>
+            <td><ul><li><a href="https://en.wikipedia.org/wiki/Traffic_information_service_%E2%80%93_broadcast" target="_blank" rel="noopener noreferrer">More Information</a>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+            </svg>
+            </li></ul></td>
         </tr>
             <td>
                 <p><b>Clock</b></p>
-<pre>
+<pre><code>
 FLYBY  TRKG  RNGE
-N/A    N/A   N/A </pre>
+N/A    N/A   N/A </code></pre>
 <i>- or -</i>
-<pre>
+<pre><code>
 FLYBY  TRKG  RNGE
-123    N/A   N/A </pre>
+123    N/A   N/A </code></pre>
             </td>
             <td>
                 <ul>
@@ -120,9 +166,9 @@ FLYBY  TRKG  RNGE
         <tr>
             <td>
                 <p><b>Clock</b></p>
-<pre>
+<pre><code>
 FLYBY  TRKG  RNGE
-N/A    123   N/A </pre>
+N/A    123   N/A </code></pre>
             </td>
             <td><ul><li>Location is not set in receiver.</li></ul></td>
             <td><ul><li>Set your location for <code>dump1090</code>. Then, restart FlightGazer.</li>
@@ -162,7 +208,10 @@ N/A    123   N/A </pre>
                 <p><b>Journey</b></p>
                 <code>latitude ▶ longitude</code>
             </td>
-            <td><ul><li>API returned a result that could not be associated with an airport.</li></ul></td>
+            <td><ul>
+                <li>API returned a result that could not be associated with an airport.</li>
+                <li>This represents the coordinates of which this aircraft was first detected/tracked by the API.</li>
+            </ul></td>
             <td><ul><li>Rare, but normal occurrence.</li></ul></td>
         </tr>
         <tr>
@@ -242,7 +291,7 @@ N/A    123   N/A </pre>
             <code>##.#° ABCD ▼##</code>
         </td>
         <td>
-            Temperature (Celcius or Fahrenheit)<br>
+            Outside temperature (Celcius or Fahrenheit)<br>
             <code>ABCD</code> = Prevailing weather condition<br>
             Wind direction and speed (knots, mph, or m/s)
         </td>
@@ -252,7 +301,7 @@ N/A    123   N/A </pre>
             <code>D##° V#.# C####</code>
         </td>
         <td>
-            <code>D</code> = Dew point<br>
+            <code>D</code> = Dew point (same unit as temperature)<br>
             <code>V</code> = Visibility (miles or kilometers)<br>
             <code>C</code> = Estimated cloud base (feet or meters)
         </td>
@@ -405,7 +454,7 @@ Visit the <code>/data/current_state.json</code> endpoint to poll FlightGazer's c
 You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack) to access running stats and other information like aircraft details and more.<br><br>
 
 <li><b>Viewing FlightGazer in a terminal</b></li>
-Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this system.<br>
+Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this (<span id="device_name"></span>) system. <br>
 You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br>
 </ul>
 <div style="margin-top: 24px; text-align: center;"><a href="#neat-tricks" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
@@ -415,7 +464,14 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
     <h4>Reporting Issues and Sending Feedback</h4>
     <details><summary><b>Expand/Collapse</b></summary>
         Found a bug? Something is broken? Want to suggest some features?<br>
-        <a href="https://github.com/WeegeeNumbuh1/FlightGazer/issues" target="_blank" rel="noopener noreferrer">Create an issue here</a>. (GitHub account required)<br><br>
+        <a href="https://github.com/WeegeeNumbuh1/FlightGazer/issues" target="_blank" rel="noopener noreferrer">Create an issue here</a>
+        <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+            <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+            </g>
+        </svg>
+        . (GitHub account required)<br><br>
         <i>Before sending a bug report, try updating first.<br>
         When sending a bug report, attach the log files. These are available by going to the "Details and Logs" page and downloading them.</i>
     </details>
@@ -425,13 +481,48 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
     <details><summary><b>Expand/Collapse</b></summary>
     <ul>
         <li><b>Airline names/operators</b></li>
-        Data is sourced from the <a href="https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html" target="_blank" rel="noopener noreferrer">Federal Aviation Administration, Directive No. JO 7340.2N, Chapter 3, Section 3</a>
-        with friendlier names being sourced via <a href="https://en.wikipedia.org/wiki/List_of_airline_codes" target="_blank" rel="noopener noreferrer">Wikipedia</a>.
+        Data is sourced from the <a href="https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html" target="_blank" rel="noopener noreferrer">
+            Federal Aviation Administration, Directive No. JO 7340.2N, Chapter 3, Section 3</a>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+            </svg>
+        with friendlier names being sourced via <a href="https://en.wikipedia.org/wiki/List_of_airline_codes" target="_blank" rel="noopener noreferrer">Wikipedia</a>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+            </svg>.
         <li><b>Aircraft types, registrations, and owners</b></li>
-        Data is sourced from wiedehopf's <code>tar1090-db</code> repository, available on <a href="https://github.com/wiedehopf/tar1090-db/tree/csv" target="_blank" rel="noopener noreferrer">GitHub</a>.<br>
-        The actual database is maintained by <a href="https://www.mictronics.de/aircraft-database/export.php" target="_blank" rel="noopener noreferrer">Mictronics</a>.
+        Data is sourced from wiedehopf's <code>tar1090-db</code> repository, available on
+         <a href="https://github.com/wiedehopf/tar1090-db/tree/csv" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+            </svg>.<br>
+        The actual database is maintained by
+         <a href="https://www.mictronics.de/aircraft-database/export.php" target="_blank" rel="noopener noreferrer">Mictronics</a>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+            </svg>
+        .
         <li><b>License</b></li>
-        FlightGazer and this web application are copyright WeegeeNumbuh1 and are licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank" rel="noopener noreferrer">GNU General Public License v3</a>.<br>
+        FlightGazer and this web application are copyright WeegeeNumbuh1 and are licensed under the
+         <a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank" rel="noopener noreferrer">GNU General Public License v3</a>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+            </svg>.<br>
         The source code is available by clicking on the FlightGazer logo on the main landing page.<br><br>
 <pre><code>This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -446,8 +537,15 @@ GNU General Public License for more details.</code></pre>
     }
     let showText = "{{ is_adsbim }}";
     if (showText === "True") {
-        document.getElementById("subheader").innerHTML = '<i>Note: FlightGazer is running on/with adsb.im.</i><br>For help regarding adsb.im, <a href="https://adsb.im/using" target="_blank" rel="noopener noreferrer">check its documentation</a>.'
+        document.getElementById("subheader").innerHTML = '<i>Note: FlightGazer is running on/with adsb.im.</i><br>For help regarding adsb.im, <a href="https://adsb.im/using" target="_blank" rel="noopener noreferrer">check its documentation</a>\
+        <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">\
+            <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">\
+                <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>\
+                <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>\
+            </g></svg>'
+        document.getElementById("sys-info-link").innerHTML = '<a href="{{ adsb_info }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">View Your System Info</a>'
     }
+    document.getElementById("device_name").innerHTML = '<code>{{ device_name }}</code>'
     function setTheme(theme) {
         if (theme === 'light') {
             document.body.style.background = '#f8f9fa';

@@ -23,7 +23,7 @@ import datetime
 import logging
 import importlib.metadata
 
-VERSION = "v.0.14.1 --- 2025-11-24"
+VERSION = "v.0.14.2 --- 2025-11-27"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -1172,7 +1172,21 @@ def check_for_updates():
 # ========= Help/Reference html =========
 @app.route('/reference')
 def reference_guide():
-    return render_template('reference.html', is_adsbim=RUNNING_ADSBIM)
+    adsb_link = ''
+    if RUNNING_ADSBIM:
+        if (
+            adsb_link_ := localpages.get(
+                'System Configuration & Management, Maps, and Stats'
+            )
+        ):
+            adsb_link = adsb_link_ + '/info'
+    device_desc = f'{HOSTNAME}, local IP address: {CURRENT_IP}'
+    return render_template(
+        'reference.html',
+        is_adsbim = RUNNING_ADSBIM,
+        adsb_info = adsb_link,
+        device_name = device_desc
+    )
 
 # ========= Misc =========
 if os.path.exists(VERSION_PATH):
