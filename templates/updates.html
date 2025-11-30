@@ -36,13 +36,14 @@
         It's recommended to use the latest version available, especially if it's been awhile since you last checked.<br>
     </div>
     <div class="container py-4">
-        <div class="mb-3">
+        <div class="mb-3" id="precheck">
             <button id="checkUpdatesBtn" class="btn btn-success">Check Now</button>
             <span id="versionInfo" style="margin-left:16px;"></span>
+            <span id="commit-history"></span>
         </div>
         <div id="changelogSection" style="display:none;">
             <h5>Changes Since Current Version</h5>
-            <a target="_blank" rel="noopener noreferrer" href="https://github.com/WeegeeNumbuh1/FlightGazer/raw/refs/heads/main/Changelog.txt">Read the full Changelog (opens a new tab)</a>
+            <a target="_blank" rel="noopener noreferrer" href="{{ url_for('show_latest_changelog') }}">Read the entire Changelog</a> (opens new tab)
             <iframe id="changelogFrame" style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#ffffff;font-family:monospace;border-radius:8px;border:none;"></iframe>
             <div id="confirm-update" class="mt-3 mb-2" style="display:flex;align-items:center;gap:16px;">
                 <button id="updateNowBtn" class="btn btn-warning">Update Now</button>
@@ -120,13 +121,22 @@
                 document.getElementById('versionInfo').innerText = data.error;
                 return;
             }
-            document.getElementById('versionInfo').innerText = `\nCurrent Version: ${data.local_version}\nLatest Version: ${data.latest_version}`;
+            document.getElementById('versionInfo').innerText = `\nYour Current Version: \t${data.local_version}\nThe Latest Version: \t${data.latest_version}`;
+            document.getElementById('commit-history').innerHTML = '<br><a target="_blank" rel="noopener noreferrer" href="https://github.com/WeegeeNumbuh1/FlightGazer/commits/main/">Review the source code changes</a>\
+            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">\
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">\
+                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>\
+                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>\
+                </g>\
+            </svg>';
             changelogContent = data.changelog || 'No changelog available.';
             document.getElementById('changelogSection').style.display = '';
             let doc = document.getElementById('changelogFrame').contentDocument;
             doc.open();
             doc.write(`<pre style='background:#222;color:#ffffff;font-family:monospace;font-size:1em;margin:0;padding:12px;'>${changelogContent.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
             doc.close();
+            document.getElementById('checkUpdatesBtn').disabled = true;
+            document.getElementById('precheck').scrollIntoView();
         });
     };
     function sendUpdateInput(val) {

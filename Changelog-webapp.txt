@@ -5,6 +5,13 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.14.3 - 2025-11-29
+    - When viewing the full changelog, it now redirects to a local cache of it rather than directing
+      to the Github page
+    - Add link to the Github commit page for convenience
+    - When the changelog is fetched, it scrolls into view
+    - Add warning on the landing page if javascript is disabled
+
 v.0.14.2 - 2025-11-27
     - Add link to the system info page if running on adsb.im in the Reference page
     - Improve color for hyperlinks and add external link icons

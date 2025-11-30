@@ -30,6 +30,15 @@
             <img src="{{ url_for('static', filename='FlightGazer-logo.png') }}" alt="FlightGazer Logo" class="logo-img">
         </a>
     </div>
+    <noscript>
+        <div class="container py-4" style="text-align:center; margin-top:10px; margin-bottom:2px;">
+        <p>
+        <h2>JavaScript is disabled in your browser.<br>
+            This is required for this web-app to work.<br>
+            Please enable JavaScript.</h2>
+        </p>
+        </div>
+    </noscript>
     <div class="status-indicator" style="text-align:center; margin-top:10px; margin-bottom:2px;">
         <span style="display:inline-block; width:18px; height:18px; border-radius:50%; vertical-align:middle; margin-right:7px; background: {{ status_color }}; border: 2px solid #222;"></span>
         <span style="font-size:1.05em; vertical-align:middle;">

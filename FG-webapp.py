@@ -5,7 +5,7 @@ FlightGazer's virtual environment. (should be handled via the install script).
 Disclosures: most of this was initially vibe-coded, but does contain manual edits to make sure
 it actually works (mostly) and that the actual web pages aren't too janky. """
 
-from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_file, send_from_directory, make_response
 from ruamel.yaml import YAML
 import os
 import sys
@@ -23,7 +23,7 @@ import datetime
 import logging
 import importlib.metadata
 
-VERSION = "v.0.14.2 --- 2025-11-27"
+VERSION = "v.0.14.3 --- 2025-11-29"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -1168,6 +1168,24 @@ def check_for_updates():
         'latest_version': remote_ver,
         'changelog': changelog_to_show
     })
+
+@app.route("/data/latest_changelog_cached.txt")
+def show_latest_changelog():
+    if not remote_changelog:
+        try:
+            update_fetcher()
+            response = make_response(remote_changelog, 200)
+            response.mimetype = "text/plain"
+            return response
+        except Exception:
+            return 'Could not fetch latest changelog.', 404
+    else:
+        try:
+            response = make_response(remote_changelog, 200)
+            response.mimetype = "text/plain"
+            return response
+        except Exception as e:
+            return f'Could not fetch latest changelog. ({e})', 500
 
 # ========= Help/Reference html =========
 @app.route('/reference')
