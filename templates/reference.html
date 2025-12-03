@@ -85,7 +85,9 @@
 </tr>
 </tbody>
 </table>
-<div style="margin-top: 24px; text-align: center;"><a href="#display-layout" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+<div style="margin-top: 24px; text-align: center;">
+    <button type="button" onClick="document.getElementById('display-layout').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+</div>
 </details>
 </div>
 <div class="container py-4" id="output-reference">
@@ -239,7 +241,9 @@ N/A    123   N/A </code></pre>
     </tbody>
 </table>
 </div>
-<div style="margin-top: 24px; text-align: center;"><a href="#output-reference" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+<div style="margin-top: 24px; text-align: center;">
+    <button type="button" onClick="document.getElementById('output-reference').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+</div>
 </details>
 </div>
 
@@ -308,7 +312,7 @@ N/A    123   N/A </code></pre>
       </tr>
     </tbody>
   </table>
-  <div class="help-text"><i>Weather data is for informational purposes only and not to be used for aviation.</i></div>
+  <div class="help-text"><i>Weather data is for informational purposes only and not to be used for flight planning.</i></div>
   <details open><summary>Weather condition meanings</summary>
     <div class="help-text"><i>Modifiers:</i><br>
         <code>+</code> = Heavy<br>
@@ -420,7 +424,9 @@ N/A    123   N/A </code></pre>
     </div>
   </details>
 </div>
-<div style="margin-top: 24px; text-align: center;"><a href="#center-row" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+<div style="margin-top: 24px; text-align: center;">
+    <button type="button" onClick="document.getElementById('center-row').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+</div>
 </details>
 </div>
 
@@ -457,7 +463,9 @@ You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack)
 Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this (<span id="device_name"></span>) system. <br>
 You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br>
 </ul>
-<div style="margin-top: 24px; text-align: center;"><a href="#neat-tricks" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+<div style="margin-top: 24px; text-align: center;">
+    <button type="button" onClick="document.getElementById('neat-tricks').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+</div>
     </details>
 </div>
 <div class="container py-4" id="issues-feedback">

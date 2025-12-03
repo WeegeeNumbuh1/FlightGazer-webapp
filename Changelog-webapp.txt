@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.14.4 - 2025-12-02
+    - The scrollback buttons no longer add to browsing history
+
 v.0.14.3 - 2025-11-29
     - When viewing the full changelog, it now redirects to a local cache of it rather than directing
       to the Github page

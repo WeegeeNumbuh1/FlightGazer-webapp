@@ -187,7 +187,9 @@
                 </table>
                 </div>
             </div>
-            <div style="margin-top: 24px; text-align: left;"><a href="#configTabs" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+            <div style="margin-top: 24px; text-align: left;">
+                <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+            </div>
         </div>
         <!-- Screen Output Tab -->
         <div class="tab-pane fade" id="screen" role="tabpanel">
@@ -340,7 +342,9 @@
                     If the Weather API is available, this will cycle through those display options as well.
                 </div>
             </div>
-            <div style="margin-top: 24px; text-align: left;"><a href="#configTabs" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+            <div style="margin-top: 24px; text-align: left;">
+                <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+            </div>
         </div>
         <!-- Brightness Tab -->
         <div class="tab-pane fade" id="brightness" role="tabpanel">
@@ -558,7 +562,9 @@
                     <option value="2" {% if config.UNITS_WX == 2 %}selected{% endif %}>U.S. Customary</option>
                 </select>
             </div>
-            <div style="margin-top: 24px; text-align: left;"><a href="#configTabs" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+            <div style="margin-top: 24px; text-align: left;">
+                <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+            </div>
         </div>
         <!-- RGB-Matrix Tab -->
         <div class="tab-pane fade" id="rgb" role="tabpanel">
@@ -834,7 +840,9 @@
             </div>
             {% endfor %}
         </div>
-        <div style="margin-top: 24px; text-align: left;"><a href="#configTabs" class="btn btn-sm btn-outline-secondary">↑ Scroll back up</a></div>
+        <div style="margin-top: 24px; text-align: left;">
+            <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+        </div>
         </div>
     </div>
     <button type="button" class="btn btn-primary apply-btn" id="applyBtn" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">Save Settings</button>
@@ -846,6 +854,7 @@
 <script>
 const updateConfigURL = "{{ url_for('update_config') }}";
 const restartService = "{{ url_for('restart_flightgazer') }}";
+let headerObj = document.getElementById('configTabs')
 $(document).ready(function() {
     // Dynamically adjust HEIGHT_LIMIT and RANGE min/max based on selected units
     function updateLimits() {
@@ -1235,6 +1244,11 @@ $(document).ready(function() {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
     });
+    // scroll-back button
+    $('.scroll-up').on('click', function(e) {
+        e.preventDefault();
+        headerObj.scrollIntoView();
+    })
 // Spinner overlay logic
 function showSpinnerOverlay(message) {
     if ($('#spinnerOverlay').length) return;
