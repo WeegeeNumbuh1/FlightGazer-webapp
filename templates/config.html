@@ -55,10 +55,10 @@
             <div class="help-text">
                 <details><summary><b>Tip: Good starting points...</b></summary>
                 <ul>
-                    <li><i>"If I can hear it, I want to track it."</i><ul><li>15000ft, 2nmi (This works well for most locations.)</li></ul></li>
-                    <li><i>"If I can see the contrails, I want to track it."</i><ul><li>50000ft, 5nmi</li></ul></li>
-                    <li><i>"It's very quiet around here."</i><ul><li>50000ft, 10nmi</li></ul></li>
-                    <li><i>"I can see the runway lights from my backyard."</i><ul><li>5000ft, 1.5nmi</li></ul></li>
+                    <li><i>&ldquo;If I can hear it, I want to track it.&rdquo;</i><ul><li>15000ft, 2nmi (This works well for most locations.)</li></ul></li>
+                    <li><i>&ldquo;If I can see the contrails, I want to track it.&rdquo;</i><ul><li>50000ft, 5nmi</li></ul></li>
+                    <li><i>&ldquo;It's very quiet around here.&rdquo;</i><ul><li>50000ft, 10nmi</li></ul></li>
+                    <li><i>&ldquo;I can see the runway lights from my backyard.&rdquo;</i><ul><li>5000ft, 1.5nmi</li></ul></li>
                 </ul>
                 </summary>
             </div>
@@ -66,9 +66,9 @@
                 <label for="units" class="form-label setting-label">Units</label>
                 <div class="help-text">
                     <ul>
-                        <li>Aeronautical (nmi, ft, kt) [default]</li>
-                        <li>Metric (km, m, km/h)</li>
-                        <li>U.S. Customary (mi, ft, mph)</li>
+                        <li>Aeronautical (nmi, ft, kt, ft/min) [default]</li>
+                        <li>Metric (km, m, km/h, m/s)</li>
+                        <li>U.S. Customary (mi, ft, mph, ft/min)</li>
                     </ul>
                 </div>
                 <select class="form-select" id="UNITS" name="UNITS">
@@ -212,7 +212,7 @@
                     </li>
                     <li>Vertical Speed (example: <code>V+1234</code>)
                         <ul>
-                            <li>The rate of climb or descent (default: feet/min; meters/min if using Metric)</li>
+                            <li>The rate of climb or descent (default: feet/min; meters/sec if using Metric)</li>
                         </ul>
                     </li>
                     <li>RSSI - Received Signal Strength Index
@@ -224,122 +224,146 @@
                     </ul>
                 </div>
             </div>
-            <div class="mt-3">
-                <img src="{{ url_for('static', filename='FG-enhanced-readout.png') }}" class="inline-image">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT" name="ENHANCED_READOUT" {% if config.ENHANCED_READOUT %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="ENHANCED_READOUT">Enhanced Readout</label>
+            <div style="padding-top: 1em;">
+                <div class="mt-3">
+                    <img src="{{ url_for('static', filename='FG-enhanced-readout.png') }}" class="inline-image">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT" name="ENHANCED_READOUT" {% if config.ENHANCED_READOUT %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="ENHANCED_READOUT">Enhanced Readout</label>
+                    </div>
+                    <div class="help-text">
+                        Replaces the default journey (origin/destination) readout with:
+                        <ul>
+                            <li>Aircraft coordinates (latitude and longitude)</li>
+                            <li>Track</li>
+                            <li>Vertical Speed</li>
+                        </ul>
+                        And swaps the Time readout in the bottom right with:
+                        <ul>
+                            <li>RSSI</li>
+                        </ul>
+                        When enabled, disables the API even if a valid key is present.<br>
+                        If you're not using the API, it's recommended to enable this or leave the below setting enabled.
+                    </div>
                 </div>
-                <div class="help-text">
-                    Replaces the default journey (origin/destination) readout with:
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT_AS_FALLBACK" name="ENHANCED_READOUT_AS_FALLBACK" {% if config.ENHANCED_READOUT_AS_FALLBACK %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="ENHANCED_READOUT_AS_FALLBACK">Enhanced Readout as Fallback</label>
+                    </div>
+                    <div class="help-text">
+                        Switch to <span class="monospace">Enhanced Readout</span> if API is unavailable or any of the API limits are reached.<br>
+                        When the API can be used again, the display will switch back to the other layouts.<br>
+                        Only works when <span class="monospace">Enhanced Readout</span> is disabled.<br>
+                        This setting is recommended to be left enabled unless you prefer the other layouts even when journey information is unavailable.</div>
+                </div>
+            </div>
+            <div style="padding-top: 1em;">
+                <div class="mt-3">
+                    <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-JourneyPlus.png') }}" class="inline-image">
+                    <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-EnhancedReadout.png') }}" class="inline-image">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="SHOW_EVEN_MORE_INFO" name="SHOW_EVEN_MORE_INFO" {% if config.SHOW_EVEN_MORE_INFO %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="SHOW_EVEN_MORE_INFO">Show Even More Info</label>
+                    </div>
+                    <div class="help-text">
+                        Display additional info such as aircraft type, airline, owner, and journey details as a scrolling marquee/ticker.<br>
+                        Only works with the <span class="monospace">Journey Plus</span> or <span class="monospace">Enhanced Readout</span> modes.<br>
+                        When using <span class="monospace">Journey Plus</span>:
                     <ul>
-                        <li>Aircraft coordinates (latitude and longitude)</li>
-                        <li>Track</li>
-                        <li>Vertical Speed</li>
+                        <li>Replaces the center readout (Vertical Speed is unavailable)</li>
+                        <li>Replaces RSSI with Track in the bottom right</li>
                     </ul>
-                    And swaps the Time readout in the bottom right with:
-                    <ul>
-                        <li>RSSI</li>
-                    </ul>
-                    When enabled, disables the API even if a valid key is present.<br>
-                    If you're not using the API, it's recommended to enable this or leave the below setting enabled.
+                    Disable this feature if it's too distracting.
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="EXTENDED_DETAILS" name="EXTENDED_DETAILS" {% if config.EXTENDED_DETAILS %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="EXTENDED_DETAILS">Extended Details</label>
+                    </div>
+                    <div class="help-text">Add an aircraft's registration and its current transponder ("squawk") code on the <span class="monospace">Show Even More Info</span> marquee.<br>
+                        The registration is only shown if the aircraft is not using its registration as its callsign. (ex: commercial flights, vanity military callsigns, etc.)</div>
                 </div>
             </div>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT_AS_FALLBACK" name="ENHANCED_READOUT_AS_FALLBACK" {% if config.ENHANCED_READOUT_AS_FALLBACK %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="ENHANCED_READOUT_AS_FALLBACK">Enhanced Readout as Fallback</label>
+            <div style="padding-top: 1em;">
+                <div class="mt-3">
+                    <img src="{{ url_for('static', filename='FG-clock-24hr.png') }}" class="inline-image">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="CLOCK_24HR" name="CLOCK_24HR" {% if config.CLOCK_24HR %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="CLOCK_24HR">24 Hour Clock</label>
+                    </div>
+                    <div class="help-text">When enabled, time is shown using 24 hours.</div>
                 </div>
-                <div class="help-text">
-                    Switch to <span class="monospace">Enhanced Readout</span> if API is unavailable or any of the API limits are reached.<br>
-                    When the API can be used again, the display will switch back to the other layouts.<br>
-                    Only works when <span class="monospace">Enhanced Readout</span> is disabled.<br>
-                    This setting is recommended to be left enabled unless you prefer the other layouts even when route information is unavailable.</div>
-            </div>
-            <div class="mt-3">
-                <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-JourneyPlus.png') }}" class="inline-image">
-                <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-EnhancedReadout.png') }}" class="inline-image">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="SHOW_EVEN_MORE_INFO" name="SHOW_EVEN_MORE_INFO" {% if config.SHOW_EVEN_MORE_INFO %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="SHOW_EVEN_MORE_INFO">Show Even More Info</label>
+                <div class="mt-3">
+                    <img src="{{ url_for('static', filename='FG-default-journey.png') }}" class="inline-image">
+                    <img src="{{ url_for('static', filename='FG-default-journey-alt.png') }}" class="inline-image">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ALTERNATIVE_FONT" name="ALTERNATIVE_FONT" {% if config.ALTERNATIVE_FONT %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="ALTERNATIVE_FONT">Alternative Font</label>
+                    </div>
+                    <div class="help-text">
+                        Use a less squared-off font for the majority of the display's output.<br>
+                        Helps when trying to distingush characters such as '<span class="monospace">0</span>' vs '<span class="monospace">O</span>' or '<span class="monospace">S</span>' vs '<span class="monospace">5</span>'.
+                    </div>
                 </div>
-                <div class="help-text">
-                    Display additional info such as aircraft type, airline, owner, and journey details as a scrolling marquee/ticker.<br>
-                    Only works with the <span class="monospace">Journey Plus</span> or <span class="monospace">Enhanced Readout</span> modes.<br>
-                    When using <span class="monospace">Journey Plus</span> :
-                <ul>
-                    <li>Replaces the center readout (Vertical Speed is unavailable)</li>
-                    <li>Replaces RSSI with Track in the bottom right</li>
-                </ul>
-                Disable this feature if it's too distracting.
+                <div class="mt-3">
+                    <img src="{{ url_for('static', filename='FG-prefer-ICAO.png') }}" class="inline-image">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="PREFER_ICAO_CODES" name="PREFER_ICAO_CODES" {% if config.PREFER_ICAO_CODES %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="PREFER_ICAO_CODES">Prefer ICAO Codes</label>
+                    </div>
+                    <div class="help-text">Use ICAO (4 letter) codes instead of the default IATA (3 letter) codes for airports.</div>
                 </div>
-            </div>
-            <div class="mt-3">
-                <img src="{{ url_for('static', filename='FG-clock-24hr.png') }}" class="inline-image">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="CLOCK_24HR" name="CLOCK_24HR" {% if config.CLOCK_24HR %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="CLOCK_24HR">24 Hour Clock</label>
-                </div>
-                <div class="help-text">When enabled, time is shown using 24 hours.</div>
-            </div>
-            <div class="mt-3">
-                <img src="{{ url_for('static', filename='FG-default-journey.png') }}" class="inline-image">
-                 <img src="{{ url_for('static', filename='FG-default-journey-alt.png') }}" class="inline-image">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="ALTERNATIVE_FONT" name="ALTERNATIVE_FONT" {% if config.ALTERNATIVE_FONT %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="ALTERNATIVE_FONT">Alternative Font</label>
-                </div>
-                <div class="help-text">
-                    Use a less squared-off font for the majority of the display's output.<br>
-                    Helps when trying to distingush characters such as '<span class="monospace">0</span>' vs '<span class="monospace">O</span>' or '<span class="monospace">S</span>' vs '<span class="monospace">5</span>'.
+                <div class="mt-3">
+                    <img src="{{ url_for('static', filename='FG-switch-progress-bar.png') }}" class="inline-image">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="DISPLAY_SWITCH_PROGRESS_BAR" name="DISPLAY_SWITCH_PROGRESS_BAR" {% if config.DISPLAY_SWITCH_PROGRESS_BAR %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="DISPLAY_SWITCH_PROGRESS_BAR">Display Switch Progress Bar</label>
+                    </div>
+                    <div class="help-text">Show a progress bar at the bottom of the aircraft info screen that represents how long the current aircraft will remain on display.<br>
+                        Only appears when two (2) or more aircraft are present in the area.</div>
                 </div>
             </div>
-            <div class="mt-3">
-                <img src="{{ url_for('static', filename='FG-switch-progress-bar.png') }}" class="inline-image">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="DISPLAY_SWITCH_PROGRESS_BAR" name="DISPLAY_SWITCH_PROGRESS_BAR" {% if config.DISPLAY_SWITCH_PROGRESS_BAR %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="DISPLAY_SWITCH_PROGRESS_BAR">Display Switch Progress Bar</label>
+            <div style="padding-top: 2em;">
+                <img src="{{ url_for('static', filename='FG-clock-centerrow.png') }}" class="inline-image">
+                <div class="mt-3">
+                    <label for="CLOCK_CENTER_ROW_ROW1" class="form-label setting-label">Clock Center Row 1</label>
+                    <div class="help-text">Select the main readout in the center section of the clock display.<br>
+                    <i>Note: for the weather options, you can set your API key in the Advanced section.</i></div>
+                    <select class="form-select" id="CLOCK_CENTER_ROW_ROW1" name="CLOCK_CENTER_ROW_ROW1">
+                        <option value="0" {% if config.CLOCK_CENTER_ROW.ROW1 == 0 %}selected{% endif %}>Don't use</option>
+                        <option value="1" {% if config.CLOCK_CENTER_ROW.ROW1 == 1 %}selected{% endif %}>Sunrise/Sunset</option>
+                        <option value="2" {% if config.CLOCK_CENTER_ROW.ROW1 == 2 %}selected{% endif %}>ADS-B receiver stats</option>
+                        <option value="3" {% if config.CLOCK_CENTER_ROW.ROW1 == 3 %}selected{% endif %}>Extended calendar info</option>
+                        <option value="4" {% if config.CLOCK_CENTER_ROW.ROW1 == 4 %}selected{% endif %}>Current weather (requires OpenWeather API)</option>
+                        <option value="5" {% if config.CLOCK_CENTER_ROW.ROW1 == 5 %}selected{% endif %}>Extended observations (requires OpenWeather API)</option>
+                    </select>
                 </div>
-                <div class="help-text">Show a progress bar at the bottom of the aircraft info screen that represents how long the current aircraft will remain on display.<br>
-                    Only appears when two (2) or more aircraft are present in the area.</div>
-            </div>
-            <img src="{{ url_for('static', filename='FG-clock-centerrow.png') }}" class="inline-image">
-            <div class="mt-3">
-                <label for="CLOCK_CENTER_ROW_ROW1" class="form-label setting-label">Clock Center Row 1</label>
-                <div class="help-text">Select the main readout in the center section of the clock display.<br>
-                <i>Note: for the weather options, you can set your API key in the Advanced section.</i></div>
-                <select class="form-select" id="CLOCK_CENTER_ROW_ROW1" name="CLOCK_CENTER_ROW_ROW1">
-                    <option value="0" {% if config.CLOCK_CENTER_ROW.ROW1 == 0 %}selected{% endif %}>Don't use</option>
-                    <option value="1" {% if config.CLOCK_CENTER_ROW.ROW1 == 1 %}selected{% endif %}>Sunrise/Sunset</option>
-                    <option value="2" {% if config.CLOCK_CENTER_ROW.ROW1 == 2 %}selected{% endif %}>ADS-B receiver stats</option>
-                    <option value="3" {% if config.CLOCK_CENTER_ROW.ROW1 == 3 %}selected{% endif %}>Extended calendar info</option>
-                    <option value="4" {% if config.CLOCK_CENTER_ROW.ROW1 == 4 %}selected{% endif %}>Current weather (requires OpenWeather API)</option>
-                    <option value="5" {% if config.CLOCK_CENTER_ROW.ROW1 == 5 %}selected{% endif %}>Extended observations (requires OpenWeather API)</option>
-                </select>
-            </div>
-            <div class="mt-3">
-                <label for="CLOCK_CENTER_ROW_ROW2" class="form-label setting-label">Clock Center Row 2</label>
-                <div class="help-text">
-                    Add an additional line of info in the center section of the clock display.<br>
-                    If the above setting is set to "Don't use" and this setting is enabled, this will force the use of a smaller font on the clock display.
+                <div class="mt-3">
+                    <label for="CLOCK_CENTER_ROW_ROW2" class="form-label setting-label">Clock Center Row 2</label>
+                    <div class="help-text">
+                        Add an additional line of info in the center section of the clock display.<br>
+                        If the above setting is set to "Don't use" and this setting is enabled, this will force the use of a smaller font on the clock display.
+                    </div>
+                    <select class="form-select" id="CLOCK_CENTER_ROW_ROW2" name="CLOCK_CENTER_ROW_ROW2">
+                        <option value="0" {% if config.CLOCK_CENTER_ROW.ROW2 == 0 %}selected{% endif %}>Don't use</option>
+                        <option value="1" {% if config.CLOCK_CENTER_ROW.ROW2 == 1 %}selected{% endif %}>Sunrise/Sunset</option>
+                        <option value="2" {% if config.CLOCK_CENTER_ROW.ROW2 == 2 %}selected{% endif %}>ADS-B receiver stats</option>
+                        <option value="3" {% if config.CLOCK_CENTER_ROW.ROW2 == 3 %}selected{% endif %}>Extended calendar info</option>
+                        <option value="4" {% if config.CLOCK_CENTER_ROW.ROW2 == 4 %}selected{% endif %}>Current weather (requires OpenWeather API)</option>
+                        <option value="5" {% if config.CLOCK_CENTER_ROW.ROW2 == 5 %}selected{% endif %}>Extended observations (requires OpenWeather API)</option>
+                    </select>
                 </div>
-                <select class="form-select" id="CLOCK_CENTER_ROW_ROW2" name="CLOCK_CENTER_ROW_ROW2">
-                    <option value="0" {% if config.CLOCK_CENTER_ROW.ROW2 == 0 %}selected{% endif %}>Don't use</option>
-                    <option value="1" {% if config.CLOCK_CENTER_ROW.ROW2 == 1 %}selected{% endif %}>Sunrise/Sunset</option>
-                    <option value="2" {% if config.CLOCK_CENTER_ROW.ROW2 == 2 %}selected{% endif %}>ADS-B receiver stats</option>
-                    <option value="3" {% if config.CLOCK_CENTER_ROW.ROW2 == 3 %}selected{% endif %}>Extended calendar info</option>
-                    <option value="4" {% if config.CLOCK_CENTER_ROW.ROW2 == 4 %}selected{% endif %}>Current weather (requires OpenWeather API)</option>
-                    <option value="5" {% if config.CLOCK_CENTER_ROW.ROW2 == 5 %}selected{% endif %}>Extended observations (requires OpenWeather API)</option>
-                </select>
-            </div>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="CLOCK_CENTER_ROW_CYCLE" name="CLOCK_CENTER_ROW_CYCLE" {% if config.CLOCK_CENTER_ROW_CYCLE %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="CLOCK_CENTER_ROW_CYCLE">Cycle Between Center Row Options</label>
-                </div>
-                <div class="help-text">Automatically cycle through all available clock center row options every 10 seconds.<br>
-                    When enabled, only one (1) row will be used and ignores the above center row settings.<br>
-                    If the Weather API is available, this will cycle through those display options as well.
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="CLOCK_CENTER_ROW_CYCLE" name="CLOCK_CENTER_ROW_CYCLE" {% if config.CLOCK_CENTER_ROW_CYCLE %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="CLOCK_CENTER_ROW_CYCLE">Cycle Between Center Row Options</label>
+                    </div>
+                    <div class="help-text">Automatically cycle through all available clock center row options every 10 seconds.<br>
+                        When enabled, only one (1) row will be used and ignores the above center row settings.<br>
+                        If the Weather API is available, this will cycle through those display options as well.
+                    </div>
                 </div>
             </div>
             <div style="margin-top: 24px; text-align: left;">
@@ -357,66 +381,82 @@
                     <output id="BRIGHTNESS_value" style="margin-left:8px;">{{ config.BRIGHTNESS }}</output>
                 </div>
             </div>
-            <div class="mt-3">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE">Active Plane Display Brightness</label>
-                </div>
-                <div class="help-text">
-                    Use a different brightness when tracking an aircraft. Toggle to enable and set value.<br>
-                    This setting is unaffected by <span class="monospace">Dynamic Brightness</span>.
-                </div>
-                <div class="input-group">
-                    <input type="range" class="form-range" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}>
-                    <!-- <input type="number" class="form-control" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" style="max-width:100px; margin-left:8px;" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}> -->
-                    <output id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value" style="margin-left:8px;">{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}</output>
-                </div>
-            </div>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="ENABLE_TWO_BRIGHTNESS" name="ENABLE_TWO_BRIGHTNESS" {% if config.ENABLE_TWO_BRIGHTNESS %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="ENABLE_TWO_BRIGHTNESS">Dynamic Brightness</label>
-                </div>
-                <div class="help-text">
-                    Enable dynamic switching of brightness based on time of day.<br>
-                    If this setting is disabled, the below settings won't do anything.
-                </div>
-            </div>
-            <div class="mt-3">
-                <label for="BRIGHTNESS_2" class="form-label setting-label">Secondary Brightness</label>
-                <div class="help-text">Used from sunset to sunrise ("night").</div>
-                <div class="input-group">
-                    <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS_2" name="BRIGHTNESS_2" value="{{ config.BRIGHTNESS_2 }}" oninput="BRIGHTNESS_2_value.value = this.value; BRIGHTNESS_2_num.value = this.value">
-                    <!-- <input type="number" class="form-control" min="0" max="100" id="BRIGHTNESS_2_num" value="{{ config.BRIGHTNESS_2 }}" style="max-width:100px; margin-left:8px;" oninput="BRIGHTNESS_2.value = this.value; BRIGHTNESS_2_value.value = this.value"> -->
-                    <output id="BRIGHTNESS_2_value" style="margin-left:8px;">{{ config.BRIGHTNESS_2 }}</output>
-                </div>
-            </div>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="USE_SUNRISE_SUNSET" name="USE_SUNRISE_SUNSET" {% if config.USE_SUNRISE_SUNSET %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="USE_SUNRISE_SUNSET">Use Sunrise/Sunset</label>
-                </div>
-                <div class="help-text">
-                    Use sunrise and sunset times to adjust brightness.<br>
-                    Overrides the below setting.
-                </div>
-            </div>
-            <div class="mt-3">
-                <label class="form-label setting-label">Brightness Switch Time</label>
-                <div class="help-text">
-                    Set the time of day to switch brightness levels.<br>
-                    This setting is the fallback in case sunrise and sunset times can't be determined for your location.<br>
-                </div>
-                <div class="row g-2">
-                    <div class="col">
-                        <label for="BRIGHTNESS_SWITCH_TIME_Sunrise" class="form-label">Sunrise</label>
-                        <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunrise" name="BRIGHTNESS_SWITCH_TIME_Sunrise" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunrise }}" required>
+            <div style="padding-top: 1em;">
+                <div class="mt-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE">Active Plane Display Brightness</label>
                     </div>
-                    <div class="col">
-                        <label for="BRIGHTNESS_SWITCH_TIME_Sunset" class="form-label">Sunset</label>
-                        <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunset" name="BRIGHTNESS_SWITCH_TIME_Sunset" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunset }}" required>
+                    <div class="help-text">
+                        Use a different brightness when tracking an aircraft. Toggle to enable and set value.<br>
+                        This setting is unaffected by <span class="monospace">Dynamic Brightness</span>.
+                    </div>
+                    <div class="input-group">
+                        <input type="range" class="form-range" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}>
+                        <!-- <input type="number" class="form-control" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" style="max-width:100px; margin-left:8px;" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}> -->
+                        <output id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value" style="margin-left:8px;">{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}</output>
                     </div>
                 </div>
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT" name="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT" {% if config.DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT">Disable Active Brightness at Night</label>
+                    </div>
+                    <div class="help-text">Enable this to reduce disturbances at night while retaining the <span class="monospace">Active Plane Display Brightness</span> functionality during the daytime.<br>
+                    If <span class="monospace">Active Plane Display Brightness</span> or <span class="monospace">Dynamic Brightness</span> are disabled, this setting will have no effect.
+                    </div>
+                </div>
+            </div>
+            <div style="padding-top: 1em;">
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ENABLE_TWO_BRIGHTNESS" name="ENABLE_TWO_BRIGHTNESS" {% if config.ENABLE_TWO_BRIGHTNESS %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="ENABLE_TWO_BRIGHTNESS">Dynamic Brightness</label>
+                    </div>
+                    <div class="help-text">
+                        Enable dynamic switching of brightness based on time-of-day.<br>
+                        If this setting is disabled, the below settings won't do anything.
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label for="BRIGHTNESS_2" class="form-label setting-label">Secondary Brightness</label>
+                    <div class="help-text">Used from sunset to sunrise ("night").</div>
+                    <div class="input-group">
+                        <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS_2" name="BRIGHTNESS_2" value="{{ config.BRIGHTNESS_2 }}" oninput="BRIGHTNESS_2_value.value = this.value; BRIGHTNESS_2_num.value = this.value">
+                        <!-- <input type="number" class="form-control" min="0" max="100" id="BRIGHTNESS_2_num" value="{{ config.BRIGHTNESS_2 }}" style="max-width:100px; margin-left:8px;" oninput="BRIGHTNESS_2.value = this.value; BRIGHTNESS_2_value.value = this.value"> -->
+                        <output id="BRIGHTNESS_2_value" style="margin-left:8px;">{{ config.BRIGHTNESS_2 }}</output>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="USE_SUNRISE_SUNSET" name="USE_SUNRISE_SUNSET" {% if config.USE_SUNRISE_SUNSET %}checked{% endif %}>
+                        <label class="form-check-label setting-label" for="USE_SUNRISE_SUNSET">Use Sunrise/Sunset</label>
+                    </div>
+                    <div class="help-text">
+                        Use your site's sunrise and sunset times to adjust brightness.<br>
+                        Overrides the below setting when enabled.
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label setting-label">Brightness Switch Time</label>
+                    <div class="help-text">
+                        Set the time of day to switch brightness levels.<br>
+                        This setting is the fallback in case sunrise and sunset times can't be determined for your location.<br>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col">
+                            <label for="BRIGHTNESS_SWITCH_TIME_Sunrise" class="form-label">Sunrise</label>
+                            <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunrise" name="BRIGHTNESS_SWITCH_TIME_Sunrise" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunrise }}" required>
+                        </div>
+                        <div class="col">
+                            <label for="BRIGHTNESS_SWITCH_TIME_Sunset" class="form-label">Sunset</label>
+                            <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunset" name="BRIGHTNESS_SWITCH_TIME_Sunset" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunset }}" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 24px; text-align: left;">
+                <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
             </div>
         </div>
         <!-- Advanced Tab -->
@@ -1099,6 +1139,9 @@ $(document).ready(function() {
         data['FASTER_REFRESH'] = form.FASTER_REFRESH && form.FASTER_REFRESH.checked;
         data['NO_GROUND_TRACKING'] = form.NO_GROUND_TRACKING && form.NO_GROUND_TRACKING.checked;
         data['CLOCK_CENTER_ROW_CYCLE'] = form.CLOCK_CENTER_ROW_CYCLE && form.CLOCK_CENTER_ROW_CYCLE.checked;
+        data['PREFER_ICAO_CODES'] = form.PREFER_ICAO_CODES && form.PREFER_ICAO_CODES.checked;
+        data['EXTENDED_DETAILS'] = form.EXTENDED_DETAILS && form.EXTENDED_DETAILS.checked;
+        data['DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT'] = form.DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT && form.DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT.checked;
         // data['FLYBY_STATS_ENABLED'] = form.FLYBY_STATS_ENABLED && form.FLYBY_STATS_ENABLED.checked;
         // data['WRITE_STATE'] = form.WRITE_STATE && form.WRITE_STATE.checked;
         data['BRIGHTNESS'] = parseInt(form.BRIGHTNESS.value);

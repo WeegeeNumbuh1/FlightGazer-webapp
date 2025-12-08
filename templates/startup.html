@@ -22,7 +22,7 @@
     <form id="startupOptionsForm">
         <div id="startupOptionsCheckboxes" class="mb-3"></div>
         <button type="button" id="applyStartupBtn" class="btn btn-success">Apply</button>
-        <span id="startupStatus" style="margin-left:16px;color:#ffd700;"></span>
+        <span id="startupStatus" style="margin-left:16px;color:#eda907;"></span>
     </form>
 </div>
 <script>
@@ -38,7 +38,7 @@ const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
             document.body.style.background = '#181818';
             document.body.style.color = '#fff';
             let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#ffd700'; });
+            alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
         }
     }
     function getPreferredTheme() {
@@ -60,6 +60,7 @@ const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
         fetch(startupOptionsUrl).then(r => r.json()).then(data => {
             if (data.error) {
                 document.getElementById('startupStatus').innerText = data.error;
+                document.getElementById('applyStartupBtn').disabled = true;
                 return;
             }
             let html = '';
@@ -70,6 +71,7 @@ const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
         });
     }
     document.getElementById('applyStartupBtn').onclick = function() {
+        if (!window.confirm('Are you sure you want to apply these options?')) return;
         let checked = Array.from(document.querySelectorAll('#startupOptionsCheckboxes input:checked')).map(cb => cb.value);
         document.getElementById('startupStatus').innerText = 'Applying changes...';
         fetch(setStartupOptionsUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({flags: checked})}).then(r => r.json()).then(data => {

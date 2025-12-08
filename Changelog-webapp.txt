@@ -5,6 +5,14 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.15.0 - 2025-12-07
+    - Add support for additional options for FlightGazer v.9.7.0
+    - Handle cases when the config files are missing
+    - Minor layout tweaks to the config pages
+    - A confirmation dialog is now present when applying startup changes
+    - Improve visibility of yellow warning text with the light theme
+    - Various small text tweaks
+
 v.0.14.4 - 2025-12-02
     - The scrollback buttons no longer add to browsing history
 

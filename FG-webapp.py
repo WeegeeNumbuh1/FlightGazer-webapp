@@ -2,8 +2,26 @@
 reading the logs, checking for updates, and modifying startup options.
 This won't run if FlightGazer isn't installed on the system as it depends on
 FlightGazer's virtual environment. (should be handled via the install script).
-Disclosures: most of this was initially vibe-coded, but does contain manual edits to make sure
-it actually works (mostly) and that the actual web pages aren't too janky. """
+Disclosures: most of this was initially vibe-coded, however at this state, it
+has been manually tweaked and modified to the point it's *good enough*. """
+
+"""
+    Copyright (C) 2025, WeegeeNumbuh1.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    A copy of the GNU General Public License should already exist in the
+    parent directory of which this file resides in.
+    If not, see <https://www.gnu.org/licenses/>.
+"""
 
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory, make_response
 from ruamel.yaml import YAML
@@ -23,7 +41,7 @@ import datetime
 import logging
 import importlib.metadata
 
-VERSION = "v.0.14.4 --- 2025-12-02"
+VERSION = "v.0.15.0 --- 2025-12-07"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -85,12 +103,13 @@ def favicon():
 # ========= Helper Functions =========
 
 def load_config():
+    """ Load FlightGazer's config file. You must try-except this function. """
     with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
         data = yaml.load(f)
     return data
 
 def save_config(data):
-    """ Save config and preserve owner/group """
+    """ Save config and preserve owner/group. You must try-except this function """
     orig_stat = None
     if os.path.exists(CONFIG_PATH):
         orig_stat = os.stat(CONFIG_PATH)
@@ -101,7 +120,7 @@ def save_config(data):
         os.chown(CONFIG_PATH, orig_stat.st_uid, orig_stat.st_gid)
 
 def get_predefined_colors():
-    """  Parse colors.py for color names and RGB values """
+    """  Parse colors.py for color names and RGB values. You must try-except this function. """
     color_names = []
     color_rgbs = {}
     with open(COLORS_PATH, 'r', encoding='utf-8') as f:
@@ -117,7 +136,7 @@ def get_predefined_colors():
     return color_names, color_rgbs
 
 def get_color_config():
-    """ Parse colors.py for current color assignments """
+    """ Parse colors.py for current color assignments. You must try-except this function. """
     color_vars = [
         # Clock colors
         'clock_color','seconds_color','am_pm_color','day_of_week_color','date_color',
@@ -157,7 +176,7 @@ def get_color_config():
     return color_config
 
 def save_color_config(colors):
-    """  Update colors.py assignments for color_vars and preserve owner/group """
+    """  Update colors.py assignments for color_vars and preserve owner/group. You must try-except this function. """
     color_vars = [
         # Clock colors
         'clock_color','seconds_color','am_pm_color','day_of_week_color','date_color',
@@ -350,7 +369,7 @@ current_flightgazer_pid = None
 current_flightgazer_process = None
 manually_running = False
 
-def flightgazer_bad_state():
+def flightgazer_bad_state() -> bool:
     """ Check if FlightGazer is running in a bad state or has failed """
     return is_posix and os.path.exists(BAD_STATE_SEMAPHORE)
 
@@ -585,9 +604,24 @@ def service_status():
 
 @app.route('/config')
 def config_page():
-    config = load_config()
-    predefined_colors, predefined_colors_rgb = get_predefined_colors()
-    color_config = get_color_config()
+    try:
+        config = load_config()
+    except Exception as e:
+        main_logger.exception("Failed to load config file!")
+        return make_response(
+            ('<h1>ERROR: config file is missing or could not be loaded!<br>'
+            'You must re-install FlightGazer.</h1><br>' \
+            '<h2>Please go back and go to \"Check for Updates\" to do the re-install.</h2><br>'
+            f'<h3>Details: {e}</h3>'), 200)
+    try:
+        predefined_colors, predefined_colors_rgb = get_predefined_colors()
+        color_config = get_color_config()
+    except Exception as e:
+        return make_response(
+            ('<h1>ERROR: color config file is missing or could not be loaded!<br>'
+            'You must re-install FlightGazer.</h1><br>' \
+            '<h2>Please go back and go to \"Check for Updates\" to do the re-install.</h2><br>'
+            f'<h3>Details: {e}</h3>'), 200)
     return render_template(
         'config.html',
         config=config,
@@ -599,7 +633,11 @@ def config_page():
 @app.route('/update', methods=['POST'])
 def update_config():
     data = request.json
-    config = load_config()
+    try:
+        config = load_config()
+    except Exception as e:
+        main_logger.exception("Failed to load config file!")
+        return jsonify({'error': f'{e}'})
     # List of all boolean (checkbox) settings
     bool_keys = [
         'JOURNEY_PLUS', 'ENHANCED_READOUT', 'ENHANCED_READOUT_AS_FALLBACK', 'SHOW_EVEN_MORE_INFO',
@@ -607,7 +645,7 @@ def update_config():
         'ENABLE_TWO_BRIGHTNESS', 'USE_SUNRISE_SUNSET',
         'PREFER_LOCAL', 'HAT_PWM_ENABLED',
         'FASTER_REFRESH', 'NO_GROUND_TRACKING', # 'FLYBY_STATS_ENABLED', 'WRITE_STATE'
-        'CLOCK_CENTER_ROW_CYCLE'
+        'CLOCK_CENTER_ROW_CYCLE', 'PREFER_ICAO_CODES', 'EXTENDED_DETAILS', 'DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT'
     ]
     # List of all numeric settings that may be missing
     numeric_keys = [
@@ -643,9 +681,13 @@ def update_config():
     # Remove any lingering 'colors' key from config dict if present
     if 'colors' in config:
         del config['colors']
-    save_config(config)
-    if 'colors' in data:
-        save_color_config(data['colors'])
+    try:
+        save_config(config)
+        if 'colors' in data:
+            save_color_config(data['colors'])
+    except Exception as e:
+        main_logger.exception("Failed to save to config file!")
+        return jsonify({'error': f'{e}'})
     return jsonify({'status': 'success'})
 
 # ========= Details and Log Routes =========
