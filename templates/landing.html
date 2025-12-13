@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
     <title>FlightGazer - Home ({{ hostname }} at {{ ip_address }})</title>
+    <meta name="author" content="WeegeeNumbuh1">
+    <meta name="description" content="FlightGazer main landing page.">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
@@ -69,24 +74,31 @@
         <a href="{{ url_for('startup_options') }}" class="btn btn-secondary">Change Startup Options</a>
         <a href="{{ url_for('reference_guide') }}" class="btn btn-secondary" target="_blank">Help &amp; Reference</a>
     </div>
-    <div class="quick-access-btns" style="margin-top:32px; text-align:center;">
+    <div class="quick-access-btns" id="quickAccessBtns" style="margin-top:32px; text-align:center;">
+        <!-- Show something (if available) before the page updates this section -->
         {% if localpages %}
             Quick links (opens a new tab)<br>
             {% for label, url in localpages.items() %}
-                <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary" style="margin:6px 8px; min-width:220px;">{{ label }}</a>
+            <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary" style="margin:6px 8px; min-width:220px;">{{ label }}</a>
             {% endfor %}
+            <span class="small-status"><i>Refreshing links...</i></span><br>
         {% endif %}
     </div>
-    <div id="serviceControlBtns" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
+    <div id="serviceControlBtns" style="position:fixed;bottom:24px;right:24px;z-index:1000; font-size: 0.7em; color:rgba(169, 169, 169, 0.6)">
+        <div id="serviceBtnOverlay" style="z-index: 1001; text-align: right;"></div>
         <button id="startServiceBtn" class="btn btn-success me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Start FlightGazer">Start</button>
         <button id="restartServiceBtn" class="btn btn-warning me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Restart FlightGazer">Restart</button>
         <button id="stopServiceBtn" class="btn btn-danger" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Stop FlightGazer">Stop</button>
     </div>
+
     <script>
     const statusURL = "{{ url_for('service_status') }}";
     const serviceRestart = "{{ url_for('restart_flightgazer') }}";
     const serviceStop = "{{ url_for('stop_flightgazer_service') }}";
     const serviceStart = "{{ url_for('start_flightgazer_service') }}";
+    const localPagesURL = "{{ url_for('api_localpages') }}";
+    const SERVICE_BTN_DISABLE_KEY = 'fg_service_buttons_disabled_until';
+    const SERVICE_BTN_TIMEOUT_MS = 30000;
     function setTheme(theme) {
         if (theme === 'light') {
             document.body.style.background = '#f8f9fa';
@@ -115,31 +127,105 @@
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
     });
-    function disableServiceBtns() {
-        document.getElementById('startServiceBtn').disabled = true;
-        document.getElementById('restartServiceBtn').disabled = true;
-        document.getElementById('stopServiceBtn').disabled = true;
-        setTimeout(function() {
-            document.getElementById('startServiceBtn').disabled = false;
-            document.getElementById('restartServiceBtn').disabled = false;
-            document.getElementById('stopServiceBtn').disabled = false;
-        }, 20000);
+
+    function setButtonsDisabled(disabled) {
+        ['startServiceBtn', 'restartServiceBtn', 'stopServiceBtn'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.disabled = disabled;
+        });
     }
+
+    function saveDisableUntil(ts) {
+        try { localStorage.setItem(SERVICE_BTN_DISABLE_KEY, String(ts)); } catch(e) {}
+    }
+
+    function clearDisableUntil() {
+        try { localStorage.removeItem(SERVICE_BTN_DISABLE_KEY); } catch(e) {}
+    }
+
+    function scheduleReenable(untilTs) {
+        const remaining = Math.max(0, untilTs - Date.now());
+        setTimeout(() => {
+            // only re-enable if the saved expiry has passed
+            const saved = Number(localStorage.getItem(SERVICE_BTN_DISABLE_KEY));
+            if (!saved || Date.now() >= saved) {
+                setButtonsDisabled(false);
+                serviceBtnTxt(false);
+                clearDisableUntil();
+            }
+        }, remaining);
+    }
+
+    function serviceBtnTxt(flag) {
+        const overlay = document.getElementById('serviceBtnOverlay');
+        if (flag === true) {
+            showTemporaryMessage('serviceBtnOverlay', 'You can try again in a few seconds', 15000);
+        } else {
+            overlay.innerText = "";
+        }
+    }
+    function disableServiceBtns() {
+        const until = Date.now() + SERVICE_BTN_TIMEOUT_MS;
+        const overlay = document.getElementById('serviceBtnOverlay');
+        saveDisableUntil(until);
+        setButtonsDisabled(true);
+        serviceBtnTxt(true);
+        scheduleReenable(until);
+    }
+
+    function restoreButtonStateFromStorage() {
+        try {
+            const saved = Number(localStorage.getItem(SERVICE_BTN_DISABLE_KEY));
+            if (saved && Date.now() < saved) {
+                setButtonsDisabled(true);
+                serviceBtnTxt(true);
+                scheduleReenable(saved);
+            } else {
+                setButtonsDisabled(false);
+                serviceBtnTxt(false);
+                clearDisableUntil();
+            }
+        } catch (e) {
+            // localStorage unavailable — default behavior: don't persist
+            setButtonsDisabled(false);
+        }
+    }
+
     function confirmAction(msg, cb) {
         if (window.confirm(msg)) cb();
     }
+    // show a message in an element and clear it after `timeout` ms,
+    // but only if the element hasn't been written to again
+    function showTemporaryMessage(elemId, message, timeout = 10000) {
+        const el = document.getElementById(elemId);
+        if (!el) return;
+        // per-element message id so older timers don't clear newer messages
+        el.dataset.msgId = String((parseInt(el.dataset.msgId || '0', 10) + 1));
+        const myId = el.dataset.msgId;
+        el.innerText = message;
+        if (el._fg_clearTimeout) clearTimeout(el._fg_clearTimeout);
+        el._fg_clearTimeout = setTimeout(() => {
+            if (el.dataset.msgId === myId) {
+                el.innerText = '';
+                delete el.dataset.msgId;
+                el._fg_clearTimeout = null;
+            }
+        }, timeout);
+    }
+
     document.getElementById('startServiceBtn').onclick = function() {
         confirmAction('Start FlightGazer service?', function() {
             disableServiceBtns();
+            serviceBtnTxt(true);
             document.getElementById('serviceStatusMsg').innerText = 'Starting...';
             fetch(serviceStart, {method:'POST'}).then(r => r.json()).then(data => {
                 if (data.status === 'already_running') {
-                    document.getElementById('serviceStatusMsg').innerText = 'FlightGazer is already running.';
+                    showTemporaryMessage('serviceStatusMsg', 'FlightGazer is already running.', 15000);
                     alert('FlightGazer is already running.');
                 } else if (data.status === 'started') {
-                    document.getElementById('serviceStatusMsg').innerText = 'Service started.';
+                    showTemporaryMessage('serviceStatusMsg', 'Service started.', 15000);
                 } else {
-                    document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
+                    showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000);
                 }
             });
         });
@@ -147,12 +233,13 @@
     document.getElementById('restartServiceBtn').onclick = function() {
         confirmAction('Restart FlightGazer service?', function() {
             disableServiceBtns();
+            serviceBtnTxt(true);
             document.getElementById('serviceStatusMsg').innerText = 'Restarting...';
             fetch(serviceRestart, {method:'POST'}).then(r => r.json()).then(data => {
                 if (data.status === 'success') {
-                    document.getElementById('serviceStatusMsg').innerText = 'Service successfully restarted.';
+                    showTemporaryMessage('serviceStatusMsg', 'Service successfully restarted.', 15000);
                 } else {
-                    document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
+                    showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000);
                 }
             });
         });
@@ -160,12 +247,17 @@
     document.getElementById('stopServiceBtn').onclick = function() {
         confirmAction('Stop FlightGazer service?', function() {
             disableServiceBtns();
+            serviceBtnTxt(true);
             document.getElementById('serviceStatusMsg').innerText = 'Stopping...';
             fetch(serviceStop, {method:'POST'}).then(r => r.json()).then(data => {
-                if (data.status === 'stopped') {
-                    document.getElementById('serviceStatusMsg').innerText = 'Service stopped.';
+                if (data.status === 'already_stopped') {
+                    showTemporaryMessage('serviceStatusMsg', 'FlightGazer is already stopped.', 15000);
+                    alert('FlightGazer is already stopped.');
+                } else if (data.status === 'stopped') {
+                    showTemporaryMessage('serviceStatusMsg', 'Service stopped.', 15000);
                 } else {
                     document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
+                    showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000);
                 }
             });
         });
@@ -201,7 +293,7 @@ It\'s recommended to bookmark this page for easy access.\n\
             }
             document.querySelector('.status-indicator span').style.background = statusColor;
             document.querySelector('.status-indicator span + span').innerText = statusText;
-        });
+        }).catch(error => console.error('Could not determine status:', error));
     }
     let statusPollingInterval;
 
@@ -230,6 +322,51 @@ It\'s recommended to bookmark this page for easy access.\n\
 
     // Initial call and start polling
     startStatusPolling();
+
+    // load and render local pages
+    async function loadLocalPages() {
+        try {
+            const response = await fetch(localPagesURL);
+            const localpages = await response.json();
+            const quickAccessDiv = document.getElementById('quickAccessBtns');
+
+            if (Object.keys(localpages).length === 0) {
+                quickAccessDiv.style.display = 'none';
+                return;
+            }
+
+            // clear existing content
+            quickAccessDiv.innerHTML = 'Quick links (opens a new tab)<br>';
+
+            // add buttons for each local page
+            for (const [label, url] of Object.entries(localpages)) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'btn btn-outline-secondary';
+                link.style.margin = '6px 8px';
+                link.style.minWidth = '220px';
+                link.textContent = label;
+                quickAccessDiv.appendChild(link);
+            }
+            quickAccessDiv.style.display = 'flex';
+        } catch (error) {
+            // silently fail, don't show error to user
+        }
+    }
+
+    // keep other tabs/windows in sync
+    window.addEventListener('storage', (e) => {
+        if (e.key === SERVICE_BTN_DISABLE_KEY) {
+            restoreButtonStateFromStorage();
+        }
+    });
+
+    // call at startup to restore persisted state
+    restoreButtonStateFromStorage();
+    // load local pages on page load
+    loadLocalPages();
     </script>
 </body>
 </html>

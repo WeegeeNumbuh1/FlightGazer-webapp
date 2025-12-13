@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlightGazer Config Editor</title>
+    <meta name="author" content="WeegeeNumbuh1">
+    <meta name="description" content="FlightGazer configuration page.">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
@@ -1211,7 +1213,13 @@ $(document).ready(function() {
                         if (restartResp.status === 'success') {
                             alert('FlightGazer successfully restarted.');
                         } else {
-                            alert('Failed to restart FlightGazer. Check the logs.');
+                            if (restartResp.error === 'Service control timeout still active, try again later.') {
+                                alert("You recently used the service controls, you'll have to restart the service manually.");
+                            } else {
+                                let errstr = String(restartResp.error)
+                                let fullmsg = 'Failed to restart FlightGazer. Check the logs.\nDetails: ' + errstr
+                                alert(fullmsg);
+                            }
                         }
                         location.reload();
                     });
@@ -1234,7 +1242,13 @@ $(document).ready(function() {
                 if (restartResp.status === 'success') {
                     alert('FlightGazer successfully restarted.');
                 } else {
-                    alert('Failed to restart FlightGazer. Check the logs.');
+                    if (restartResp.error === 'Service control timeout still active, try again later.') {
+                        alert("You recently used the service controls, you'll have to restart the service manually.");
+                    } else {
+                        let errstr = String(restartResp.error)
+                        let fullmsg = 'Failed to restart FlightGazer. Check the logs.\nDetails: ' + errstr
+                        alert(fullmsg);
+                    }
                 }
                 location.reload();
             });

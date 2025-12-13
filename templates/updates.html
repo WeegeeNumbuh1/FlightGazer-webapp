@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
     <title>FlightGazer - Check for Updates</title>
+    <meta name="author" content="WeegeeNumbuh1">
+    <meta name="description" content="FlightGazer updater page.">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
@@ -159,11 +164,15 @@ function showUpdateProgressPage() {
     fetch(updatesStartUrl, {method:'POST'}).then(r => r.json()).then(data => {
         if (data.status === 'started') {
             pollUpdateOutputIframe();
-        } else {
+        } else if (data.status === 'already_running') {
             let doc = document.getElementById('updateOutputFrame').contentDocument;
             doc.open();
             doc.write('<pre style="background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Update already running.</pre>');
             doc.close();
+        } else {
+            alert(data.status)
+            let btn = document.getElementById('backToHomeBtn');
+            if (btn) btn.style.display = '';
         }
     });
 }
@@ -213,11 +222,15 @@ document.getElementById('updateNowBtn').onclick = function() {
     }).then(r => r.json()).then(data => {
         if (data.status === 'started') {
             pollUpdateOutputIframeFull();
-        } else {
+        } else if (data.status === 'already_running') {
             let doc = document.getElementById('updateOutputFrameFull').contentDocument;
             doc.open();
             doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Update already running.</pre>');
             doc.close();
+        } else {
+            alert(data.status)
+            let btn = document.getElementById('backToHomeBtn');
+            if (btn) btn.style.display = '';
         }
     });
 }

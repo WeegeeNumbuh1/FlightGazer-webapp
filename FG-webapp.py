@@ -23,7 +23,15 @@ has been manually tweaked and modified to the point it's *good enough*. """
     If not, see <https://www.gnu.org/licenses/>.
 """
 
-from flask import Flask, render_template, request, jsonify, send_file, send_from_directory, make_response
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    send_file,
+    send_from_directory,
+    make_response,
+)
 from ruamel.yaml import YAML
 import os
 import sys
@@ -40,8 +48,9 @@ import io
 import datetime
 import logging
 import importlib.metadata
+import concurrent.futures as CF
 
-VERSION = "v.0.15.0 --- 2025-12-07"
+VERSION = "v.0.16.0 --- 2025-12-13"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -236,9 +245,9 @@ def get_webapp_version() -> str:
         return 'Unknown'
 
 def get_ip() -> None:
-    """ Gets us our local IP. Pulled exactly as is from the main FlightGazer script.
-    Modifies the global `CURRENT_IP` """
-    global CURRENT_IP
+    """ Gets us our local IP (and hostname). Pulled exactly as is from the main FlightGazer script.
+    Modifies the globals `CURRENT_IP` and `HOSTNAME` """
+    global CURRENT_IP, HOSTNAME
     ip_now = CURRENT_IP
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(0)
@@ -253,6 +262,7 @@ def get_ip() -> None:
         main_logger.info(f"Current IP: {IP}")
     if ip_now and IP != ip_now:
         main_logger.info(f"IP address changed: {ip_now} -> {IP}")
+    HOSTNAME = socket.gethostname()
     CURRENT_IP = IP
 
 def local_webpage_prober() -> dict:
@@ -275,70 +285,98 @@ def local_webpage_prober() -> dict:
     """
     global RUNNING_ADSBIM
     pages = {}
-    def webpage_title(input: str) -> str | None:
+    def webpage_title(url: str) -> tuple[str, str | None]:
         """ Get the title of a webpage given `input` as a string. """
         try:
-            response = webapp_session.get(input, timeout=0.5, allow_redirects=True)
+            response = webapp_session.get(url, timeout=0.5, allow_redirects=True)
             # get the webpage title; https://stackoverflow.com/a/47236359
             resp_body = response.text
-            title = re.search('(?<=<title>).+?(?=</title>)', resp_body, re.DOTALL).group().strip()
-            return title
+            title = re.search('(?<=<title>).+?(?=</title>)', resp_body, re.DOTALL)
+            if title:
+                return url, title.group().strip()
         except Exception:
-            return None
+            pass
+        return url, None
+
     def match_title(input: None | str, title: str) -> bool:
         if input and title in input:
             return True
         return False
+
+    root = f"http://{CURRENT_IP}"
+    candidates = {
+        'adsb_root': [root, f"http://{CURRENT_IP}:1099"],
+        'display_emulator': [f"http://{CURRENT_IP}:8888", "http://localhost:8888"],
+        'tar1090': [f"http://{CURRENT_IP}/tar1090", f"http://{CURRENT_IP}:8080"],
+        'graphs1090': [f"http://{CURRENT_IP}/graphs1090", f"http://{CURRENT_IP}:8542"],
+        'skystats': [f"http://{CURRENT_IP}/skystats", f"http://{CURRENT_IP}:5173"],
+        'planefence': [f"http://{CURRENT_IP}:8088"],
+    }
+
+    # flatten URL list for use with the threadpool
+    urls = []
+    for lst in candidates.values():
+        for u in lst:
+            if u not in urls:
+                urls.append(u)
+
+    # probe the stuff concurrently
+    results: dict[str, None | str] = {}
+    max_workers = len(urls)
+    with CF.ThreadPoolExecutor(max_workers=max_workers) as exe:
+        future_to_url = {exe.submit(webpage_title, u): u for u in urls}
+        for fut in CF.as_completed(future_to_url):
+            url, title = fut.result()
+            results[url] = title
+
     # find adsb.im
-    adsbim = f"http://{CURRENT_IP}"
-    local_page = webpage_title(adsbim)
+    local_page = results.get(root)
     if local_page:
         if "Feeder Homepage" in local_page:
-            pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
+            pages.update({"System Configuration & Management, Maps, and Stats": root})
             RUNNING_ADSBIM = True
         elif "PiAware" in local_page: # FlightAware's PiAware is running here
-            pages.update({"FlightAware PiAware page": adsbim})
+            pages.update({"FlightAware PiAware page": root})
         # else: # something else is running here, link it anyway
-        #     pages.update({f"{local_page}"[:100]: adsbim})
+        #     pages.update({f"{local_page}"[:100]: root})
     else:
         adsbim = f"http://{CURRENT_IP}:1099"
-        local_page = webpage_title(adsbim)
+        local_page = results.get(adsbim)
         if match_title(local_page, "Feeder Homepage"):
             pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
             RUNNING_ADSBIM = True
+
     # try to find the display emulator
-    display_emulator = [f"http://{CURRENT_IP}:8888", "http://localhost:8888"]
-    for url in display_emulator:
-        rgbemulatorpage = webpage_title(url)
-        if rgbemulatorpage and any(map(rgbemulatorpage.__contains__, ["FlightGazer", "RGBME"])):
+    for url in candidates['display_emulator']:
+        t = results.get(url)
+        if t and any(x in t for x in ("FlightGazer", "RGBME")):
             pages.update({"RGBMatrixEmulator": url})
             break
+
     # find the rest of our stuff
-    tar1090location = [f"http://{CURRENT_IP}/tar1090", f"http://{CURRENT_IP}:8080"]
-    for url in tar1090location:
-        tar1090page = webpage_title(url)
-        if match_title(tar1090page, "tar1090"):
+    # tar1090
+    for url in candidates['tar1090']:
+        if match_title(results.get(url), "tar1090"):
             pages.update({"tar1090 Tracking Interface": url})
             break
 
-    graphs1090location = [f"http://{CURRENT_IP}/graphs1090", f"http://{CURRENT_IP}:8542"]
-    for url in graphs1090location:
-        graphs1090page = webpage_title(url)
-        if match_title(graphs1090page, "graphs1090"):
+    # graphs1090
+    for url in candidates['graphs1090']:
+        if match_title(results.get(url), "graphs1090"):
             pages.update({"graphs1090 Statistics Interface": url})
             break
 
-    skystatslocation = [f"http://{CURRENT_IP}/skystats", f"http://{CURRENT_IP}:5173"]
-    for url in skystatslocation:
-        skystatspage = webpage_title(url)
-        if match_title(skystatspage, "Skystats"):
+    # skystats
+    for url in candidates['skystats']:
+        if match_title(results.get(url), "Skystats"):
             pages.update({"Skystats": url})
             break
 
-    planefencelocation = f"http://{CURRENT_IP}:8088"
-    planefencepage = webpage_title(planefencelocation)
-    if match_title(planefencepage, "Planefence"):
-        pages.update({"Planefence": planefencelocation})
+    # planefence
+    planefence_url = candidates['planefence'][0]
+    if match_title(results.get(planefence_url), "Planefence"):
+        pages.update({"Planefence": planefence_url})
+
     return pages
 
 def match_commandline(command_search: str, process_name: str) -> int | None:
@@ -394,20 +432,25 @@ def get_flightgazer_status():
 
     try:
         # if the previous poll showed that no existing PID for FlightGazer is running, run through this
-        if current_flightgazer_process is None or not current_flightgazer_process.is_running():
+        flow_reason = ""
+        if current_flightgazer_process is None:
+            flow_reason = "FlightGazer process does not exist"
+        if current_flightgazer_process and not current_flightgazer_process.is_running():
+            flow_reason = f"Previous FlightGazer process PID {current_flightgazer_pid} is no longer running"
+        if flow_reason:
             result = subprocess.run(['systemctl', 'is-active', 'flightgazer'], capture_output=True, text=True)
             result2 = subprocess.run(['systemctl', 'is-failed', 'flightgazer'], capture_output=True, text=True)
             if result2.returncode == 1: # no failures
                 if ((result.returncode == 0 and result.stdout.strip() == 'active')
                     or result.stdout.strip() == 'activating'):
+                    main_logger.info(f"Running through process discovery logic (Reason: {flow_reason})")
                     # try to find the PID of the running instance
-                    if current_flightgazer_pid is None:
-                        current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
-                        if current_flightgazer_pid is not None:
-                            main_logger.info(f"Detected FlightGazer's PID: {current_flightgazer_pid}")
-                            # The main process of FlightGazer is running (not in the systemd startup phase)
-                            current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
-                            manually_running = False
+                    current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
+                    if current_flightgazer_pid is not None:
+                        main_logger.info(f"Detected FlightGazer's PID: {current_flightgazer_pid}")
+                        # The main process of FlightGazer is running (not in the systemd startup phase)
+                        current_flightgazer_process = psutil.Process(pid=current_flightgazer_pid)
+                        manually_running = False
                     return 'running'
                 elif result.returncode == 3 or result.stdout.strip() == 'inactive':
                     current_flightgazer_pid = match_commandline('FlightGazer.py', 'python')
@@ -451,6 +494,7 @@ def get_flightgazer_status():
                     return 'manually running'
 
     except Exception:
+        main_logger.exception("Process discovery failed.")
         current_flightgazer_pid = None
         current_flightgazer_process = None
         manually_running = False
@@ -490,24 +534,83 @@ def update_fetcher() -> None:
         else:
             main_logger.info("Cache still valid; no updates since last checked")
 
+class ActionTimeout:
+    """ Prevent abusing some control routes.
+    When a control action (e.g: service start, restart, stop) is called, this
+    object serves as a guard to prevent abusing these actions.
+    ### how to use:
+    >>> lockout_sec = 30
+    >>> guard = ActionTimeout(lockout_sec)
+    >>> def should_i_do_this():
+    >>>      if guard.touch():
+    >>>          yeah_lets_go()
+    >>>      else:
+    >>>          nah_bro()
+    """
+    def __init__(self, lockout_time: int = 30):
+        self._lock = threading.Lock()
+        self._lockout_time = lockout_time
+        self._timer: threading.Timer | None = None
+        self.good_to_go = True
+
+    def _expire(self) -> None:
+        """ Called by the timer when the lockout period ends. """
+        with self._lock:
+            self._timer = None
+            self.good_to_go = True
+
+    def _start_timer(self) -> None:
+        """ Start or restart the background timer """
+        if self._timer:
+            self._timer.cancel()
+        self._timer = threading.Timer(self._lockout_time, self._expire)
+        self._timer.daemon = True
+        self._timer.start()
+        self.good_to_go = False
+
+    def _reset_timer(self) -> None:
+        """ Cancel any running timer and allow actions immediately """
+        with self._lock:
+            if self._timer:
+                self._timer.cancel()
+                self._timer = None
+            self.good_to_go = True
+
+    def touch(self) -> bool:
+        """ Check if the guard allows an action. If allowed, start the lockout timer
+        in the background and return True. If lockout is active, return False.
+        This method returns immediately (non-blocking)
+        """
+        with self._lock:
+            if self.good_to_go:
+                self._start_timer()
+                return True
+            else:
+                return False
+
 # ========= Initialization Stuff =========
 get_ip()
+""" Keeps track of how many times the probing thread has done its work.
+This gets reset if a command to change the running state of the main FlightGazer
+service is used. """
 def probing_thread() -> None:
     """ Probes available webpages: does an initial burst every
-    30 seconds for 5 minutes at startup (to wait for the other pages to start),
-    then once every 10 minutes for the next hour,
+    30 seconds for 10 minutes at startup (to wait for the other pages to start),
+    then once every 5 minutes for the next hour,
     then updates once a day thereafter.
     Modifies the `localpages` global. """
     global localpages
-    run_count = 0
+    probing_cycle_count = 0
+    stage1 = 20
+    stage2 = 32
     while True:
         localpages = local_webpage_prober()
-        run_count += 1
-        if run_count <= 10:
+        probing_cycle_count += 1
+        if probing_cycle_count < stage1:
             sleep(30)
             get_ip()
-        elif 11 <= run_count < 17:
-            sleep(600)
+        elif stage1 <= probing_cycle_count < stage2:
+            sleep(300)
             get_ip()
         else:
             sleep(86400)
@@ -522,6 +625,17 @@ def update_ip() -> None:
 
 threading.Thread(target=probing_thread, name='local-webpage-searcher', daemon=True).start()
 threading.Thread(target=update_ip, name='IP-watcher', daemon=True).start()
+service_guard = ActionTimeout(30)
+long_guard = ActionTimeout(600)
+update_guard = ActionTimeout(600)
+
+# ========= API Routes =========
+
+@app.route('/api/localpages')
+def api_localpages():
+    global localpages
+    localpages = local_webpage_prober()
+    return jsonify(localpages)
 
 # ========= Root Route =========
 
@@ -550,17 +664,27 @@ def restart_flightgazer():
     try:
         status = get_flightgazer_status()
         if status == 'stopped':
-            subprocess.Popen(
-                ['systemctl', 'start', 'flightgazer'],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
+            if service_guard.touch():
+                subprocess.Popen(
+                    ['systemctl', 'start', 'flightgazer'],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+            else:
+                raise PermissionError
         # Restart the systemd service
         else:
             main_logger.info("FlightGazer service restart requested")
-            subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True, timeout=15)
+            if service_guard.touch():
+                subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True, timeout=15)
+            else:
+                raise PermissionError
         main_logger.info("FlightGazer service restart successful")
         return jsonify({'status': 'success'})
+    except PermissionError:
+        message = "Service control timeout still active, try again later."
+        main_logger.warning(message)
+        return jsonify({'status': 'error', 'error': str(message)})
     except Exception as e:
         main_logger.exception("FlightGazer service restart failed.")
         return jsonify({'status': 'error', 'error': str(e)})
@@ -573,13 +697,20 @@ def start_flightgazer_service():
             return jsonify({'status': 'already_running'})
         # Start the service in the background
         main_logger.info("FlightGazer service start requested")
-        subprocess.Popen(
-            ['systemctl', 'start', 'flightgazer'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+        if service_guard.touch():
+            subprocess.Popen(
+                ['systemctl', 'start', 'flightgazer'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+        else:
+            raise PermissionError
         main_logger.info("FlightGazer service start successful")
         return jsonify({'status': 'started'})
+    except PermissionError:
+        message = "Service control timeout still active, try again later."
+        main_logger.warning(message)
+        return jsonify({'status': 'error', 'error': str(message)})
     except Exception as e:
         main_logger.exception("FlightGazer service start failed.")
         return jsonify({'status': 'error', 'error': str(e)})
@@ -587,10 +718,20 @@ def start_flightgazer_service():
 @app.route('/service/stop', methods=['POST'])
 def stop_flightgazer_service():
     try:
+        status = get_flightgazer_status()
+        if status == 'stopped':
+            return jsonify({'status': 'already_stopped'})
         main_logger.info("FlightGazer service stop requested")
-        subprocess.run(['systemctl', 'stop', 'flightgazer'], check=True)
+        if service_guard.touch():
+            subprocess.run(['systemctl', 'stop', 'flightgazer'], check=True)
+        else:
+            raise PermissionError
         main_logger.info("FlightGazer service stop successful")
         return jsonify({'status': 'stopped'})
+    except PermissionError:
+        message = "Service control timeout still active, try again later."
+        main_logger.warning(message)
+        return jsonify({'status': 'error', 'error': str(message)})
     except Exception as e:
         main_logger.exception("FlightGazer service stop failed")
         return jsonify({'status': 'error', 'error': str(e)})
@@ -715,9 +856,10 @@ def details_live():
             'Info':
             {
                 'status': 'Current state file could not be found.',
-                'what_to_do': ('FlightGazer may not be running or '
-                               'the setting to write a state file is disabled. '
-                               'Please check the other logs.')
+                'what_to_do': (
+                    'FlightGazer may not be running or '
+                    'the setting to write a state file is disabled. '
+                    'Please check the other logs.')
             },
              'More_Info':
             {
@@ -732,8 +874,9 @@ def details_live():
             'Info':
             {
                 'status': f'The state file is currently blank or could not be decoded.',
-                'what_to_do': ('Please refresh again in a few moments. '
-                               'If this message does not go away, please check the other logs.')
+                'what_to_do': (
+                    'Please refresh again in a few moments. '
+                    'If this message does not go away, please check the other logs.')
             },
             'More_Info':
             {
@@ -1030,6 +1173,11 @@ def set_startup_options():
         return jsonify({'error': 'Invalid startup flags detected'}), 400
 
     try:
+        if long_guard.touch():
+            pass
+        else:
+            raise PermissionError
+
         with open(SERVICE_PATH, 'r', encoding='utf-8') as f:
             lines = f.readlines()
 
@@ -1070,6 +1218,10 @@ def set_startup_options():
         main_logger.info("Service file successfully updated")
         return jsonify({'status': 'success'})
 
+    except PermissionError:
+        message = "Lockout for updating startup options is still active, try again later."
+        main_logger.warning(f"{message}")
+        return jsonify({'error': str(message)}), 500
     except subprocess.TimeoutExpired:
         main_logger.error("Service file reload timed out")
         return jsonify({'error': 'Command timed out'}), 500
@@ -1150,6 +1302,12 @@ def start_update():
         data = request.get_json()
         reset_config = data.get('reset_config', False)
     main_logger.info("Starting FlightGazer update process")
+    if update_guard.touch():
+        pass
+    else:
+        message = "Update timeout still active. Try again at a later time."
+        main_logger.warning(message)
+        return jsonify({'status': str(message)})
     with update_lock:
         if update_running:
             return jsonify({'status':'already_running'})

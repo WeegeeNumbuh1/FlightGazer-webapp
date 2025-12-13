@@ -5,6 +5,25 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.16.0 - 2025-12-13
+    - Improved backend services:
+        - Refactored the local site prober to be significantly faster
+        - Fix backend logic for the service status polling where it would lose track of
+          FlightGazer's PID when restarting the service
+        - Add timeouts to service control actions and the updater to prevent abuse
+        - IP and hostname are updated the same time the internal site prober runs
+    - Landing page improvements:
+        - The page now polls for available sites upon refresh or initial load
+        - Service status messages now auto clear
+        - The service control buttons now persist state across sessions
+          and have a small message when they're disabled
+            - Extended button timeout to 30 seconds
+    - Various other page improvements to handle the backend timeouts
+    - Most of the pages now try to get the browser not to cache its contents
+    - Upon applying new startup settings, the apply button is disabled
+    - Text tweaks for the Reference page
+    - Releases with FlightGazer v.9.7.1
+
 v.0.15.0 - 2025-12-07
     - Add support for additional options for FlightGazer v.9.7.0
     - Handle cases when the config files are missing
