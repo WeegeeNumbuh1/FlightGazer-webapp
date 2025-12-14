@@ -236,33 +236,39 @@ document.getElementById('updateNowBtn').onclick = function() {
 }
 let lastUpdateOutput = '';
 function pollUpdateOutputIframeFull() {
-    fetch(updatesOutputUrl).then(r => r.json()).then(data => {
-        if (data.lines && data.lines.length) {
-            let newText = data.lines[data.lines.length-1];
-            if (newText !== lastUpdateOutput && newText !== '') {
-                let doc = document.getElementById('updateOutputFrameFull').contentDocument;
-                doc.open();
-                doc.write(`<pre id='updatePre' style='background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:10px;/* max-height:100%; */overflow-y:auto;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
-                doc.close();
-                lastUpdateOutput = newText;
-                // Auto-scroll to bottom
-                // doc.scrollTop = doc.scrollHeight // option 1, kinda works
-                const preElement = doc.getElementById('updatePre');
-                preElement.scrollIntoView(false) // should basically work all the time (tested: chromium & mozilla)
-                // online guides have failed me here:
-                // const preElement = doc.getElementById('updatePre');
-                // if (preElement) {
-                //     preElement.scrollTop = preElement.scrollHeight;
-                // }
+    try {
+        fetch(updatesOutputUrl).then(r => r.json()).then(data => {
+            if (data.lines && data.lines.length) {
+                let newText = data.lines[data.lines.length-1];
+                if (newText !== lastUpdateOutput && newText !== '') {
+                    let doc = document.getElementById('updateOutputFrameFull').contentDocument;
+                    doc.open();
+                    doc.write(`<pre id='updatePre' style='background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:10px;/* max-height:100%; */overflow-y:auto;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
+                    doc.close();
+                    lastUpdateOutput = newText;
+                    // Auto-scroll to bottom
+                    // doc.scrollTop = doc.scrollHeight // option 1, kinda works
+                    const preElement = doc.getElementById('updatePre');
+                    preElement.scrollIntoView(false) // should basically work all the time (tested: chromium & mozilla)
+                    // online guides have failed me here:
+                    // const preElement = doc.getElementById('updatePre');
+                    // if (preElement) {
+                    //     preElement.scrollTop = preElement.scrollHeight;
+                    // }
+                }
             }
-        }
-        updateRunning = data.running;
-        if (updateRunning) {
-            setTimeout(pollUpdateOutputIframeFull, 500);
-        } else {
-            document.getElementById('backToHomeBtn').style.display = '';
-        }
-    });
+            updateRunning = data.running;
+            if (updateRunning) {
+                setTimeout(pollUpdateOutputIframeFull, 500);
+            } else {
+                document.getElementById('backToHomeBtn').style.display = '';
+            }
+        });
+    } catch(e) {
+        alert("Connection to system interrupted! The update may not have succeeded.\n\
+        If the version number did not change at the homepage, try to update again at a later time.");
+        document.getElementById('backToHomeBtn').style.display = '';
+    }
 }
 document.getElementById('backToHomeBtn').onclick = function() {
     window.location.href = homepage;
