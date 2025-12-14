@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.16.1 - 2025-12-14
+    - Add support for the case when using adsb.im and it detects an SDR disconnection
+    - Add link to adsb.im system logs in the Help & Reference page
+
 v.0.16.0 - 2025-12-13
     - Improved backend services:
         - Refactored the local site prober to be significantly faster

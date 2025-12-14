@@ -44,6 +44,9 @@ Use the `uninstall-webapp.sh` script in the `web-app` folder in the FlightGazer 
 ## Changelog
 [`Changelog-webapp.txt`](/Changelog-webapp.txt)
 
+## Planned Features
+- [ ] Basic web authentication for some features
+
 ## Contributions
 Pull requests are not accepted.<br>
 Issues, bug reports, and other comments are welcomed.

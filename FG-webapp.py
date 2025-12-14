@@ -50,7 +50,7 @@ import logging
 import importlib.metadata
 import concurrent.futures as CF
 
-VERSION = "v.0.16.0 --- 2025-12-13"
+VERSION = "v.0.16.1 --- 2025-12-14"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -299,13 +299,16 @@ def local_webpage_prober() -> dict:
         return url, None
 
     def match_title(input: None | str, title: str) -> bool:
+        """ If a given `input` is found in `title`, returns True,
+        False otherwise. """
         if input and title in input:
             return True
         return False
 
     root = f"http://{CURRENT_IP}"
+    adsbim = f"http://{CURRENT_IP}:1099"
     candidates = {
-        'adsb_root': [root, f"http://{CURRENT_IP}:1099"],
+        'adsb_root': [root, adsbim],
         'display_emulator': [f"http://{CURRENT_IP}:8888", "http://localhost:8888"],
         'tar1090': [f"http://{CURRENT_IP}/tar1090", f"http://{CURRENT_IP}:8080"],
         'graphs1090': [f"http://{CURRENT_IP}/graphs1090", f"http://{CURRENT_IP}:8542"],
@@ -332,18 +335,24 @@ def local_webpage_prober() -> dict:
     # find adsb.im
     local_page = results.get(root)
     if local_page:
-        if "Feeder Homepage" in local_page:
-            pages.update({"System Configuration & Management, Maps, and Stats": root})
-            RUNNING_ADSBIM = True
-        elif "PiAware" in local_page: # FlightAware's PiAware is running here
-            pages.update({"FlightAware PiAware page": root})
-        # else: # something else is running here, link it anyway
-        #     pages.update({f"{local_page}"[:100]: root})
+        match local_page:
+            case x if "Feeder Homepage" in x:
+                pages.update({"System Configuration & Management, Maps, and Stats": root})
+                RUNNING_ADSBIM = True
+            case x if "PiAware" in x: # FlightAware's PiAware is running here
+                pages.update({"FlightAware PiAware page": root})
+            case x if "SDR Setup" in x:
+                pages.update({"⚠️ SDR Disconnected! Click Here to Investigate/Fix": root})
+                RUNNING_ADSBIM = True
+            # case _: # something else is running here, link it anyway
+            #     pages.update({f"{local_page}"[:100]: root})
     else:
-        adsbim = f"http://{CURRENT_IP}:1099"
         local_page = results.get(adsbim)
         if match_title(local_page, "Feeder Homepage"):
             pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
+            RUNNING_ADSBIM = True
+        elif match_title(local_page, "SDR Setup"):
+            pages.update({"⚠️ SDR Disconnected! Click Here to Investigate/Fix": adsbim})
             RUNNING_ADSBIM = True
 
     # try to find the display emulator
@@ -597,7 +606,7 @@ def probing_thread() -> None:
     """ Probes available webpages: does an initial burst every
     30 seconds for 10 minutes at startup (to wait for the other pages to start),
     then once every 5 minutes for the next hour,
-    then updates once a day thereafter.
+    then updates twice a day thereafter.
     Modifies the `localpages` global. """
     global localpages
     probing_cycle_count = 0
@@ -613,7 +622,8 @@ def probing_thread() -> None:
             sleep(300)
             get_ip()
         else:
-            sleep(86400)
+            sleep(43200)
+            # no need to check IP, it's handled below
 
 def update_ip() -> None:
     """ Check if the IP changes (every hour) """
@@ -693,7 +703,7 @@ def restart_flightgazer():
 def start_flightgazer_service():
     try:
         status = get_flightgazer_status()
-        if status == 'running':
+        if status == 'running' or status == 'degraded':
             return jsonify({'status': 'already_running'})
         # Start the service in the background
         main_logger.info("FlightGazer service start requested")
@@ -1390,19 +1400,32 @@ def show_latest_changelog():
 # ========= Help/Reference html =========
 @app.route('/reference')
 def reference_guide():
-    adsb_link = ''
+    adsb_info = ''
+    adsb_logs = ''
+    valid_keys = [
+        'System Configuration',
+        'SDR Disconnected'
+    ]
     if RUNNING_ADSBIM:
-        if (
-            adsb_link_ := localpages.get(
-                'System Configuration & Management, Maps, and Stats'
-            )
-        ):
-            adsb_link = adsb_link_ + '/info'
+        key_view = list(localpages.keys())
+        for lookup_key in valid_keys:
+            found = False
+            for available_key in key_view:
+                if lookup_key in available_key:
+                    if isinstance((adsb_root_ := localpages[available_key]), str):
+                        adsb_info = adsb_root_ + '/info'
+                        adsb_logs = adsb_root_ + '/logs'
+                        found = True
+                        break
+            if found:
+                break
+
     device_desc = f'{HOSTNAME}, local IP address: {CURRENT_IP}'
     return render_template(
         'reference.html',
         is_adsbim = RUNNING_ADSBIM,
-        adsb_info = adsb_link,
+        adsb_info = adsb_info,
+        adsb_logs = adsb_logs,
         device_name = device_desc
     )
 
