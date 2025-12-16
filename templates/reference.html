@@ -28,6 +28,14 @@
 </div>
 <div id="bottomRightAnchor" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
 </div>
+<svg aria-hidden="true" style="display:none">
+  <symbol id="external-link-icon" viewBox="0 0 24 24">
+    <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"/>
+      <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"/>
+    </g>
+  </symbol>
+</svg>
 <div class="container py-4" id="display-layout">
     <h4>Display Layout Reference</h4>
 <details><summary><b>Expand/Collapse</b></summary>
@@ -78,12 +86,10 @@
     3.	Current vertical speed of the aircraft<br>
     4.	RSSI – (Received Signal Strength Index) how strong of a signal from the aircraft as detected by the receiver (in
      <a href="https://en.wikipedia.org/wiki/DBFS" target="_blank" rel="noopener noreferrer">dBFS</a>
-     <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-        <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-            <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-        </g>
-    </svg>)</td>
+    <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+        <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+    </svg>)
+</td>
 </tr>
 </tbody>
 </table>
@@ -110,35 +116,27 @@
             <td><p><b>Show Even More Info</b></p>&ldquo; <code>LADD Aircraft</code> &rdquo;</td>
             <td><ul><li>Limiting Aircraft Data Displayed - <i>&ldquo;Please don't track me.&rdquo;</i></li></ul></td>
             <td><ul><li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More Information</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
-            </svg></li></ul></td>
+                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                </svg>
+        </li></ul></td>
         </tr>
         <tr>
             <td><p><b>Show Even More Info</b></p>&ldquo; <code>PIA Aircraft</code> &rdquo;</td>
             <td><ul><li>(U.S. only) Privacy ICAO Address - <i>&ldquo;Good luck figuring out who I am.&rdquo;</i></li></ul></td>
             <td><ul><li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank" rel="noopener noreferrer">More Information</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
-            </svg>
+                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                </svg>
             </li></ul></td>
         </tr>
         <tr>
             <td><p><b>Show Even More Info</b></p>&ldquo; <code>TIS-B Contact</code> &rdquo;</td>
             <td><ul><li>Traffic Information Service – Broadcast - broadcast information sent by ground stations corresponding to an aircraft; cannot be tied to a registration or aircraft type and is used for collision avoidance.</li></ul></td>
             <td><ul><li><a href="https://en.wikipedia.org/wiki/Traffic_information_service_%E2%80%93_broadcast" target="_blank" rel="noopener noreferrer">More Information</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
-            </svg>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg>
             </li></ul></td>
         </tr>
             <td>
@@ -460,21 +458,27 @@ To delay this effect, lower the brightness of the display.<br><br>
 
 <li><b>Accessing FlightGazer's data/state programmatically</b></li>
 Visit the <code>/data/current_state.json</code> endpoint to poll FlightGazer's current state.<br>
-You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack) to access running stats and other information like aircraft details and more. The details on how to interpret this JSON
+You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack) to access running stats and other information like aircraft details and more.<br>
+The details on how to interpret this JSON
  <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/state-file-schema.md" target="_blank" rel="noopener noreferrer">can be viewed here</a>
-    <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-        <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-            <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-        </g>
-    </svg>
+<svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+  <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+</svg>
 .
 <br><br>
 
 <li><b>Viewing FlightGazer in a terminal</b></li>
 Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this (<span id="device_name"></span>) system. <br>
-You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br>
+You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br><br>
+
+<li><b>Additional Tips and Tricks</b></li>
+<a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/tips-n-tricks.md" target="_blank" rel="noopener noreferrer">Check this document.</a>
+<svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+  <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+</svg>
+
 </ul>
+
 <div style="margin-top: 24px; text-align: center;">
     <button type="button" onClick="document.getElementById('neat-tricks').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
 </div>
@@ -483,29 +487,33 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
 <div class="container py-4" id="issues-feedback">
     <h4>Reporting Issues and Sending Feedback</h4>
     <details><summary><b>Expand/Collapse</b></summary>
-        Found a bug regarding the FlightGazer software or want to suggest some features?<br>(The below links require a GitHub account)<br><br>
+        <i>Recommended:</i>
+        <ul>
+            <li>Read the Troubleshooting section above</li>
+            <li>👉 <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/FAQs.md" target="_blank" rel="noopener noreferrer">Read the FAQ's.</a>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+            </svg>
+        </li>
+        </ul>
+        Found a bug regarding the FlightGazer software or want to suggest some features?<br>
+        <br>(The below links require a GitHub account)
         <ul>
         <li>For the main program:
          <a href="https://github.com/WeegeeNumbuh1/FlightGazer/issues" target="_blank" rel="noopener noreferrer">Create an issue here</a>
-        <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-            <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-            </g>
-        </svg>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+            </svg>
         </li>
         <li>For this web-app:
          <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp/issues" target="_blank" rel="noopener noreferrer">Create an issue here</a>
-        <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-            <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-            </g>
-        </svg>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+            </svg>
         </li>
         </ul>
         <i>Before sending a bug report, try updating first.<br>
-        When sending a bug report, attach the log files. These are available by going to the "Details and Logs" page and downloading them.</i>
+        When sending a bug report, attach the log files.<br>These are available by going to the "Details and Logs" page and downloading them.</i>
     </details>
 </div>
 <div class="container py-4" id="sources">
@@ -515,70 +523,46 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
         <li><b>Airline names/operators</b></li>
         Data is sourced from the <a href="https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html" target="_blank" rel="noopener noreferrer">
             Federal Aviation Administration, Directive No. JO 7340.2N, Chapter 3, Section 3</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>
         with friendlier names being sourced via <a href="https://en.wikipedia.org/wiki/List_of_airline_codes" target="_blank" rel="noopener noreferrer">Wikipedia</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>.
         <li><b>Aircraft types, registrations, and owners</b></li>
         Data is sourced from wiedehopf's <code>tar1090-db</code> repository, available on
          <a href="https://github.com/wiedehopf/tar1090-db/tree/csv" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>.<br>
         The actual database is maintained by
          <a href="https://www.mictronics.de/aircraft-database/export.php" target="_blank" rel="noopener noreferrer">Mictronics</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>
         .
         <li><b>Web-app changelog</b></li>
         The latest available one is
          <a href="https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer-webapp/refs/heads/master/Changelog-webapp.txt" target="_blank" rel="noopener noreferrer">viewable here</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>
             .
         <li><b>License</b></li>
         FlightGazer and
          <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer">this web application</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>
          are copyright
          <a href="https://github.com/WeegeeNumbuh1" target="_blank" rel="noopener noreferrer">WeegeeNumbuh1</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg> and are licensed under the
          <a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank" rel="noopener noreferrer">GNU General Public License v3</a>
-            <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                    <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                </g>
+            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>.<br>
         The source code is available by clicking on the FlightGazer logo on the main landing page.<br><br>
 <pre><code>This program is distributed in the hope that it will be useful,
