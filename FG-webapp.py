@@ -50,7 +50,7 @@ import logging
 import importlib.metadata
 import concurrent.futures as CF
 
-VERSION = "v.0.16.3 --- 2025-12-15"
+VERSION = "v.0.16.4 --- 2025-12-18"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -746,7 +746,7 @@ def stop_flightgazer_service():
         main_logger.exception("FlightGazer service stop failed")
         return jsonify({'status': 'error', 'error': str(e)})
 
-@app.route('/service/status')
+@app.route('/api/status')
 def service_status():
     status = get_flightgazer_status()
     return jsonify({'status': status})
@@ -1135,6 +1135,10 @@ def details_flybys_csv():
         return ''.join(html_)
     except Exception as e:
         return f'<span style="color:#f66;font-family:monospace">File could not be loaded.<br>{e.__class__.__name__}: {e}</span>', 404
+
+@app.route('/details/log-reference')
+def detail_reference():
+    return render_template('details-reference.html')
 
 # ========= Startup Control Routes =========
 

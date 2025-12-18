@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="WeegeeNumbuh1">
+    <meta name="description" content="Details page reference">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { background: #181818; color: #fff; }
+        .centered { text-align: center; margin-top: 60px; }
+        .monospace { font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h3>What do all these logs mean?</h3>
+        <ul>
+            <li><b>Live Details</b> - Live data being processed by FlightGazer.<br>
+                <ul>
+                    <li>For an explanation for all the data points,
+                    <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/state-file-schema.md" target="_blank" rel="noopener noreferrer">refer to the online guide.</a>
+                    <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                        <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                            <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                        </g>
+                    </svg>
+                    </li>
+                    <li>To programmatically access this same data, check the <code>/data/current_state.json</code> endpoint.</li>
+                </ul><br></li>
+            <li><b>Main Log</b> - Logfile of FlightGazer events.<br>
+                <ul>
+                    <li>
+                        This file keeps a history of the times FlightGazer is running. It records startup configuration, issues with certain settings and features, and any errors that may arise.
+                    </li>
+                    <li>
+                        After the &ldquo;<span class="monospace">Main loop started!</span>&rdquo; line, FlightGazer tracks special events and generates stats at the end of each day.
+                    </li>
+                    <li><b>If FlightGazer is running in a degraded state, this log will explain why.</b></li>
+                </ul>
+                <br><details><summary>Some phrases you may encounter in the log</summary>
+                    <ul>
+                        <li>&ldquo;<span class="monospace">High-priority aircraft override triggered by</span>&rdquo;...</li>
+                        Indicates that this aircraft was within 0.4 or less nautical miles line-of-sight from your site while there were also other aircraft in the area.
+                        This causes the aircraft selection algorithm to override its selection process and only track this High-priority aircraft until it is no longer within this distance.
+                        <li>&ldquo;<span class="monospace">rare selections</span>&rdquo;</li>
+                        Number of times the amount of aircraft in the designated tracking area changed when the selection algorithm was about to pick another aircraft, forcing it to handle this &ldquo;rare&rdquo; case.
+                        <li>&ldquo;<span class="monospace">aircraft selections</span>&rdquo;</li>
+                        Number of times the selection algorithm had to select an aircraft. The busier the site, the higher this number will be compared to <span class="monospace">flybys</span>.
+                        <li>&ldquo;<span class="monospace">Could not find database entry for</span>&rdquo;...</li>
+                        Indicates that this aircraft with this ICAO hex ID does not have an entry in the lookup database (e.g. there is no information about it).
+                </details>
+            </li><br>
+            <li><b>Initialization Log</b> - Startup information before the main FlightGazer program runs.
+                <ul>
+                    <li>This is a system-level log that keeps track of startup tasks and any required preparation handled by the system before running FlightGazer.</li>
+                    <li><b>If FlightGazer fails to start, it's important to check this log.</b></li>
+                    <li>If its been awhile since FlightGazer was started, checking this tab may show &ldquo;<span class="monospace">No entries</span>&rdquo;.
+                        Depending on the system, this log may have been <i>rotated</i> (think: archived) and thus entries for this log are no longer accessible.
+                    </li>
+                </ul>
+            </li><br>
+            <li><b>Hourly Data</b> - Hourly data of flybys and API usage.
+                <ul>
+                    <li>This comma-separated values file keeps track of cumulative hourly flybys and API usage as FlightGazer runs.</li>
+                    <li>This file is used by FlightGazer so that the flyby count and API usage isn't lost whenever it's restarted.</li>
+                    <li>The data in this file can be used for long term traffic analysis of your site.</li>
+                    <li>In a year, this file grows by roughly 250 KiB.</li>
+                </ul>
+            </li><br>
+            <li><b>Migration History</b> - Logfile of FlightGazer updates.
+                <ul>
+                    <li>This file keeps track of every instance FlightGazer is updated. Specifically, this log records the settings migration portion of the update process.</li>
+                    <li><b>This log is important to check if there are any issues when updating FlightGazer.</b></li>
+                    <li>Future releases may add new features or change some settings, and this log compares what needed to be changed from the default settings to match your current settings at the time.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

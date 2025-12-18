@@ -33,8 +33,8 @@
     </div>
     </details>
     <div class="mb-2 d-flex flex-wrap gap-2">
-        <button id="refreshDetailsBtn" class="btn btn-sm btn-warning" type="button"><span style="font-size:1.1em;">&#x21bb;</span> Refresh All</button>
-        <button id="scrollToBottomBtn" class="btn btn-sm btn-success" type="button"><span style="font-size:1.1em;">&#x21d3;</span> Scroll to Bottom</button>
+        <button id="refreshDetailsBtn" class="btn btn-sm btn-warning" type="button" title="Refresh all logs"><span style="font-size:1.1em;">&#x21bb;</span> Refresh All</button>
+        <button id="scrollToBottomBtn" class="btn btn-sm btn-success" type="button" title="Scroll log window to latest data"><span style="font-size:1.1em;">&#x21d3;</span> Scroll to Bottom</button>
     </div>
     <div id="timestamp" class="faint-text">Data as of: [N/A]</div>
     <ul class="nav nav-tabs" id="detailsTabs" role="tablist">
@@ -53,6 +53,10 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="migrate-log-tab" data-bs-toggle="tab" data-bs-target="#migrate-log" type="button" role="tab">Migration History</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <!-- neat bootstrap (v5.3) bug: don't use the word "tab" in the target name. Ask me how long it took to debug that one. -->
+            <button class="nav-link" id="reference-tab" data-bs-toggle="tab" data-bs-target="#reference" type="button" role="tab">❓Help</button>
+        </li>
     </ul>
     <div class="tab-content" id="detailsTabsContent" style="background:#222; border-radius:0 0 8px 8px; padding:24px 18px; min-height:420px;">
         <div class="tab-pane fade show active" id="live" role="tabpanel">
@@ -70,6 +74,9 @@
         </div>
         <div class="tab-pane fade" id="flybys-csv" role="tabpanel">
             <iframe id="flybysCsvFrame" src="{{ url_for('details_flybys_csv') }}" style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+        </div>
+        <div class="tab-pane fade" id="reference" role="tabpanel">
+            <iframe id="referneceFrame" src="{{ url_for('detail_reference') }}" style="width:100%; min-height:320px; height:70vh; border:none;"></iframe>
         </div>
     </div>
 </div>
@@ -115,10 +122,11 @@ function renderJson(obj, indent=0) {
     return html;
 }
 function renderJsonIframeContent(obj) {
-    // Returns a full HTML string for the iframe
+    // returns a full HTML string for the iframe
     return `<!DOCTYPE html><html><head><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>${renderJson(obj)}</body></html>`;
 }
 function loadLiveDetails() {
+    // special handling for the live details json
     $('#liveDetailsTabsContainer').html('<em>Loading...</em>');
     $('#liveDetailsTabContent').html('');
     $.getJSON(detailsLiveUrl, function(data) {
@@ -178,6 +186,10 @@ $(document).ready(function() {
         if (flybysCsvFrame) {
             flybysCsvFrame.contentWindow.location.reload();
         }
+        // let referenceFrame = document.getElementById('referneceFrame');
+        // if (referenceFrame) {
+        //     referenceFrame.contentWindow.location.reload();
+        // }
     }
     loadLiveDetails();
     // $('#live-tab').on('shown.bs.tab', function() {
