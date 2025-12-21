@@ -466,6 +466,14 @@ The details on how to interpret this JSON
 </svg>
 .
 <br><br>
+<li><b>Other API endpoints for this webapp</b></li>
+The below endpoints return JSON objects:
+<ul>
+    <li><code>/api/status</code> (what drives the status message on the landing page)</li>
+    <li><code>/api/localpages</code> (list of other relevant pages accessible on this system)</li>
+</ul>
+It's recommended to not poll these too often (status about every minute, localpages once an hour).<br>
+<br>
 
 <li><b>Viewing FlightGazer in a terminal</b></li>
 Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this (<span id="device_name"></span>) system. <br>
@@ -491,10 +499,15 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
         <ul>
             <li>Read the Troubleshooting section above</li>
             <li>👉 <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/FAQs.md" target="_blank" rel="noopener noreferrer">Read the FAQ's.</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>
-        </li>
+                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+                <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                </svg>
+            </li>
+            <li><a href="https://github.com/WeegeeNumbuh1/FlightGazer?tab=readme-ov-file#-support--discussion" target="_blank" rel="noopener noreferrer">Additional support links</a>
+                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+                <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                </svg>
+            </li>
         </ul>
         Found a bug regarding the FlightGazer software or want to suggest some features?<br>
         <br>(The below links require a GitHub account)
