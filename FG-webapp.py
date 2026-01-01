@@ -6,7 +6,7 @@ Disclosures: most of this was initially vibe-coded, however at this state, it
 has been manually tweaked and modified to the point it's *good enough*. """
 
 """
-    Copyright (C) 2025, WeegeeNumbuh1.
+    Copyright (C) 2026, WeegeeNumbuh1.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
