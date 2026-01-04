@@ -50,7 +50,7 @@ import logging
 import importlib.metadata
 import concurrent.futures as CF
 
-VERSION = "v.0.16.5 --- 2025-12-20"
+VERSION = "v.0.16.6 --- 2026-01-03"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -1010,8 +1010,18 @@ def details_migrate_log():
     try:
         with open(MIGRATE_LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
             content = f.read()
+        line_count = content.count('\n') + 1
+        header_line = ''
+        if line_count > 200:
+            log_content_split = content.splitlines()
+            content = '\n'.join(log_content_split[-200:])
+            header_line = (
+                f'<div class="logline"><i>Showing the latest 200 lines (out of {line_count})</i>.<br>'
+                'Download the file for complete data.<br><br></div>'
+            )
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
-        # Use .replace with double quotes to avoid confusion with f-string braces
+        if header_line:
+            html += header_line
         safe_content = content.replace('<', '&lt;').replace('>', '&gt;')
         html += f'<div class="logline">{safe_content}</div>'
         html += '</body></html>'
@@ -1053,7 +1063,19 @@ def details_init_log():
             ], capture_output=True, text=True, shell=True)
         log_content = result.stdout if result.returncode == 0 else '(No init log found)'
         init_log_cache = log_content
+        line_count = log_content.count('\n') + 1
+        header_line = ''
+        if line_count > 500:
+            log_content_split = log_content.splitlines()
+            log_content = '\n'.join(log_content_split[-500:])
+            header_line = (
+                f'<div class="logline"><i>Showing the latest 500 lines (out of {line_count})</i>.<br>'
+                'Download the file for complete data.<br><br></div>'
+            )
+
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
+        if header_line:
+            html += header_line
         safe_content = log_content.replace('<', '&lt;').replace('>', '&gt;')
         html += f'<div class="logline">{safe_content}</div>'
         html += '</body></html>'
@@ -1115,11 +1137,11 @@ def details_flybys_csv():
         if lines:
             html_.append('<table>')
             csv_len = len(lines)
-            if csv_len > 1001: # header + 1000 entries
-                lines_ = lines[-1000:]
+            if csv_len > 761: # header + 760 entries (~1 month + a small buffer)
+                lines_ = lines[-760:]
                 lines_.insert(0, lines[0])
                 lines = lines_
-                html_.append(f'<i>Showing the latest 1000 lines (out of {csv_len}).</i><br>Download the file for complete data.<br><br>')
+                html_.append(f'<i>Showing the latest 760 lines (out of {csv_len}).</i><br>Download the file for complete data.<br><br>')
             for i, line in enumerate(lines):
                 cells = [c.strip() for c in line.strip().split(',')]
                 if i == 0:
