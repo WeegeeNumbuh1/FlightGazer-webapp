@@ -50,7 +50,7 @@ import logging
 import importlib.metadata
 import concurrent.futures as CF
 
-VERSION = "v.0.16.6 --- 2026-01-03"
+VERSION = "v.0.16.7 --- 2026-01-17"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -288,7 +288,7 @@ def local_webpage_prober() -> dict:
     def webpage_title(url: str) -> tuple[str, str | None]:
         """ Get the title of a webpage given `input` as a string. """
         try:
-            response = webapp_session.get(url, timeout=0.5, allow_redirects=True)
+            response = webapp_session.get(url, timeout=4, allow_redirects=True)
             # get the webpage title; https://stackoverflow.com/a/47236359
             resp_body = response.text
             title = re.search('(?<=<title>).+?(?=</title>)', resp_body, re.DOTALL)
