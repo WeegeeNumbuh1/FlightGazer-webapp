@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.16.8 - 2026-01-18
+    - Updated support links
+
 v.0.16.7 - 2026-01-17
     - Extended localpage timeout to handle slow loading pages
     - Added additional source to the sources text corresponding to FlightGazer v.9.9.0

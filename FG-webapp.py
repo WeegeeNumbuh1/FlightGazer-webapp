@@ -50,7 +50,7 @@ import logging
 import importlib.metadata
 import concurrent.futures as CF
 
-VERSION = "v.0.16.7 --- 2026-01-17"
+VERSION = "v.0.16.8 --- 2026-01-18"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
