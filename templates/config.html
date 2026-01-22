@@ -19,6 +19,8 @@
         .form-range { background-color: #0e0e0e2e; }
         .inline-image { max-width: 256px; }
         .monospace { font-family: monospace; }
+        .sticky-col {position: sticky; left: 0; background-color: #fff; z-index: 1; }
+
     </style>
 </head>
 <body>
@@ -168,17 +170,17 @@
                 <div class="api-schedule-table-outer">
                 <table class="table table-bordered api-schedule-table">
                     <thead>
-                        <tr><th></th><th colspan="12">AM</th><th colspan="12">PM</th></tr>
-                        <tr><th>Hour →<br>Day ↓</th>{% for h in range(0,24) %}<th>{{ h }}</th>{% endfor %}</tr>
+                        <tr><th style="background-color: #666;"></th><th colspan="12" style="background-color: rgb(255, 238, 160);">&ldquo;AM&rdquo;</th><th colspan="12" style="background-color: rgb(198, 229, 241);">&ldquo;PM&rdquo;</th></tr>
+                        <tr><th class="sticky-col" style="background-color: rgb(192, 192, 192);">Hour →<br>Day ↓</th>{% for h in range(0,24) %}<th>{{ h }}</th>{% endfor %}</tr>
                     </thead>
                     <tbody>
                     {% for day in ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'] %}
                         <tr>
-                            <td>{{ day.title() }}</td>
+                            <td class="sticky-col">{{ day.title() }}</td>
                             {% set am = config.API_SCHEDULE[day]['0-11'] %}
                             {% set pm = config.API_SCHEDULE[day]['12-23'] %}
                             {% for i in range(12) %}
-                                <td><input type="checkbox" class="api-hour" data-day="{{day}}" data-hour="{{i}}" {% if am[i]=='x' %}checked{% endif %}></td>
+                                <td style="padding: 12px;"><input type="checkbox" class="api-hour" data-day="{{day}}" data-hour="{{i}}" {% if am[i]=='x' %}checked{% endif %}></td>
                             {% endfor %}
                             {% for i in range(12) %}
                                 <td><input type="checkbox" class="api-hour" data-day="{{day}}" data-hour="{{i+12}}" {% if pm[i]=='x' %}checked{% endif %}></td>

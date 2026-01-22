@@ -15,6 +15,7 @@
         body { background: #181818; color: #fff; }
         .centered { text-align: center; margin-top: 60px; }
         .back-btn { margin-top: 40px; }
+        .monospace { font-family: monospace; }
     </style>
 </head>
 <body>
@@ -126,7 +127,9 @@
                 document.getElementById('versionInfo').innerText = data.error;
                 return;
             }
-            document.getElementById('versionInfo').innerText = `\nYour Current Version: \t${data.local_version}\nThe Latest Version: \t${data.latest_version}`;
+            document.getElementById('versionInfo').innerHTML = `\
+            <br><span class="monospace">Your Current Version: ${data.local_version}\
+            <br>The Latest Version: &nbsp;&nbsp;<b>${data.latest_version}</b></span>`;
             document.getElementById('commit-history').innerHTML = '<br><a target="_blank" rel="noopener noreferrer" href="https://github.com/WeegeeNumbuh1/FlightGazer/commits/main/">Review the source code changes</a>\
             <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">\
                 <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">\

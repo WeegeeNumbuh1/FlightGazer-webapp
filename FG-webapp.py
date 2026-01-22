@@ -49,8 +49,9 @@ import datetime
 import logging
 import importlib.metadata
 import concurrent.futures as CF
+import zipfile
 
-VERSION = "v.0.16.8 --- 2026-01-18"
+VERSION = "v.0.16.9 --- 2026-01-21"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -388,6 +389,41 @@ def local_webpage_prober() -> dict:
 
     return pages
 
+def linecounter(file: str) -> int | None:
+    """ Counts number of lines in a file. """
+    try:
+        with open(file, 'rb') as f:
+            return sum(1 for _ in f)
+    except Exception:
+        return None
+
+def tail(f, lines=1, _buffer=4098):
+    """ Tail a file and get X lines from the end.
+    ### Source:
+    https://stackoverflow.com/a/13790289 """
+    lines_found = []
+
+    # block counter will be multiplied by buffer
+    # to get the block size from the end
+    block_counter = -1
+
+    # loop until we find X lines
+    while len(lines_found) < lines:
+        try:
+            f.seek(block_counter * _buffer, os.SEEK_END)
+        except IOError:  # either file is too small, or too many lines requested
+            f.seek(0)
+            lines_found = f.readlines()
+            break
+
+        lines_found = f.readlines()
+
+        # decrement the block counter to get the
+        # next X bytes
+        block_counter -= 1
+
+    return lines_found[-lines:]
+
 def match_commandline(command_search: str, process_name: str) -> int | None:
     """ Taken directly from `FlightGazer.py` but modified to only return the PID.
     This must only be used when it's known that a single instance is running. """
@@ -599,9 +635,6 @@ class ActionTimeout:
 
 # ========= Initialization Stuff =========
 get_ip()
-""" Keeps track of how many times the probing thread has done its work.
-This gets reset if a command to change the running state of the main FlightGazer
-service is used. """
 def probing_thread() -> None:
     """ Probes available webpages: does an initial burst every
     30 seconds for 10 minutes at startup (to wait for the other pages to start),
@@ -985,19 +1018,20 @@ def details_log_html():
     if not os.path.exists(LOG_PATH):
         raise FileNotFoundError
     try:
+        loglen = linecounter(LOG_PATH)
         with open(LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
-            lines = f.readlines()
+            if loglen:
+                lines = tail(f, 5000)
         html_lines = []
         for line in lines:
             # Highlight timestamp
             line = re.sub(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)', r'<span style="color:#ffd700;">\1</span>', line)
             # Highlight log levels
-            line = re.sub(r'\b(DEBUG|INFO|WARNING|ERROR|CRITICAL)\b', lambda m: f'<span style="color:{ {"DEBUG":"#8cf","INFO":"#6f6","WARNING":"#ff0","ERROR":"#f66","CRITICAL":"#f00"}[m.group(1)]};font-weight:bold;">{m.group(1)}</span>', line)
-            # Highlight thread names
-            line = re.sub(r'\| ([A-Za-z0-9\-]+) \|', r'| <span style="color:#b2dfdb;">\1</span> |', line)
+            line = re.sub(r'\b(DEBUG|INFO|WARNING|ERROR|CRITICAL)\b',
+                          lambda m: f'<span style="color:{ {"DEBUG":"#8cf","INFO":"#6f6","WARNING":"#ff0","ERROR":"#f66","CRITICAL":"#f00"}[m.group(1)]};font-weight:bold;">{m.group(1)}</span>', line)
             html_lines.append(line)
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
-        html += '\n'.join(f'<div class="logline">{l}</div>' for l in html_lines)
+        html += '\n'.join(f'<div class="logline"><code>{l}</code></div>' for l in html_lines)
         html += '</body></html>'
         return html
     except Exception as e:
@@ -1008,13 +1042,13 @@ def details_migrate_log():
     if not os.path.exists(MIGRATE_LOG_PATH):
         return '<div style="color:#f66;font-family:monospace;padding:12px;">Migration history log not found or an update has not been done yet.</div>', 404
     try:
+        line_count = linecounter(MIGRATE_LOG_PATH)
         with open(MIGRATE_LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
-            content = f.read()
-        line_count = content.count('\n') + 1
+            content = tail(f, 1000)
         header_line = ''
         if line_count > 200:
-            log_content_split = content.splitlines()
-            content = '\n'.join(log_content_split[-200:])
+            log_content_split = content
+            content = ''.join(log_content_split[-200:])
             header_line = (
                 f'<div class="logline"><i>Showing the latest 200 lines (out of {line_count})</i>.<br>'
                 'Download the file for complete data.<br><br></div>'
@@ -1124,8 +1158,12 @@ def details_flybys_csv():
     if not os.path.exists(FLYBY_STATS_PATH):
         return '<div style="color:#f66;font-family:monospace;padding:12px;">flybys.csv not found.</div>', 404
     try:
+        csv_len = linecounter(FLYBY_STATS_PATH)
         with open(FLYBY_STATS_PATH, 'r', encoding='utf-8', errors='replace') as f:
-            lines = f.readlines()
+            if csv_len:
+                lines = tail(f, 760)
+                f.seek(0)
+                lines.insert(0, f.readline())
         html_ = []
         html_.append(
             '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} '
@@ -1136,11 +1174,7 @@ def details_flybys_csv():
         )
         if lines:
             html_.append('<table>')
-            csv_len = len(lines)
             if csv_len > 761: # header + 760 entries (~1 month + a small buffer)
-                lines_ = lines[-760:]
-                lines_.insert(0, lines[0])
-                lines = lines_
                 html_.append(f'<i>Showing the latest 760 lines (out of {csv_len}).</i><br>Download the file for complete data.<br><br>')
             for i, line in enumerate(lines):
                 cells = [c.strip() for c in line.strip().split(',')]
@@ -1157,6 +1191,45 @@ def details_flybys_csv():
         return ''.join(html_)
     except Exception as e:
         return f'<span style="color:#f66;font-family:monospace">File could not be loaded.<br>{e.__class__.__name__}: {e}</span>', 404
+
+@app.route('/details/download_all')
+def download_all():
+    """ Downloads all relevant logs and zips them up in memory. """
+    """ Programmer's notes: don't use a tempfile, there were some wacky
+    quirks when trying to debug on Windows lmao """
+    zip_name = f'FlightGazer-logs_[{append_date_now()}].zip'
+    files = [
+        CURRENT_STATE_JSON_PATH,
+        LOG_PATH,
+        FLYBY_STATS_PATH,
+        MIGRATE_LOG_PATH,
+    ]
+    details_init_log()
+    if init_log_cache:
+        initlog_temp = io.BytesIO()
+        initlog_temp.write(init_log_cache.encode('utf-8'))
+        initlog_temp.seek(0)
+    else:
+        initlog_temp = None
+    try:
+        zip_file = io.BytesIO()
+        with zipfile.ZipFile(zip_file, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zip_bytes:
+            for file in files:
+                if os.path.isfile(file):
+                    zip_bytes.write(file, arcname=os.path.basename(file))
+            if initlog_temp is not None:
+                zip_bytes.writestr("FlightGazer-initialization.log", initlog_temp.getvalue())
+                initlog_temp.close()
+        zip_file.seek(0)
+        return send_file(
+            zip_file,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name=zip_name
+        )
+    except Exception as e:
+        main_logger.exception("Could not make zip.")
+        return f'Could not generate files: {e}', 404
 
 @app.route('/details/log-reference')
 def detail_reference():
@@ -1462,4 +1535,5 @@ if os.path.exists(VERSION_PATH):
 # ========= Debugging =========
 if __name__ == '__main__':
     if os.name == 'nt':
+        main_logger.level = logging.DEBUG
         app.run(debug=True, port=9898)

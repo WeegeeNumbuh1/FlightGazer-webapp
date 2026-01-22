@@ -454,8 +454,11 @@ Simply set the display element to 'BLACK'<br><br>
 <li><b>Extending the life of the physical display</b></li>
 The display is a wear item.<br>
 Over time, some of the pixels may become dimmer or their ability to reproduce accurate color is hindered.<br>
-To delay this effect, lower the brightness of the display.<br><br>
+To delay this effect, lower the brightness of the display.<br>
+</ul>
 
+<details><summary>More Technical Tips:</summary>
+<ul>
 <li><b>Accessing FlightGazer's data/state programmatically</b></li>
 Visit the <code>/data/current_state.json</code> endpoint to poll FlightGazer's current state.<br>
 You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack) to access running stats and other information like aircraft details and more.<br>
@@ -477,8 +480,12 @@ It's recommended to not poll these too often (status about every minute, localpa
 
 <li><b>Viewing FlightGazer in a terminal</b></li>
 Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this (<span id="device_name"></span>) system. <br>
-You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br><br>
+You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br>
+</ul>
+</details>
 
+<br>
+<ul>
 <li><b>Additional Tips and Tricks</b></li>
 <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/tips-n-tricks.md" target="_blank" rel="noopener noreferrer">Check this document.</a>
 <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
