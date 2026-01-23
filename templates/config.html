@@ -183,7 +183,7 @@
                                 <td style="padding: 12px;"><input type="checkbox" class="api-hour" data-day="{{day}}" data-hour="{{i}}" {% if am[i]=='x' %}checked{% endif %}></td>
                             {% endfor %}
                             {% for i in range(12) %}
-                                <td><input type="checkbox" class="api-hour" data-day="{{day}}" data-hour="{{i+12}}" {% if pm[i]=='x' %}checked{% endif %}></td>
+                                <td style="padding: 12px;"><input type="checkbox" class="api-hour" data-day="{{day}}" data-hour="{{i+12}}" {% if pm[i]=='x' %}checked{% endif %}></td>
                             {% endfor %}
                         </tr>
                     {% endfor %}
