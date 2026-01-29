@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.16.10 - 2026-01-28
+    - Updated Reference page to mention new operators database source
+
 v.0.16.9 - 2026-01-21
     - Improved backend log readers to be more memory efficient and capable of handling large text files
     - New option to download all log files as a zip file
