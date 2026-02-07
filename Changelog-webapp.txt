@@ -5,6 +5,11 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.16.11 - 2026-02-07
+    - Disable the scroll to bottom button in the Details and Logs page when viewing tabs
+      that don't support this function
+    - Layout tweaks to the Display Layout Reference
+
 v.0.16.10 - 2026-01-28
     - Updated Reference page to mention new operators database source
 

@@ -45,50 +45,76 @@
 </thead>
 <tbody>
 <tr>
-    <td><img src="{{ url_for('static', filename='FG_clock-annotated.png') }}" alt="FlightGazer clock layout" class="inline-image"></td>
-</tr>
-<tr>
-    <td><b>Clock</b><br>1.	Time, day of week, date<br>2.	Center readout<br>3.	Flyby counter – Number of aircraft that have been in your designated area today<br>4.	Tracking counter – How many aircraft your receiver is currently tracking<br>5.	Range – The distance of the farthest aircraft your receiver can detect<br></td>
-</tr>
-<tr>
-    <td><img src="{{ url_for('static', filename='FG_default-journey-annotated.png') }}" alt="FlightGazer journey layout" class="inline-image"></td>
-</tr>
-<tr>
-    <td><b>Journey Readout</b><br>
-        1.	Aircraft's callsign<br>
-        2.	Aircraft's current distance and direction from your site<br>
-        3.	Country of the aircraft<br>
-        4.	Current altitude of the aircraft<br>
-        5.	Current speed of the aircraft<br>
-        6.	Time the aircraft has spent in the air<br>
-        7.	Origin airport<br>
-        8.	Destination airport<br>
-        9.	Current count of aircraft in your specified tracking area<br>
-        10.	UAT indicator (aircraft info is being sent over Universal Access Transceiver, 978MHz - U.S. Only)<br>
-        11.	Progress bar indicating how long the current aircraft will be displayed<br>
+    <td>
+        <h4>Clock</h4>
+        <img src="{{ url_for('static', filename='FG_clock-annotated.png') }}" alt="FlightGazer clock layout" class="inline-image">
     </td>
 </tr>
 <tr>
-    <td><img src="{{ url_for('static', filename='FG_journey-plus-annotated.png') }}" alt="FlightGazer journey plus" class="inline-image"></td>
+    <td>
+        <ol type="1">
+        <li>Time, day of week, date</li>
+        <li>Center readout</li>
+        <li>Flyby counter – Number of aircraft that have been in your designated area today</li>
+        <li>Tracking counter – How many aircraft your receiver is currently tracking</li>
+        <li>Range – The distance of the farthest aircraft your receiver can detect</li>
+        </ol>
+    </td>
 </tr>
 <tr>
-    <td><b>Journey Plus</b><br>
-        1.	Scrolling marquee (enabled with <span class="monospace">Show Even More Info</span>) or aircraft ground track and vertical speed<br>
-        2.	Ground track of the aircraft (or RSSI of signal when <span class="monospace">Show Even More Info</span> is disabled)<br></td>
+    <td>
+        <h4>Journey Readout</h4>
+        <img src="{{ url_for('static', filename='FG_default-journey-annotated.png') }}" alt="FlightGazer journey layout" class="inline-image">
+    </td>
 </tr>
 <tr>
-    <td><img src="{{ url_for('static', filename='FG_enhanced-readout-annotated.png') }}" alt="FlightGazer enhanced readout" class="inline-image"></td>
+    <td>
+        <ol type="1">
+        <li>Aircraft's callsign</li>
+        <li>Aircraft's current distance and direction from your site</li>
+        <li>Country of the aircraft</li>
+        <li>Current altitude of the aircraft</li>
+        <li>Current speed of the aircraft</li>
+        <li>Time the aircraft has spent in the air</li>
+        <li>Origin airport</li>
+        <li>Destination airport</li>
+        <li>Current count of aircraft in your specified tracking area</li>
+        <li>UAT indicator (aircraft info is being sent over Universal Access Transceiver, 978MHz - U.S. Only)</li>
+        <li>Progress bar indicating how long the current aircraft will be displayed</li>
+        </ol>
+    </td>
 </tr>
 <tr>
-<td><b>Enhanced Readout</b><br>
-    1.	Current position of the aircraft<br>
-    2.	Ground track of the aircraft<br>
-    3.	Current vertical speed of the aircraft<br>
-    4.	RSSI – (Received Signal Strength Index) how strong of a signal from the aircraft as detected by the receiver (in
+    <td>
+        <h4>Journey Plus</h4>
+        <img src="{{ url_for('static', filename='FG_journey-plus-annotated.png') }}" alt="FlightGazer journey plus" class="inline-image">
+    </td>
+</tr>
+<tr>
+    <td>
+        <ol type="1">
+        <li>Scrolling marquee (enabled with <span class="monospace">Show Even More Info</span>) or aircraft ground track and vertical speed</li>
+        <li>Ground track of the aircraft (or RSSI of signal when <span class="monospace">Show Even More Info</span> is disabled)</li>
+        </ol>
+</tr>
+<tr>
+    <td>
+        <h4>Enhanced Readout</h4>
+        <img src="{{ url_for('static', filename='FG_enhanced-readout-annotated.png') }}" alt="FlightGazer enhanced readout" class="inline-image">
+    </td>
+</tr>
+<tr>
+<td>
+    <ol type="1">
+    <li>Current position of the aircraft</li>
+    <li>Ground track of the aircraft</li>
+    <li>Current vertical speed of the aircraft</li>
+    <li>RSSI – (Received Signal Strength Index) how strong of a signal from the aircraft as detected by the receiver (in
      <a href="https://en.wikipedia.org/wiki/DBFS" target="_blank" rel="noopener noreferrer">dBFS</a>
     <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
         <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-    </svg>)
+    </svg>)</li>
+    </ol>
 </td>
 </tr>
 </tbody>

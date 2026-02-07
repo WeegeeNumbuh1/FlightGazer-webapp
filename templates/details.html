@@ -201,6 +201,19 @@ $(document).ready(function() {
             refreshAll();
         }
     );
+    // enable/disable the scroll button depending on active tab
+    function updateScrollBtnState(targetSelector) {
+        const enabledTabs = ['#logs','#migrate-log','#init-log','#flybys-csv'];
+        const ok = enabledTabs.includes(targetSelector);
+        $('#scrollToBottomBtn').prop('disabled', !ok);
+    }
+    updateScrollBtnState('#live');
+
+    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        const target = $(e.target).attr('data-bs-target') || $(e.target).data('bs-target');
+        updateScrollBtnState(target);
+    });
+
     // Auto-scroll log iframes to bottom when loaded
     function scrollAllLogFramesToBottom() {
         ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame'].forEach(function(id) {
