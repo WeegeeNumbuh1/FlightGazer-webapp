@@ -51,7 +51,7 @@ import importlib.metadata
 import concurrent.futures as CF
 import zipfile
 
-VERSION = "v.0.16.11 --- 2026-02-07"
+VERSION = "v.0.17.0 --- 2026-03-05"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -824,12 +824,24 @@ def update_config():
         return jsonify({'error': f'{e}'})
     # List of all boolean (checkbox) settings
     bool_keys = [
-        'JOURNEY_PLUS', 'ENHANCED_READOUT', 'ENHANCED_READOUT_AS_FALLBACK', 'SHOW_EVEN_MORE_INFO',
-        'CLOCK_24HR', 'ALTERNATIVE_FONT', 'DISPLAY_SWITCH_PROGRESS_BAR',
-        'ENABLE_TWO_BRIGHTNESS', 'USE_SUNRISE_SUNSET',
-        'PREFER_LOCAL', 'HAT_PWM_ENABLED',
-        'FASTER_REFRESH', 'NO_GROUND_TRACKING', # 'FLYBY_STATS_ENABLED', 'WRITE_STATE'
-        'CLOCK_CENTER_ROW_CYCLE', 'PREFER_ICAO_CODES', 'EXTENDED_DETAILS', 'DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT'
+        'JOURNEY_PLUS',
+        'ENHANCED_READOUT',
+        'ENHANCED_READOUT_AS_FALLBACK',
+        'SHOW_EVEN_MORE_INFO',
+        'CLOCK_24HR',
+        'ALTERNATIVE_FONT',
+        'DISPLAY_SWITCH_PROGRESS_BAR',
+        'ENABLE_TWO_BRIGHTNESS',
+        'USE_SUNRISE_SUNSET',
+        'PREFER_LOCAL',
+        'HAT_PWM_ENABLED',
+        'FASTER_REFRESH',
+        'NO_GROUND_TRACKING',
+        'CLOCK_CENTER_ROW_CYCLE',
+        'PREFER_ICAO_CODES',
+        'EXTENDED_DETAILS',
+        'DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT',
+        'API_PERSISTENT_CACHE',
     ]
     # List of all numeric settings that may be missing
     numeric_keys = [

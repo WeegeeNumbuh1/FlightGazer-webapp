@@ -5,6 +5,17 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.0.17.0 - 2026-03-05
+    - Support new settings for FlightGazer v.10.0.0
+    - Improved layout for the Configuration page
+        - Numerous styling tweaks
+        - Less verbose help text
+        - Limit width of input elements so that they don't span the entire width of the window
+          on widescreen devices
+        - Added visual subgroupings for settings
+    - Additional layout tweaks for the Reference page
+        - Tables now feature zebra stripes and other small changes
+
 v.0.16.11 - 2026-02-07
     - Disable the scroll to bottom button in the Details and Logs page when viewing tabs
       that don't support this function

@@ -16,6 +16,7 @@
         .inline-image { max-width: 256px; }
         .table-padding { padding: 16px; }
         .monospace { font-family: monospace; }
+        tbody tr:nth-child(even) { background-color: rgba(150, 150, 150, 0.1); } thead { border-bottom-width: 1px; }
     </style>
 </head>
 <body>
@@ -109,7 +110,7 @@
     <li>Current position of the aircraft</li>
     <li>Ground track of the aircraft</li>
     <li>Current vertical speed of the aircraft</li>
-    <li>RSSI – (Received Signal Strength Index) how strong of a signal from the aircraft as detected by the receiver (in
+    <li>RSSI – (Received Signal Strength Index)<br>how strong of a signal from the aircraft as detected by the receiver (in
      <a href="https://en.wikipedia.org/wiki/DBFS" target="_blank" rel="noopener noreferrer">dBFS</a>
     <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
         <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
@@ -127,10 +128,10 @@
 <div class="container py-4" id="output-reference">
     <h4>Output Reference &amp; Troubleshooting</h4>
     <details><summary><b>Expand/Collapse</b></summary>
-        <div class="help-text"><i>Valid for FlightGazer v.9.0.0 and newer.</i></div>
+        <div class="help-text"><i>Valid for FlightGazer v.9.7.0 and newer.</i></div>
     <div style="overflow-x: auto;">
     <table cellpadding="8">
-    <thead>
+    <thead style="position: sticky; top: 0; z-index: 1;">
     <tr>
         <th><h5>Output</h5></th>
         <th><h5>Meaning / Cause</h5></th>
@@ -139,32 +140,6 @@
     </thead>
     <tbody>
         <tr>
-            <td><p><b>Show Even More Info</b></p>&ldquo; <code>LADD Aircraft</code> &rdquo;</td>
-            <td><ul><li>Limiting Aircraft Data Displayed - <i>&ldquo;Please don't track me.&rdquo;</i></li></ul></td>
-            <td><ul><li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More Information</a>
-                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-                </svg>
-        </li></ul></td>
-        </tr>
-        <tr>
-            <td><p><b>Show Even More Info</b></p>&ldquo; <code>PIA Aircraft</code> &rdquo;</td>
-            <td><ul><li>(U.S. only) Privacy ICAO Address - <i>&ldquo;Good luck figuring out who I am.&rdquo;</i></li></ul></td>
-            <td><ul><li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank" rel="noopener noreferrer">More Information</a>
-                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-                </svg>
-            </li></ul></td>
-        </tr>
-        <tr>
-            <td><p><b>Show Even More Info</b></p>&ldquo; <code>TIS-B Contact</code> &rdquo;</td>
-            <td><ul><li>Traffic Information Service – Broadcast - broadcast information sent by ground stations corresponding to an aircraft; cannot be tied to a registration or aircraft type and is used for collision avoidance.</li></ul></td>
-            <td><ul><li><a href="https://en.wikipedia.org/wiki/Traffic_information_service_%E2%80%93_broadcast" target="_blank" rel="noopener noreferrer">More Information</a>
-        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-        </svg>
-            </li></ul></td>
-        </tr>
             <td>
                 <p><b>Clock</b></p>
 <pre><code>
@@ -264,6 +239,44 @@ N/A    123   N/A </code></pre>
             </td>
             <td><ul><li>Could not connect to the API.</li></ul></td>
             <td><ul><li>Check your network connection.</li></ul></td>
+        </tr>
+        <tr>
+            <td><p><b>Callsign</b></p><code>!ABC123</code></td>
+            <td><ul><li>This aircraft has declared an emergency.</li></ul></td>
+            <td><ul><li>Rare occurrence; FlightGazer will track this aircraft for as long
+                 as it's detected or the aircraft is no longer experiencing an emergency.</li></ul></td>
+        </tr>
+        <tr>
+            <td><p><b>Callsign</b></p><code>ABC123*</code></td>
+            <td><ul><li>This aircraft is being tracked because of the <span class="monospace">Follow This Aircraft</span> setting.</li></ul></td>
+            <td><ul><li>Expected operation.</li></ul></td>
+        </tr>
+        <tr>
+            <td><p><b>Show Even More Info</b></p>&ldquo; <code>LADD Aircraft</code> &rdquo;</td>
+            <td><ul><li>Limiting Aircraft Data Displayed - <i>&ldquo;Please don't track me.&rdquo;</i></li></ul></td>
+            <td><ul><li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More Information</a>
+                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                </svg>
+        </li></ul></td>
+        </tr>
+        <tr>
+            <td><p><b>Show Even More Info</b></p>&ldquo; <code>PIA Aircraft</code> &rdquo;</td>
+            <td><ul><li>(U.S. only) Privacy ICAO Address - <i>&ldquo;Good luck figuring out who I am.&rdquo;</i></li></ul></td>
+            <td><ul><li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank" rel="noopener noreferrer">More Information</a>
+                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                </svg>
+            </li></ul></td>
+        </tr>
+        <tr>
+            <td><p><b>Show Even More Info</b></p>&ldquo; <code>TIS-B Contact</code> &rdquo;</td>
+            <td><ul><li>Traffic Information Service – Broadcast - broadcast information sent by ground stations corresponding to an aircraft; cannot be tied to a registration or aircraft type and is used for collision avoidance.</li></ul></td>
+            <td><ul><li><a href="https://en.wikipedia.org/wiki/Traffic_information_service_%E2%80%93_broadcast" target="_blank" rel="noopener noreferrer">More Information</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
+            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg>
+            </li></ul></td>
         </tr>
     </tbody>
 </table>
