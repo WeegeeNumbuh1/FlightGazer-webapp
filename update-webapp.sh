@@ -1,7 +1,7 @@
 #!/bin/bash
 {
 # Script to update FlightGazer's web interface
-# Last updated: v.0.10.2
+# Last updated: v.0.17.1
 # by: WeegeeNumbuh1
 BASEDIR=$(cd `dirname -- $0` && pwd)
 TEMPPATH=/tmp/FlightGazer-tmp
@@ -46,7 +46,7 @@ echo -e "${FADE}Copying ${TEMPPATH} to ${BASEDIR}..."
 cp -afT "$TEMPPATH" "$BASEDIR" # recall that this script already lives in the web-app folder
 echo "> Restarting service..."
 rm -rf "$TEMPPATH" >/dev/null 2>&1 # clean up after ourselves
-systemctl restart flightgazer-webapp.service
+systemd-run --scope -p "Delegate=yes" systemctl restart flightgazer-webapp.service >/dev/null 2>&1
 if [ $? -ne 0 ]; then
     echo -e "${RED}>>> Failed to start service!"
     exit 1
