@@ -71,7 +71,7 @@
                 </summary>
             </div>
             <div class="mt-3">
-                <label for="units" class="form-label setting-label">Units</label>
+                <label class="form-label setting-label">Units</label>
                 <div class="help-text">
                     <ul>
                         <li>Aeronautical (nmi, ft, kt, ft/min) [default]</li>
@@ -155,7 +155,7 @@
                 <div class="help-text">
                     Limit API usage of the provided API key based on its running cost from the past 30 days. (ex: $10.00)<br>
                     <details><summary>More details</summary>
-                    If the cost exceeds this value, API calls will stop and will not resume until there are credits available again.<br>
+                    If the cost reaches or exceeds this value, API calls will stop and will not resume until there are credits available again.<br>
                     If the cost upon startup exceeds this value, the API will not be used but will start if there are credits available at a later time.<br>
                     </details>
                     Leave this blank to have no limit. (Not recommended)
@@ -586,7 +586,15 @@
                 <div class="help-text">
                     URL of your dump1090 install if it's in a different location or on a different network device.<br>
                     Leave this blank to not use this feature.<br>
-                    <i>Example: <span class="monospace">http://localhost/custom_name_here</span></i> or <i><span class="monospace">http://192.168.xxx.xxx:8080</span> (no trailing <span class="monospace">/</span>)</i>
+                    <details><summary>Examples</summary>
+                        (no trailing <span class="monospace">/</span>)
+                        <ul>
+                            <li><span class="monospace">http://localhost/custom_name_here</span></li>
+                            <li><span class="monospace">http://192.168.xxx.xxx/skyaware</span></li>
+                            <li><span class="monospace">http://192.168.xxx.xxx/tar1090</span></li>
+                            <li><span class="monospace">http://192.168.xxx.xxx:8080</span></li>
+                        </ul>
+                    </details>
                 </div>
                 <input type="url" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION" value="{{ config.CUSTOM_DUMP1090_LOCATION }}" style="font-family: monospace;">
             </div>
@@ -595,7 +603,13 @@
                 <div class="help-text">
                     URL of your dump978 install if it's in a different location or on a different network device.<br>
                     Leave this blank to not use this feature.<br>
-                    <i>Example: <span class="monospace">http://192.168.xxx.xxx:8978</span></i>
+                    <details><summary>Examples</summary>
+                        (no trailing <span class="monospace">/</span>)
+                        <ul>
+                            <li><span class="monospace">http://192.168.xxx.xxx:8978</span></li>
+                            <li><span class="monospace">http://192.168.xxx.xxx/skyaware978</span></li>
+                        </ul>
+                    </details>
                 </div>
                 <input type="url" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION" value="{{ config.CUSTOM_DUMP978_LOCATION }}" style="font-family: monospace;">
             </div>
@@ -638,7 +652,7 @@
                 <input type="text" class="form-control" id="OPENWEATHER_API_KEY" name="OPENWEATHER_API_KEY" value="{{ config.OPENWEATHER_API_KEY }}" style="font-family: monospace;" maxlength="50" pattern="[0-9a-fA-F]+">
             </div>
             <div class="mt-3">
-                <label for="units" class="form-label setting-label">Weather Units</label>
+                <label class="form-label setting-label">Weather Units</label>
                 <div class="help-text">
                     <ul>
                         <li>Aeronautical (°C, kt, ft, smi, hPa)</li>
@@ -948,7 +962,7 @@
     </form>
 </div>
 <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery-3.6.0-min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.js') }}"></script>
 <script>
 const updateConfigURL = "{{ url_for('update_config') }}";
 const restartService = "{{ url_for('restart_flightgazer') }}";

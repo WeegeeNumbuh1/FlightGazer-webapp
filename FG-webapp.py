@@ -51,7 +51,7 @@ import importlib.metadata
 import concurrent.futures as CF
 import zipfile
 
-VERSION = "v.0.17.1 --- 2026-03-06"
+VERSION = "v.0.18.0 --- 2026-03-15"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -78,6 +78,8 @@ CURRENT_IP = '' # local IP address of the system
 HOSTNAME = socket.gethostname()
 RUNNING_ADSBIM = False
 localpages = {}
+whitelabel = os.path.join(os.path.dirname(__file__), 'static', 'extra')
+wlstr = ''
 is_posix = True if os.name == 'posix' else False
 try:
     FLASK_VER = importlib.metadata.version('flask')
@@ -672,6 +674,16 @@ service_guard = ActionTimeout(30)
 long_guard = ActionTimeout(600)
 update_guard = ActionTimeout(600)
 
+if os.path.isfile(whitelabel):
+    try:
+        with open(whitelabel, 'rb') as f:
+            head = f.read(64)
+        msg = head.decode(encoding='utf-8').strip()
+        if len(msg) > 0:
+            wlstr = f'This system was designed for {msg}.'
+    except Exception:
+        pass
+
 # ========= API Routes =========
 
 @app.route('/api/localpages')
@@ -696,8 +708,9 @@ def landing_page():
         status=status,
         localpages=localpages,
         webapp_version=webapp_version,
-        hostname = hostname,
-        ip_address = ip_address
+        hostname=hostname,
+        ip_address=ip_address,
+        label=wlstr
     )
 
 # ========= Service Control Routes =========

@@ -128,7 +128,7 @@
 <div class="container py-4" id="output-reference">
     <h4>Output Reference &amp; Troubleshooting</h4>
     <details><summary><b>Expand/Collapse</b></summary>
-        <div class="help-text"><i>Valid for FlightGazer v.9.7.0 and newer.</i></div>
+        <div class="help-text"><i>Valid for FlightGazer v.10.1.0 and newer.</i></div>
     <div style="overflow-x: auto;">
     <table cellpadding="8">
     <thead style="position: sticky; top: 0; z-index: 1;">
@@ -215,6 +215,26 @@ N/A    123   N/A </code></pre>
             <td><ul>
                 <li>API returned a result that could not be associated with an airport.</li>
                 <li>This represents the coordinates of which this aircraft was first detected/tracked by the API.</li>
+            </ul></td>
+            <td><ul><li>Rare, but normal occurrence.</li></ul></td>
+        </tr>
+        <tr>
+            <td>
+                <p><b>Journey</b></p>
+                <code>ABC ▶ -DEF</code>
+            </td>
+            <td><ul>
+                <li>This flight was diverted to this destination.</li>
+            </ul></td>
+            <td><ul><li>Rare, but normal occurrence.</li></ul></td>
+        </tr>
+        <tr>
+            <td>
+                <p><b>Journey</b></p>
+                <code>-DEF ▶ GHI</code>
+            </td>
+            <td><ul>
+                <li>This flight was diverted and is now flying to its intended destination.</li>
             </ul></td>
             <td><ul><li>Rare, but normal occurrence.</li></ul></td>
         </tr>
