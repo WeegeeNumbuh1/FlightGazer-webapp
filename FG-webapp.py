@@ -1,9 +1,21 @@
+#      _/_/_/_/ _/_/    _/            _/        _/       _/_/_/
+#     _/         _/         _/_/_/   _/_/_/  _/_/_/_/ _/         _/_/_/ _/_/_/_/   _/_/   _/  _/_/
+#    _/_/_/     _/    _/   _/    _/ _/    _/  _/     _/  _/_/ _/    _/     _/   _/_/_/_/ _/_/
+#   _/         _/    _/   _/    _/ _/    _/  _/     _/    _/ _/    _/   _/     _/       _/
+#  _/         _/_/    _/   _/_/_/ _/    _/    _/_/   _/_/_/   _/_/_/ _/_/_/_/   _/_/_/ _/
+#                             _/                               by: WeegeeNumbuh1
+#         (web-app)      _/_/
+
 """ FlightGazer web interface. Handles editing the config file,
 reading the logs, checking for updates, and modifying startup options.
 This won't run if FlightGazer isn't installed on the system as it depends on
-FlightGazer's virtual environment. (should be handled via the install script).
-Disclosures: most of this was initially vibe-coded, however at this state, it
-has been manually tweaked and modified to the point it's *good enough*. """
+FlightGazer's virtual environment. (should be handled via the install script). """
+
+"""
+Disclosures: most of this (including template files) was *initially* vibe-coded (v.0.1.0),
+however at this state, it has been manually tweaked, modified, and
+refined to the point it's *good enough*. Read that changelog.
+"""
 
 """
     Copyright (C) 2026, WeegeeNumbuh1.
@@ -43,15 +55,16 @@ import subprocess
 import requests
 import psutil
 import socket
-from time import sleep
+from time import sleep, monotonic
 import io
 import datetime
 import logging
 import importlib.metadata
 import concurrent.futures as CF
 import zipfile
+import gzip
 
-VERSION = "v.0.18.0 --- 2026-03-15"
+VERSION = "v.1.0.0 --- 2026-04-03"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -78,6 +91,7 @@ CURRENT_IP = '' # local IP address of the system
 HOSTNAME = socket.gethostname()
 RUNNING_ADSBIM = False
 localpages = {}
+localpages_timestamp = 0.0
 whitelabel = os.path.join(os.path.dirname(__file__), 'static', 'extra')
 wlstr = ''
 is_posix = True if os.name == 'posix' else False
@@ -87,6 +101,9 @@ except Exception:
     FLASK_VER = "Unknown"
 
 webapp_session = requests.session()
+# note: unlike in the main FlightGazer application where we bother to clean up after outselves
+# we just let systemd/gunicorn kill these threads off when this exits (no `ThreadPool.shutdown()`)
+prober_tp = CF.ThreadPoolExecutor(max_workers=10, thread_name_prefix='LocalSiteProberWorker')
 
 yaml = YAML()
 yaml.preserve_quotes = True
@@ -236,14 +253,16 @@ def save_color_config(colors):
 def get_version() -> str:
     try:
         with open(VERSION_PATH, 'r', encoding='utf-8') as f:
-            return f.read().strip()
+            head = f.read(16)
+            return head.strip()
     except Exception:
         return 'Unknown'
 
 def get_webapp_version() -> str:
     try:
         with open(WEBAPP_VERSION_PATH, 'r', encoding='utf-8') as f:
-            return f.read().strip()
+            head = f.read(16)
+            return head.strip()
     except Exception:
         return 'Unknown'
 
@@ -281,6 +300,10 @@ def local_webpage_prober() -> dict:
         - The Display Emulator
     - Find Skystats
         - Either at /skystats or port 5173
+    - Find FA's SkyAware
+        - /skyaware or port 8080 (handled with the tar1090 logic)
+    - Find SkyAware UAT
+        - Either at /skyaware978 or port 8978
     - Port 8088
         - Planefence
 
@@ -291,8 +314,9 @@ def local_webpage_prober() -> dict:
     def webpage_title(url: str) -> tuple[str, str | None]:
         """ Get the title of a webpage given `input` as a string. """
         try:
-            response = webapp_session.get(url, timeout=4, allow_redirects=True)
+            response = webapp_session.get(url, timeout=3, allow_redirects=True)
             # get the webpage title; https://stackoverflow.com/a/47236359
+            response.raise_for_status()
             resp_body = response.text
             title = re.search('(?<=<title>).+?(?=</title>)', resp_body, re.DOTALL)
             if title:
@@ -314,6 +338,8 @@ def local_webpage_prober() -> dict:
         'adsb_root': [root, adsbim],
         'display_emulator': [f"http://{CURRENT_IP}:8888", "http://localhost:8888"],
         'tar1090': [f"http://{CURRENT_IP}/tar1090", f"http://{CURRENT_IP}:8080"],
+        'skyaware': [f"http://{CURRENT_IP}/skyaware"],
+        'skyaware978': [f"http://{CURRENT_IP}/skyaware978", f"http://{CURRENT_IP}:8978"],
         'graphs1090': [f"http://{CURRENT_IP}/graphs1090", f"http://{CURRENT_IP}:8542"],
         'skystats': [f"http://{CURRENT_IP}/skystats", f"http://{CURRENT_IP}:5173"],
         'planefence': [f"http://{CURRENT_IP}:8088"],
@@ -328,12 +354,10 @@ def local_webpage_prober() -> dict:
 
     # probe the stuff concurrently
     results: dict[str, None | str] = {}
-    max_workers = len(urls)
-    with CF.ThreadPoolExecutor(max_workers=max_workers) as exe:
-        future_to_url = {exe.submit(webpage_title, u): u for u in urls}
-        for fut in CF.as_completed(future_to_url):
-            url, title = fut.result()
-            results[url] = title
+    future_to_url = {prober_tp.submit(webpage_title, u): u for u in urls}
+    for fut in CF.as_completed(future_to_url):
+        url, title = fut.result()
+        results[url] = title
 
     # find adsb.im
     local_page = results.get(root)
@@ -366,10 +390,27 @@ def local_webpage_prober() -> dict:
             break
 
     # find the rest of our stuff
-    # tar1090
+    # skyaware (check this first)
+    for url in candidates['skyaware']:
+        if match_title(results.get(url), "SkyAware"):
+            pages.update({"SkyAware Tracking Interface": url})
+            break
+
+    # tar1090/skyaware
     for url in candidates['tar1090']:
         if match_title(results.get(url), "tar1090"):
             pages.update({"tar1090 Tracking Interface": url})
+            break # note, tar1090 has priority if skyaware is using 8080
+        if match_title(results.get(url), "SkyAware"):
+            # don't do anything if we already found it
+            if not 'SkyAware Tracking Interface' in pages:
+                pages.update({"SkyAware Tracking Interface": url})
+                break
+
+    # skyaware978
+    for url in candidates['skyaware978']:
+        if match_title(results.get(url), "SkyAware"):
+            pages.update({"SkyAware UAT Tracking Interface": url})
             break
 
     # graphs1090
@@ -643,12 +684,14 @@ def probing_thread() -> None:
     then once every 5 minutes for the next hour,
     then updates twice a day thereafter.
     Modifies the `localpages` global. """
-    global localpages
+    global localpages, localpages_timestamp
     probing_cycle_count = 0
     stage1 = 20
     stage2 = 32
     while True:
-        localpages = local_webpage_prober()
+        if not localpages_timestamp or (monotonic() - localpages_timestamp > 15):
+            localpages = local_webpage_prober()
+            localpages_timestamp = monotonic()
         probing_cycle_count += 1
         if probing_cycle_count < stage1:
             sleep(30)
@@ -668,8 +711,27 @@ def update_ip() -> None:
         sleep(3600)
         get_ip()
 
+def background_update_checker() -> None:
+    """ Check for updates from the repo every week """
+    sleep(600) # wait for things to settle
+    try:
+        main_logger.info("Checking for updates at service startup.")
+        update_fetcher()
+    except Exception as e:
+        main_logger.info(f"Unable to fetch updates: {e}")
+    main_logger.info("Will check for updates again in a week.")
+    sleep(604800)
+    while True:
+        try:
+            main_logger.info("Running weekly update check.")
+            update_fetcher()
+        except Exception as e:
+            main_logger.info(f"Unable to fetch updates: {e}")
+        sleep(604800)
+
 threading.Thread(target=probing_thread, name='local-webpage-searcher', daemon=True).start()
 threading.Thread(target=update_ip, name='IP-watcher', daemon=True).start()
+threading.Thread(target=background_update_checker, name='update-checker', daemon=True).start()
 service_guard = ActionTimeout(30)
 long_guard = ActionTimeout(600)
 update_guard = ActionTimeout(600)
@@ -688,9 +750,21 @@ if os.path.isfile(whitelabel):
 
 @app.route('/api/localpages')
 def api_localpages():
-    global localpages
-    localpages = local_webpage_prober()
+    global localpages, localpages_timestamp
+    if not localpages_timestamp or (monotonic() - localpages_timestamp > 15):
+        # prevent spamming the local page discovery
+        main_logger.debug("Running local webpage prober")
+        localpages = local_webpage_prober()
+        localpages_timestamp = monotonic()
+        main_logger.debug("Local webpage prober finished")
+    else:
+        main_logger.debug("Local webpage cache still valid, using this instead")
     return jsonify(localpages)
+
+@app.route('/api/status')
+def service_status():
+    status = get_flightgazer_status()
+    return jsonify({'status': status})
 
 # ========= Root Route =========
 
@@ -701,7 +775,9 @@ def landing_page():
     status = get_flightgazer_status()
     hostname = HOSTNAME
     ip_address = CURRENT_IP
-    # Pass localpages to the template
+    update_avail = False
+    if remote_ver and version != remote_ver:
+        update_avail = True
     return render_template(
         'landing.html',
         version=version,
@@ -710,6 +786,7 @@ def landing_page():
         webapp_version=webapp_version,
         hostname=hostname,
         ip_address=ip_address,
+        update_avail=update_avail,
         label=wlstr
     )
 
@@ -791,11 +868,6 @@ def stop_flightgazer_service():
     except Exception as e:
         main_logger.exception("FlightGazer service stop failed")
         return jsonify({'status': 'error', 'error': str(e)})
-
-@app.route('/api/status')
-def service_status():
-    status = get_flightgazer_status()
-    return jsonify({'status': status})
 
 # ========= Config Modification Routes =========
 
@@ -1040,9 +1112,9 @@ def download_log():
 
 @app.route('/details/log_html')
 def details_log_html():
-    if not os.path.exists(LOG_PATH):
-        raise FileNotFoundError
     try:
+        if not os.path.exists(LOG_PATH):
+            raise FileNotFoundError('Main log file could not be found.')
         loglen = linecounter(LOG_PATH)
         with open(LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
             if loglen:
@@ -1055,17 +1127,27 @@ def details_log_html():
             line = re.sub(r'\b(DEBUG|INFO|WARNING|ERROR|CRITICAL)\b',
                           lambda m: f'<span style="color:{ {"DEBUG":"#8cf","INFO":"#6f6","WARNING":"#ff0","ERROR":"#f66","CRITICAL":"#f00"}[m.group(1)]};font-weight:bold;">{m.group(1)}</span>', line)
             html_lines.append(line)
-        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
         html += '\n'.join(f'<div class="logline"><code>{l}</code></div>' for l in html_lines)
         html += '</body></html>'
-        return html
+        # below technique adapted from https://stackoverflow.com/a/59635292
+        if 'gzip' in request.accept_encodings:
+            content = gzip.compress(html.encode('utf-8'), 5)
+            response = make_response(content)
+            response.headers['Content-length'] = len(content)
+            response.headers['Content-Encoding'] = 'gzip'
+            return response
+        else:
+            return html
     except Exception as e:
-        return f'<span style="color:#f66;font-family:monospace">Log file not found: {e.__class__.__name__}: {e}</span>', 404
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
+        return html + f'<span style="color:#f66;font-family:monospace">Log file could not be loaded -> {e.__class__.__name__}: {e}</span></body></html>'
 
 @app.route('/details/migrate_log')
 def details_migrate_log():
     if not os.path.exists(MIGRATE_LOG_PATH):
-        return '<div style="color:#f66;font-family:monospace;padding:12px;">Migration history log not found or an update has not been done yet.</div>', 404
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
+        return html + '<div>Migration history log not found or an update has not been done yet.</div></body></html>'
     try:
         line_count = linecounter(MIGRATE_LOG_PATH)
         with open(MIGRATE_LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
@@ -1078,15 +1160,23 @@ def details_migrate_log():
                 f'<div class="logline"><i>Showing the latest 200 lines (out of {line_count})</i>.<br>'
                 'Download the file for complete data.<br><br></div>'
             )
-        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
         if header_line:
             html += header_line
         safe_content = content.replace('<', '&lt;').replace('>', '&gt;')
         html += f'<div class="logline">{safe_content}</div>'
         html += '</body></html>'
-        return html
+        if 'gzip' in request.accept_encodings:
+            content = gzip.compress(html.encode('utf-8'), 5)
+            response = make_response(content)
+            response.headers['Content-length'] = len(content)
+            response.headers['Content-Encoding'] = 'gzip'
+            return response
+        else:
+            return html
     except Exception as e:
-        return f'<span style="color:#f66;font-family:monospace">Log file not found.<br>{e.__class__.__name__}: {e}</span>', 404
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
+        return html + '<span style="color:#f66;font-family:monospace">Log file not found.<br>{e.__class__.__name__}: {e}</span></body></html>'
 
 @app.route('/details/download_migrate_log')
 def download_migrate_log():
@@ -1109,7 +1199,8 @@ def details_init_log():
     global init_log_cache
     if not is_posix:
         init_log_cache = None
-        return f'<span style="color:#f66;font-family:monospace;">Initialization log is unavailable on this system.</span>', 404
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
+        return html + '<span>Initialization log is unavailable on this system.</span></body></html>'
     try:
         # Fetch logs for FlightGazer-init.sh via journalctl (unit: flightgazer.service or fallback to grep script name)
         result = subprocess.run([
@@ -1132,16 +1223,24 @@ def details_init_log():
                 'Download the file for complete data.<br><br></div>'
             )
 
-        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
         if header_line:
             html += header_line
         safe_content = log_content.replace('<', '&lt;').replace('>', '&gt;')
         html += f'<div class="logline">{safe_content}</div>'
         html += '</body></html>'
-        return html
+        if 'gzip' in request.accept_encodings:
+            content = gzip.compress(html.encode('utf-8'), 5)
+            response = make_response(content)
+            response.headers['Content-length'] = len(content)
+            response.headers['Content-Encoding'] = 'gzip'
+            return response
+        else:
+            return html
     except Exception as e:
         init_log_cache = None
-        return f'<span style="color:#f66;font-family:monospace;">Initialization log not found or unavailable on this system.<br>{e.__class__.__name__}: {e}</span>', 404
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
+        return html + f'<span style="color:#f66;font-family:monospace;">Initialization log not found or unavailable on this system.<br>{e.__class__.__name__}: {e}</span></body></html>'
 
 @app.route('/details/download_init_log')
 def download_init_log():
@@ -1181,7 +1280,8 @@ def download_flybys_csv():
 @app.route('/details/flybys_csv')
 def details_flybys_csv():
     if not os.path.exists(FLYBY_STATS_PATH):
-        return '<div style="color:#f66;font-family:monospace;padding:12px;">flybys.csv not found.</div>', 404
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
+        return html + '<div style="color:#f66;font-family:monospace;padding:12px;">flybys.csv not found.</div></body></html>'
     try:
         csv_len = linecounter(FLYBY_STATS_PATH)
         with open(FLYBY_STATS_PATH, 'r', encoding='utf-8', errors='replace') as f:
@@ -1191,7 +1291,7 @@ def details_flybys_csv():
                 lines.insert(0, f.readline())
         html_ = []
         html_.append(
-            '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#181818;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} '
+            '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} '
             'table{border-collapse:collapse;width:100%;} th,td{border:1px solid #444;padding:4px 8px;} '
             'th{position:sticky;top:0;z-index:1;background:#222;color:#ffd700;} '
             'tr:nth-child(even){background:#222;} tr:nth-child(odd){background:#181818;} '
@@ -1213,9 +1313,17 @@ def details_flybys_csv():
         else:
             html_.append('<div style="color:#aaa">(No data in flybys.csv)</div>')
         html_.append('</body></html>')
-        return ''.join(html_)
+        if 'gzip' in request.accept_encodings:
+            content = gzip.compress(''.join(html_).encode('utf-8'), 5)
+            response = make_response(content)
+            response.headers['Content-length'] = len(content)
+            response.headers['Content-Encoding'] = 'gzip'
+            return response
+        else:
+            return ''.join(html_)
     except Exception as e:
-        return f'<span style="color:#f66;font-family:monospace">File could not be loaded.<br>{e.__class__.__name__}: {e}</span>', 404
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
+        return html + f'<span style="color:#f66;font-family:monospace">File could not be loaded.<br>{e.__class__.__name__}: {e}</span></body></html>'
 
 @app.route('/details/download_all')
 def download_all():

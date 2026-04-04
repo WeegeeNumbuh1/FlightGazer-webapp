@@ -21,8 +21,20 @@
 </head>
 <body>
 <div class="container py-4">
-    <button id="closeWindow" class="btn btn btn-info">Close this tab/window</button>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-info mb-3 float-end" style="position:relative;z-index:10;">☀️🌙</button>
+    <button id="closeWindow" class="btn btn btn-info">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+        </svg>
+        Close this tab/window</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:relative;z-index:10;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill" viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
+    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
+    </svg>
+    </button>
     <h2 class="mb-4">Help and Reference Guide</h2>
     <div id="subheader" class="help-text"></div>
     <div id="sys-info-link" class="help-text"></div>
@@ -121,7 +133,12 @@
 </tbody>
 </table>
 <div style="margin-top: 24px; text-align: center;">
-    <button type="button" onClick="document.getElementById('display-layout').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+    <button type="button" onClick="document.getElementById('display-layout').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
+        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+        </svg>
+        Scroll back up</button>
 </div>
 </details>
 </div>
@@ -272,8 +289,8 @@ N/A    123   N/A </code></pre>
             <td><ul><li>Expected operation.</li></ul></td>
         </tr>
         <tr>
-            <td><p><b>Show Even More Info</b></p>&ldquo; <code>LADD Aircraft</code> &rdquo;</td>
-            <td><ul><li>Limiting Aircraft Data Displayed - <i>&ldquo;Please don't track me.&rdquo;</i></li></ul></td>
+            <td><p><b>Show Even More Info</b></p><q> <code>LADD Aircraft</code> </q></td>
+            <td><ul><li>Limiting Aircraft Data Displayed - <i><q>Please don't track me.</q></i></li></ul></td>
             <td><ul><li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More Information</a>
                 <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
                     <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
@@ -281,8 +298,8 @@ N/A    123   N/A </code></pre>
         </li></ul></td>
         </tr>
         <tr>
-            <td><p><b>Show Even More Info</b></p>&ldquo; <code>PIA Aircraft</code> &rdquo;</td>
-            <td><ul><li>(U.S. only) Privacy ICAO Address - <i>&ldquo;Good luck figuring out who I am.&rdquo;</i></li></ul></td>
+            <td><p><b>Show Even More Info</b></p><q> <code>PIA Aircraft</code> </q></td>
+            <td><ul><li>(U.S. only) Privacy ICAO Address - <i><q>Good luck figuring out who I am.</q></i></li></ul></td>
             <td><ul><li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank" rel="noopener noreferrer">More Information</a>
                 <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
                     <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
@@ -290,7 +307,7 @@ N/A    123   N/A </code></pre>
             </li></ul></td>
         </tr>
         <tr>
-            <td><p><b>Show Even More Info</b></p>&ldquo; <code>TIS-B Contact</code> &rdquo;</td>
+            <td><p><b>Show Even More Info</b></p><q> <code>TIS-B Contact</code> </q></td>
             <td><ul><li>Traffic Information Service – Broadcast - broadcast information sent by ground stations corresponding to an aircraft; cannot be tied to a registration or aircraft type and is used for collision avoidance.</li></ul></td>
             <td><ul><li><a href="https://en.wikipedia.org/wiki/Traffic_information_service_%E2%80%93_broadcast" target="_blank" rel="noopener noreferrer">More Information</a>
         <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
@@ -302,7 +319,12 @@ N/A    123   N/A </code></pre>
 </table>
 </div>
 <div style="margin-top: 24px; text-align: center;">
-    <button type="button" onClick="document.getElementById('output-reference').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+    <button type="button" onClick="document.getElementById('output-reference').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
+        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+        </svg>
+        Scroll back up</button>
 </div>
 </details>
 </div>
@@ -485,7 +507,12 @@ N/A    123   N/A </code></pre>
   </details>
 </div>
 <div style="margin-top: 24px; text-align: center;">
-    <button type="button" onClick="document.getElementById('center-row').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+    <button type="button" onClick="document.getElementById('center-row').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
+        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+        </svg>
+        Scroll back up</button>
 </div>
 </details>
 </div>
@@ -554,7 +581,12 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
 </ul>
 
 <div style="margin-top: 24px; text-align: center;">
-    <button type="button" onClick="document.getElementById('neat-tricks').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">↑ Scroll back up</button>
+    <button type="button" onClick="document.getElementById('neat-tricks').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
+        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+        </svg>
+        Scroll back up</button>
 </div>
     </details>
 </div>
@@ -621,6 +653,12 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
               <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>
         .
+    </ul>
+    <hr>
+    <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer" title="View the source code of this web-app on GitHub">
+        <img src="{{ url_for('static', filename='FlightGazer-logo_webapp.png') }}" width="192" height="120" alt="FlightGazer Webapp Logo" class="logo-img">
+    </a>
+        <ul class="list-unstyled">
         <li><b>Web-app changelog</b></li>
         The latest available one is
          <a href="https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer-webapp/refs/heads/master/Changelog-webapp.txt" target="_blank" rel="noopener noreferrer">viewable here</a>
@@ -629,12 +667,7 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
             </svg>
             .
         <li><b>License</b></li>
-        FlightGazer and
-         <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer">this web application</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>
-         are copyright
+        FlightGazer and this web application are copyright
          <a href="https://github.com/WeegeeNumbuh1" target="_blank" rel="noopener noreferrer">WeegeeNumbuh1</a>
             <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
               <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
@@ -643,43 +676,30 @@ You'll need to get <code>ssh</code> access to this system, then use the command 
             <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
               <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
             </svg>.<br>
-        The source code is available by clicking on the FlightGazer logo on the main landing page.<br><br>
+        The source code is available by clicking on the FlightGazer logo on the main landing page.<br>
+        </ul>
+        <p>
 <pre><code>This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.</code></pre>
+        </p>
     </details>
 </div>
 <script>
-    document.getElementById('closeWindow').onclick = closeWindow;
-    function closeWindow() {
-        close();
-    }
-    let showText = "{{ is_adsbim }}";
-    if (showText === "True") {
-        document.getElementById("subheader").innerHTML = '\
-        <i>Note: FlightGazer is running on/with adsb.im.</i><br>For help regarding adsb.im, <a href="https://adsb.im/using" target="_blank" rel="noopener noreferrer">check its documentation</a>\
-        <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">\
-            <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">\
-                <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>\
-                <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>\
-            </g></svg>'
-        document.getElementById("sys-info-link").innerHTML = '\
-        <a href="{{ adsb_info }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">View Your System Info</a>\
-        <a href="{{ adsb_logs }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">View System Logs</a>'
-    }
-    document.getElementById("device_name").innerHTML = '<code>{{ device_name }}</code>'
     function setTheme(theme) {
         if (theme === 'light') {
             document.body.style.background = '#f8f9fa';
             document.body.style.color = '#222';
             let alerts = document.querySelectorAll('.alert');
             alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
+            document.documentElement.setAttribute("data-bs-theme", theme);
         } else {
             document.body.style.background = '#181818';
             document.body.style.color = '#fff';
             let alerts = document.querySelectorAll('.alert');
             alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
+            document.documentElement.setAttribute("data-bs-theme", theme);
         }
     }
     function getPreferredTheme() {
@@ -697,6 +717,29 @@ GNU General Public License for more details.</code></pre>
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
     });
+</script>
+<script>
+    document.getElementById('closeWindow').onclick = closeWindow;
+    function closeWindow() {
+        close();
+    }
+    let showText = "{{ is_adsbim }}";
+    if (showText === "True") {
+        document.getElementById("subheader").innerHTML = '\
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-megaphone-fill" viewBox="0 0 16 16" aria-hidden="true">\
+        <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0zm-1 .724c-2.067.95-4.539 1.481-7 1.656v6.237a25 25 0 0 1 1.088.085c2.053.204 4.038.668 5.912 1.56zm-8 7.841V4.934c-.68.027-1.399.043-2.008.053A2.02 2.02 0 0 0 0 7v2c0 1.106.896 1.996 1.994 2.009l.496.008a64 64 0 0 1 1.51.048m1.39 1.081q.428.032.85.078l.253 1.69a1 1 0 0 1-.983 1.187h-.548a1 1 0 0 1-.916-.599l-1.314-2.48a66 66 0 0 1 1.692.064q.491.026.966.06"/>\
+        </svg>\
+        <i> Note: FlightGazer is running on/with adsb.im.</i><br>For help regarding adsb.im, <a href="https://adsb.im/using" target="_blank" rel="noopener noreferrer">check its documentation</a>\
+        <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">\
+            <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">\
+                <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>\
+                <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>\
+            </g></svg>'
+        document.getElementById("sys-info-link").innerHTML = '\
+        <a href="{{ adsb_info }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">View Your System Info</a>\
+        <a href="{{ adsb_logs }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">View System Logs</a>'
+    }
+    document.getElementById("device_name").innerHTML = '<code>{{ device_name }}</code>'
 </script>
 </body>
 </html>

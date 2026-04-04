@@ -5,6 +5,28 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.0.0 - 2026-04-03
+    - Refined and good enough to make this v.1.0.0
+    - Numerous QoL improvements:
+        - The Back to Home button doesn't add to history and acts more
+          like the back button in a browser
+        - Fold service control buttons into a dropup power menu a la Material Design / Windows
+        - Replace emojis in text/UI elements with Bootstrap iconography
+        - Reduce/eliminate the long-standing FOUC for the Configuration page in dark mode
+        - More consistent theming and colors via Bootstrap
+        - Landing page now refreshes upon navigation back to it, along with numerous changes to
+          eliminate layout shifts
+        - Various other small page layout tweaks
+    - Backend changes and improvements:
+        - Update checker now runs once a week in the background and if there's an update,
+          the landing page will now show a message regarding this
+        - The local page discovery now has a 15 second cache to prevent spamming the feature
+            - Worker threads are now reused and don't spawn new ones every time this is run
+        - Log files are now gzipped to minimize data transfer when viewing in the Details page,
+          with compression ratios up to 20x seen in testing
+        - Add support for detecting FlightAware SkyAware pages
+    - Biggest improvements since v.0.16.0
+
 v.0.18.0 - 2026-03-15
     - Updated Reference page for FlightGazer v.10.1.0
     - Minor help text tweaks

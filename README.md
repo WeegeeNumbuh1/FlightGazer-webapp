@@ -14,6 +14,15 @@ Repo for the web interface that handles configuration, reading logs, checking/in
 > [!IMPORTANT]
 > This won't do anything if FlightGazer isn't installed in your system!
 
+### What is looks like
+<details open><summary>Show/Hide gif</summary>
+
+<div align="center">
+    <img src="./FlightGazer-webapp.gif" alt="Web App Interface gif">
+    <br><i>(as of v.1.0.0)</i>
+</div>
+</details>
+
 ## Install
 Use the `install-FlightGazer-webapp.sh` script in the FlightGazer directory.
 
@@ -35,7 +44,10 @@ In the same spirit like you can poll `dump1090` data, FlightGazer's running stat
 ```
 
 ## Update
-Use the `install-FlightGazer-webapp.sh` file again once the web app is installed to check for updates and install the latest version here in this repo.<br>
+When running an update for FlightGazer, the webapp is automatically updated to the latest version available on the repo.<br>
+
+*If you want to do things manually:*<br>
+Use the `install-FlightGazer-webapp.sh` file again once the web app is installed to check for updates and install the latest version.<br>
 The `update.sh` script for FlightGazer also handles updating the web interface as well and this is the preferred method.
 
 ## Uninstall
