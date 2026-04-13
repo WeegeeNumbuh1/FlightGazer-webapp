@@ -64,7 +64,7 @@ import concurrent.futures as CF
 import zipfile
 import gzip
 
-VERSION = "v.1.0.0 --- 2026-04-03"
+VERSION = "v.1.0.1 --- 2026-04-12"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -1576,14 +1576,6 @@ def send_update_input():
     user_input = request.json.get('input')
     update_input_queue.put(user_input)
     return jsonify({'status':'sent'})
-
-# def get_local_changelog():
-#     changelog_path = os.path.join(os.path.dirname(__file__), 'Changelog.txt')
-#     try:
-#         with open(changelog_path, 'r', encoding='utf-8') as f:
-#             return f.read()
-#     except Exception:
-#         return ''
 
 @app.route('/updates/check', methods=['POST'])
 def check_for_updates():

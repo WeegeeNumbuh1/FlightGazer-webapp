@@ -187,7 +187,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                 </div>
                 <input type="number" step="1" class="form-control" id="API_DAILY_LIMIT" name="API_DAILY_LIMIT" value="{{ config.API_DAILY_LIMIT or '' }}" min="1" max="10000">
             </div>
-            <div class="mb-3">
+            <div class="mt-3">
                 <label for="API_COST_LIMIT" class="form-label setting-label">API Cost Limit</label>
                 <div class="help-text">
                     Limit API usage of the provided API key based on its running cost from the past 30 days. (ex: $10.00)<br>
@@ -366,7 +366,8 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                     <div class="help-text">
                         Set the speed at which the scrolling text moves across the display.<br>
                         <details><summary>More details</summary>
-                        Recommended to keep this value between 20 - 30 for readability. Higher values may not be achievable depending on system conditions and configurations, especially if using the display emulator.
+                        Recommended to keep this value between 20 - 30 for readability. Higher values may not be achievable depending on system conditions and configurations, especially if using the display emulator.<br>
+                        Note: if using the emulator, the framerate is capped to 25 FPS, unless the emulator configuration is also changed correspondingly.
                         </details>
                         <i>Default: 25</i>
                     </div>
