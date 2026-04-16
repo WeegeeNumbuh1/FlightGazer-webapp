@@ -5,6 +5,12 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.0.2 - 2026-04-15
+    - Adjusted service control handling to accommodate the new service type
+      used in FlightGazer v.11 and newer
+    - When checking an update, the new changelog is now stored in a temp file
+      instead of residing in memory
+
 v.1.0.1 - 2026-04-12
     - Minor layout refinements and help text updates
 

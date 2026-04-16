@@ -58,13 +58,15 @@ import socket
 from time import sleep, monotonic
 import io
 import datetime
+import time
 import logging
 import importlib.metadata
 import concurrent.futures as CF
 import zipfile
 import gzip
+import tempfile
 
-VERSION = "v.1.0.1 --- 2026-04-12"
+VERSION = "v.1.0.2 --- 2026-04-15"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -87,6 +89,8 @@ SERVICE_PATH = '/etc/systemd/system/flightgazer.service'
 # as now this working directory `web-app` no longer exists.
 INIT_PATH = os.path.join(os.path.dirname(os.getcwd()), 'FlightGazer-init.sh')
 UPDATE_PATH = os.path.join(os.path.dirname(__file__), '..', 'update.sh')
+VENV_CHECKFILE = '/etc/FlightGazer-pyvenv/first_run_complete'
+LATEST_CHANGELOG = '/run/FlightGazer/latest_changelog'
 CURRENT_IP = '' # local IP address of the system
 HOSTNAME = socket.gethostname()
 RUNNING_ADSBIM = False
@@ -249,6 +253,15 @@ def save_color_config(colors):
     main_logger.info("Updated color configuration")
     if orig_stat and os.name != 'nt':
         os.chown(COLORS_PATH, orig_stat.st_uid, orig_stat.st_gid)
+
+def is_checkfile_old() -> bool:
+    """ Checks if the venv checkfile is expired so we can adjust
+    our approach in using the service controls """
+    if os.path.exists(VENV_CHECKFILE):
+        file_date = os.path.getmtime(VENV_CHECKFILE)
+        return (time.time() - file_date) > 3 * 2_592_000
+    else:
+        return True # the init script will automatically run the re-install
 
 def get_version() -> str:
     try:
@@ -521,9 +534,9 @@ def get_flightgazer_status():
     try:
         # if the previous poll showed that no existing PID for FlightGazer is running, run through this
         flow_reason = ""
-        if current_flightgazer_process is None:
-            flow_reason = "FlightGazer process does not exist"
-        if current_flightgazer_process and not current_flightgazer_process.is_running():
+        if current_flightgazer_process is None or current_flightgazer_pid is None:
+            flow_reason = "FlightGazer main process does not exist"
+        elif current_flightgazer_process and not current_flightgazer_process.is_running():
             flow_reason = f"Previous FlightGazer process PID {current_flightgazer_pid} is no longer running"
         if flow_reason:
             result = subprocess.run(['systemctl', 'is-active', 'flightgazer'], capture_output=True, text=True)
@@ -599,7 +612,51 @@ def append_date_now() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S")
 
 remote_ver = None
-remote_changelog = None
+remote_changelog = False
+class RetrieveNStore:
+    """ Retrieve and store a file. You must instantiate this class with
+    the file you're handling. This assumes only text files! """
+    def __init__(self, path, read_only=True):
+        self.path = path
+        self.temp_path = None
+        self._read_only = read_only
+
+    def read(self) -> str | None:
+        """ Retrieve the file. Returns `None` for any failure. """
+        try:
+            with open(self.path, 'r', encoding='utf-8') as f:
+                contents = f.read()
+            return contents
+        except Exception:
+            if self.temp_path is not None:
+                try:
+                    with open(self.temp_path, 'r', encoding='utf-8') as f:
+                        contents = f.read()
+                    return contents
+                except Exception:
+                    return None
+            else:
+                return None
+
+    def write(self, content) -> bool:
+        """ Write to the file. Returns `True` on success, `False` otherwise. """
+        if self._read_only or not content:
+            return False
+        try:
+            with open(self.path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            return True
+        except Exception:
+            if not self.temp_path:
+                self.temp_path = os.path.join(tempfile.gettempdir(), 'fg_new_changelog')
+            try:
+                with open(self.temp_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                return True
+            except Exception:
+                return False
+
+updated_changelog = RetrieveNStore(LATEST_CHANGELOG, False)
 def update_fetcher() -> None:
     """ Checks and fetches changelog from the repo.
     Modifies the globals `remote_ver` and `remote_changelog`.
@@ -611,14 +668,18 @@ def update_fetcher() -> None:
     new_changelog = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt'
     if remote_ver is None:
         remote_ver = requests.get(ver_file, timeout=10).text.strip()
-        remote_changelog = requests.get(new_changelog, timeout=10).text
+        remote_changelog_ = requests.get(new_changelog, timeout=10).text
+        main_logger.info(f"Got changelog: {len(remote_changelog_) / 1024:.3f}KiB")
+        remote_changelog = updated_changelog.write(remote_changelog_)
         main_logger.info(f"Version available online: {remote_ver}")
     else:
         remote_ver_ = requests.get(ver_file, timeout=10).text.strip()
         if remote_ver_ != remote_ver:
             main_logger.info(f"Version available online: {remote_ver}")
             remote_ver = remote_ver_
-            remote_changelog = requests.get(new_changelog, timeout=10).text
+            remote_changelog_ = requests.get(new_changelog, timeout=10).text
+            main_logger.info(f"Got changelog: {len(remote_changelog_) / 1024:.3f}KiB")
+            remote_changelog = updated_changelog.write(remote_changelog_)
         else:
             main_logger.info("Cache still valid; no updates since last checked")
 
@@ -667,8 +728,7 @@ class ActionTimeout:
     def touch(self) -> bool:
         """ Check if the guard allows an action. If allowed, start the lockout timer
         in the background and return True. If lockout is active, return False.
-        This method returns immediately (non-blocking)
-        """
+        This method returns immediately (non-blocking) """
         with self._lock:
             if self.good_to_go:
                 self._start_timer()
@@ -809,7 +869,28 @@ def restart_flightgazer():
         else:
             main_logger.info("FlightGazer service restart requested")
             if service_guard.touch():
-                subprocess.run(['systemctl', 'restart', 'flightgazer'], check=True, timeout=15)
+                if is_checkfile_old():
+                    subprocess.Popen(
+                        ['systemctl', 'restart', 'flightgazer'],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE
+                    )
+                else:
+                    subprocess.Popen(
+                        ['systemctl', 'restart', 'flightgazer'],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE
+                    )
+                    sleep(10)
+                    waitstep = 0
+                    while (statres := get_flightgazer_status()) != 'running':
+                        waitstep += 1
+                        if waitstep < 7:
+                            sleep(5)
+                            if statres == 'failed' or statres == 'stopped':
+                                raise TimeoutError("Service restart failed")
+                        else:
+                            break
             else:
                 raise PermissionError
         main_logger.info("FlightGazer service restart successful")
@@ -1589,14 +1670,17 @@ def check_for_updates():
         return jsonify({'error': f'Failed to fetch remote files due to an internal error. Details ---> {e.__class__.__name__}: {e}'}), 500
     local_ver = get_version()
     # Truncate changelog to only show entries newer than local version
-    lines = remote_changelog.splitlines()
-    truncated = []
-    for line in lines:
-        if line.strip().startswith(f'v.{local_ver} '):
-            break
-        truncated.append(line)
-    # If found, only show lines above current version
-    changelog_to_show = '\n'.join(truncated).strip()
+    if remote_changelog:
+        lines = updated_changelog.read().splitlines()
+        truncated = []
+        for line in lines:
+            if line.strip().startswith(f'v.{local_ver} '):
+                break
+            truncated.append(line)
+        # If found, only show lines above current version
+        changelog_to_show = '\n'.join(truncated).strip()
+    else:
+        changelog_to_show = "Could not fetch changelog."
     return jsonify({
         'local_version': local_ver,
         'latest_version': remote_ver,
@@ -1608,14 +1692,14 @@ def show_latest_changelog():
     if not remote_changelog:
         try:
             update_fetcher()
-            response = make_response(remote_changelog, 200)
+            response = make_response(updated_changelog.read(), 200)
             response.mimetype = "text/plain"
             return response
         except Exception:
             return 'Could not fetch latest changelog.', 404
     else:
         try:
-            response = make_response(remote_changelog, 200)
+            response = make_response(updated_changelog.read(), 200)
             response.mimetype = "text/plain"
             return response
         except Exception as e:
