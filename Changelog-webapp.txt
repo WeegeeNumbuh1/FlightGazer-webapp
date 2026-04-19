@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.0.3 - 2026-04-19
+    - Added support for new setting in FlightGazer v.11.1.0
+
 v.1.0.2 - 2026-04-15
     - Adjusted service control handling to accommodate the new service type
       used in FlightGazer v.11 and newer

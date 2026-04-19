@@ -41,7 +41,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
 });
 </script>
 </head>
-<body> <!-- quick fix: hide things until we're able to load the rest of this page; should be improved later -->
+<body>
 <div class="container py-4" style="margin-bottom:6em;">
     <button id="backToHomeBtn" class="btn btn btn-info">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16" aria-hidden="true">
@@ -176,7 +176,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                         </g>
                     </svg>.<br><i>(There is a free Personal tier, billing information required)</i>
                 </div>
-                <input type="text" class="form-control" id="API_KEY" name="API_KEY" value="{{ config.API_KEY }}" style="font-family: monospace;" maxlength="50" pattern="[0-9a-zA-Z]+">
+                <input type="text" class="form-control" id="API_KEY" name="API_KEY" value="{{ config.API_KEY }}" style="font-family: monospace;" maxlength="50" pattern="[0-9a-zA-Z]+" spellcheck="false" autocomplete="off">
             </div>
             <hr>
             <div class="mt-3">
@@ -649,7 +649,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                         </ul>
                     </details>
                 </div>
-                <input type="url" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION" value="{{ config.CUSTOM_DUMP1090_LOCATION }}" style="font-family: monospace;">
+                <input type="url" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION" value="{{ config.CUSTOM_DUMP1090_LOCATION }}" style="font-family: monospace;" spellcheck="false" autocomplete="off">
             </div>
             <div class="mt-3">
                 <label for="CUSTOM_DUMP978_LOCATION" class="form-label setting-label">Custom dump978 Location</label>
@@ -664,13 +664,13 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                         </ul>
                     </details>
                 </div>
-                <input type="url" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION" value="{{ config.CUSTOM_DUMP978_LOCATION }}" style="font-family: monospace;">
+                <input type="url" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION" value="{{ config.CUSTOM_DUMP978_LOCATION }}" style="font-family: monospace;" spellcheck="false" autocomplete="off">
             </div>
             <hr>
             <div class="mt-3">
                 <label for="FOLLOW_THIS_AIRCRAFT" class="form-label setting-label">Follow This Aircraft</label>
                 <div class="help-text">
-                    ICAO hex ID of a specific aircraft to follow. Leave this blank to not use this feature.<br>
+                    ICAO hex ID of a specific aircraft to follow once it's detected by your receiver. Leave this blank to not use this feature.<br>
                     <details><summary>More details</summary>
                     When this aircraft enters the reception area for your ADS-B receiver (not the values set by <span class="monospace">Height Limit</span> or <span class="monospace">Range</span>),
                      FlightGazer will start tracking it as if it were inside your designated <span class="monospace">Range</span>.<br>
@@ -678,7 +678,27 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                     and will append a "*" on the aircraft's callsign. This does not disable API use when this aircraft is being tracked.
                     </details>
                 </div>
-                <input type="text" class="form-control" id="FOLLOW_THIS_AIRCRAFT" name="FOLLOW_THIS_AIRCRAFT" value="{{ config.FOLLOW_THIS_AIRCRAFT }}" style="font-family: monospace;" maxlength="6" pattern="[0-9a-fA-F]+">
+                <input type="text" class="form-control" id="FOLLOW_THIS_AIRCRAFT" name="FOLLOW_THIS_AIRCRAFT" value="{{ config.FOLLOW_THIS_AIRCRAFT }}" style="font-family: monospace;" maxlength="6" pattern="[0-9a-fA-F]+" spellcheck="false" autocomplete="off">
+                <style>
+                input:invalid {
+                border: red solid 3px;
+                }
+                </style>
+            </div>
+            <div class="mt-3">
+                <label for="IGNORE_AIRCRAFT_ICAOS" class="form-label setting-label">Ignore Aircraft ICAOs</label>
+                <div class="help-text">
+                    List of comma-separated ICAO hex IDs to ignore from tracking, such as ADS-B towers and tethered balloons. Leave this blank to not use this feature.<br>
+                    This feature does not support pattern matching, you must provide exact IDs.<br>
+                    <details><summary>Examples</summary>
+                        <ul>
+                            <li><span class="monospace">a00002,c97ef2,4cc088</span></li>
+                            <li><span class="monospace">5113FB, ADFB94</span></li>
+                            <li><span class="monospace">aaf2d6</span></li>
+                        </ul>
+                    </details>
+                </div>
+                <input type="text" class="form-control" id="IGNORE_AIRCRAFT_ICAOS" name="IGNORE_AIRCRAFT_ICAOS" value="{{ config.IGNORE_AIRCRAFT_ICAOS }}" style="font-family: monospace;" maxlength="1000" pattern="[0-9a-fA-F, ]+" spellcheck="false" autocomplete="off">
                 <style>
                 input:invalid {
                 border: red solid 3px;
@@ -702,7 +722,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                         </g>
                     </svg>.
                 </div>
-                <input type="text" class="form-control" id="OPENWEATHER_API_KEY" name="OPENWEATHER_API_KEY" value="{{ config.OPENWEATHER_API_KEY }}" style="font-family: monospace;" maxlength="50" pattern="[0-9a-fA-F]+">
+                <input type="text" class="form-control" id="OPENWEATHER_API_KEY" name="OPENWEATHER_API_KEY" value="{{ config.OPENWEATHER_API_KEY }}" style="font-family: monospace;" maxlength="50" pattern="[0-9a-fA-F]+" spellcheck="false" autocomplete="off">
             </div>
             <div class="mt-3">
                 <label class="form-label setting-label">Weather Units</label>
@@ -1371,6 +1391,7 @@ $(document).ready(function() {
         data['CUSTOM_DUMP978_LOCATION'] = form.CUSTOM_DUMP978_LOCATION.value;
         data['OPENWEATHER_API_KEY'] = form.OPENWEATHER_API_KEY.value;
         data['FOLLOW_THIS_AIRCRAFT'] = form.FOLLOW_THIS_AIRCRAFT.value;
+        data['IGNORE_AIRCRAFT_ICAOS'] = form.IGNORE_AIRCRAFT_ICAOS.value;
         data['CLOCK_CENTER_ROW'] = {
             'ROW1': parseInt(form.CLOCK_CENTER_ROW_ROW1.value),
             'ROW2': parseInt(form.CLOCK_CENTER_ROW_ROW2.value)
