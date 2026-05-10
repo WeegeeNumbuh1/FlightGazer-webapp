@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.0.4 - 2026-05-09
+    - Small cleanups
+
 v.1.0.3 - 2026-04-19
     - Added support for new setting in FlightGazer v.11.1.0
 
