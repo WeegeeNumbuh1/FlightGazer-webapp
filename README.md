@@ -14,7 +14,7 @@ Repo for the web interface that handles configuration, reading logs, checking/in
 > [!IMPORTANT]
 > This won't do anything if FlightGazer isn't installed in your system!
 
-### What is looks like
+### What it looks like
 <details open><summary>Show/Hide gif</summary>
 
 <div align="center">
