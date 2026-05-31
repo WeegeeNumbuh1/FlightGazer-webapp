@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.0.4 --- 2026-05-09"
+VERSION = "v.1.0.5 --- 2026-05-30"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -320,7 +320,8 @@ def local_webpage_prober() -> dict:
     - Port 8088
         - Planefence
 
-    Returns a dict, with the key-value pairs being the link name and URL.
+    Returns a dict, with the key-value pairs being the link name,
+    and a tuple of `(URL, priority [int])`.
     """
     global RUNNING_ADSBIM
     pages = {}
@@ -377,71 +378,75 @@ def local_webpage_prober() -> dict:
     if local_page:
         match local_page:
             case x if "Feeder Homepage" in x:
-                pages.update({"System Configuration & Management, Maps, and Stats": root})
+                pages.update({
+                    "System Configuration & Management, Maps, and Stats": (root, 1)}
+                )
                 RUNNING_ADSBIM = True
             case x if "PiAware" in x: # FlightAware's PiAware is running here
-                pages.update({"FlightAware PiAware page": root})
+                pages.update({"FlightAware PiAware page": (root, 1)})
             case x if "SDR Setup" in x:
-                pages.update({"⚠️ SDR Disconnected! Click Here to Investigate/Fix": root})
+                pages.update(
+                    {"⚠️ SDR Disconnected! Click Here to Investigate/Fix": (root, 2)}
+                )
                 RUNNING_ADSBIM = True
             # case _: # something else is running here, link it anyway
             #     pages.update({f"{local_page}"[:100]: root})
     else:
         local_page = results.get(adsbim)
         if match_title(local_page, "Feeder Homepage"):
-            pages.update({"System Configuration & Management, Maps, and Stats": adsbim})
+            pages.update({"System Configuration & Management, Maps, and Stats": (adsbim, 1)})
             RUNNING_ADSBIM = True
         elif match_title(local_page, "SDR Setup"):
-            pages.update({"⚠️ SDR Disconnected! Click Here to Investigate/Fix": adsbim})
+            pages.update({"⚠️ SDR Disconnected! Click Here to Investigate/Fix": (adsbim, 2)})
             RUNNING_ADSBIM = True
 
     # try to find the display emulator
     for url in candidates['display_emulator']:
         t = results.get(url)
         if t and any(x in t for x in ("FlightGazer", "RGBME")):
-            pages.update({"RGBMatrixEmulator": url})
+            pages.update({"RGBMatrixEmulator": (url, 0)})
             break
 
     # find the rest of our stuff
     # skyaware (check this first)
     for url in candidates['skyaware']:
         if match_title(results.get(url), "SkyAware"):
-            pages.update({"SkyAware Tracking Interface": url})
+            pages.update({"SkyAware Tracking Interface": (url, 0)})
             break
 
     # tar1090/skyaware
     for url in candidates['tar1090']:
         if match_title(results.get(url), "tar1090"):
-            pages.update({"tar1090 Tracking Interface": url})
+            pages.update({"tar1090 Tracking Interface": (url, 0)})
             break # note, tar1090 has priority if skyaware is using 8080
         if match_title(results.get(url), "SkyAware"):
             # don't do anything if we already found it
             if not 'SkyAware Tracking Interface' in pages:
-                pages.update({"SkyAware Tracking Interface": url})
+                pages.update({"SkyAware Tracking Interface": (url, 0)})
                 break
 
     # skyaware978
     for url in candidates['skyaware978']:
         if match_title(results.get(url), "SkyAware"):
-            pages.update({"SkyAware UAT Tracking Interface": url})
+            pages.update({"SkyAware UAT Tracking Interface": (url, 0)})
             break
 
     # graphs1090
     for url in candidates['graphs1090']:
         if match_title(results.get(url), "graphs1090"):
-            pages.update({"graphs1090 Statistics Interface": url})
+            pages.update({"graphs1090 Statistics Interface": (url, 0)})
             break
 
     # skystats
     for url in candidates['skystats']:
         if match_title(results.get(url), "Skystats"):
-            pages.update({"Skystats": url})
+            pages.update({"Skystats": (url, 0)})
             break
 
     # planefence
     planefence_url = candidates['planefence'][0]
     if match_title(results.get(planefence_url), "Planefence"):
-        pages.update({"Planefence": planefence_url})
+        pages.update({"Planefence": (planefence_url, 0)})
 
     return pages
 

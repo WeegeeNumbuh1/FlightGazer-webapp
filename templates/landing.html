@@ -103,8 +103,8 @@
         <!-- Show something (if available) before the page updates this section -->
         {% if localpages %}
             Quick links (opens a new tab)<br>
-            {% for label, url in localpages.items() %}
-            <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary" style="margin:6px 8px; min-width:220px;">{{ label }}</a>
+            {% for label, page in localpages.items() %}
+            <a href="{{ page[0] }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary" style="margin:6px 8px; min-width:220px;">{{ label }}</a>
             {% endfor %}
             {% endif %}
             <span class="small-status">
@@ -146,10 +146,6 @@
                     Stop</a></li>
             </ul>
         </div>
-
-        <!-- <button id="startServiceBtn" class="btn btn-success me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Start FlightGazer">Start</button>
-        <button id="restartServiceBtn" class="btn btn-warning me-2" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Restart FlightGazer">Restart</button>
-        <button id="stopServiceBtn" class="btn btn-danger" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="Stop FlightGazer">Stop</button> -->
     </div>
 
     <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
@@ -427,12 +423,23 @@ It\'s recommended to bookmark this page for easy access.\n\
             quickAccessDiv.innerHTML = 'Quick links (opens a new tab)<br>';
 
             // add buttons for each local page
-            for (const [label, url] of Object.entries(localpages)) {
+            for (const [label, page] of Object.entries(localpages)) {
                 const link = document.createElement('a');
+                const url = page[0];
                 link.href = url;
+                const btnPriority = page[1];
                 link.target = '_blank';
                 link.rel = 'noopener noreferrer';
-                link.className = 'btn btn-outline-secondary';
+                if (btnPriority < 1 || btnPriority > 2) {
+                    link.className = 'btn btn-outline-secondary';
+                } else if (btnPriority === 1) {
+                    link.className = 'btn btn-success';
+                } else if (btnPriority === 2) {
+                    link.className = 'btn btn-warning';
+                    link.style.fontWeight = 'bold';
+                } else {
+                    link.className = 'btn btn-outline-secondary';
+                }
                 link.style.margin = '6px 8px';
                 link.style.minWidth = '220px';
                 link.textContent = label;

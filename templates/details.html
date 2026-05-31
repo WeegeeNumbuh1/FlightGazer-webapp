@@ -176,10 +176,15 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
 <script>
 const homeUrl = {{ url_for('landing_page') | tojson }};
 const fullHomeUrl = window.location.origin + homeUrl;
+let windowHistoryCount = window.history.length;
 
 function goHome() {
     if (document.referrer === fullHomeUrl) {
-        window.history.back();
+        if (windowHistoryCount > 1) {
+            window.history.back();
+        } else {
+            close();
+        }
     } else {
         window.location.href = homeUrl;
     }

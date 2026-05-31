@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.0.5 - 2026-05-30
+    - Add button highlighting for the quick links section on the landing page
+    - Fix "back to home" button when a subpage is opened in a new tab/window
+
 v.1.0.4 - 2026-05-09
     - Small cleanups
 

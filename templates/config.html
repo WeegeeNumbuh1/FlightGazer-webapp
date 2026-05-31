@@ -1101,11 +1101,17 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
 // the back to home button logic (you'll see this in other pages)
 const homeUrl = {{ url_for('landing_page') | tojson }};
 const fullHomeUrl = window.location.origin + homeUrl;
+let windowHistoryCount = window.history.length;
 
 function goHome() {
     // Check if the user likely came from the landing page
     if (document.referrer === fullHomeUrl) {
         // Came from home: go back in history (no new entry added)
+        if (windowHistoryCount > 1) {
+            window.history.back();
+        } else { // opened a new tab/window; just close it (browser should go to the referring tab)
+            close();
+        }
         window.history.back();
     } else {
         // Direct access or from elsewhere: navigate to home (adds one entry)
