@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.0.5 --- 2026-05-30"
+VERSION = "v.1.0.6 --- 2026-05-31"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -321,7 +321,7 @@ def local_webpage_prober() -> dict:
         - Planefence
 
     Returns a dict, with the key-value pairs being the link name,
-    and a tuple of `(URL, priority [int])`.
+    and a tuple of `(URL, priority [int], help string)`.
     """
     global RUNNING_ADSBIM
     pages = {}
@@ -379,14 +379,19 @@ def local_webpage_prober() -> dict:
         match local_page:
             case x if "Feeder Homepage" in x:
                 pages.update({
-                    "System Configuration & Management, Maps, and Stats": (root, 1)}
+                    "System Configuration & Management, Maps, and Stats":
+                    (root, 1, "Configure and control your system with ADSB.im")}
                 )
                 RUNNING_ADSBIM = True
             case x if "PiAware" in x: # FlightAware's PiAware is running here
-                pages.update({"FlightAware PiAware page": (root, 1)})
+                pages.update(
+                    {"FlightAware PiAware page":
+                    (root, 1, "Overview page of your PiAware system")}
+                )
             case x if "SDR Setup" in x:
                 pages.update(
-                    {"⚠️ SDR Disconnected! Click Here to Investigate/Fix": (root, 2)}
+                    {"⚠️ SDR Disconnected! Click Here to Investigate/Fix":
+                     (root, 2, "Your SDR is having issues, please check on it")}
                 )
                 RUNNING_ADSBIM = True
             # case _: # something else is running here, link it anyway
@@ -394,59 +399,87 @@ def local_webpage_prober() -> dict:
     else:
         local_page = results.get(adsbim)
         if match_title(local_page, "Feeder Homepage"):
-            pages.update({"System Configuration & Management, Maps, and Stats": (adsbim, 1)})
+            pages.update(
+                {"System Configuration & Management, Maps, and Stats":
+                (adsbim, 1, "Configure and control your system with ADSB.im")})
             RUNNING_ADSBIM = True
         elif match_title(local_page, "SDR Setup"):
-            pages.update({"⚠️ SDR Disconnected! Click Here to Investigate/Fix": (adsbim, 2)})
+            pages.update(
+                {"⚠️ SDR Disconnected! Click Here to Investigate/Fix":
+                 (adsbim, 2, "Your SDR is having issues, please check on it")})
             RUNNING_ADSBIM = True
 
     # try to find the display emulator
     for url in candidates['display_emulator']:
         t = results.get(url)
         if t and any(x in t for x in ("FlightGazer", "RGBME")):
-            pages.update({"RGBMatrixEmulator": (url, 0)})
+            pages.update(
+                {"RGBMatrixEmulator":
+                 (url, 0, "Emulated version of the RGB LED display")}
+            )
             break
 
     # find the rest of our stuff
     # skyaware (check this first)
     for url in candidates['skyaware']:
         if match_title(results.get(url), "SkyAware"):
-            pages.update({"SkyAware Tracking Interface": (url, 0)})
+            pages.update(
+                {"Live Aircraft Map (SkyAware)":
+                 (url, 0, "Watch real-time aircraft positions on a map")}
+            )
             break
 
     # tar1090/skyaware
     for url in candidates['tar1090']:
         if match_title(results.get(url), "tar1090"):
-            pages.update({"tar1090 Tracking Interface": (url, 0)})
+            pages.update(
+                {"Live Aircraft Map (tar1090)":
+                (url, 0, "Watch real-time aircraft positions on a map")}
+            )
             break # note, tar1090 has priority if skyaware is using 8080
         if match_title(results.get(url), "SkyAware"):
             # don't do anything if we already found it
             if not 'SkyAware Tracking Interface' in pages:
-                pages.update({"SkyAware Tracking Interface": (url, 0)})
+                pages.update(
+                    {"Live Aircraft Map (SkyAware)":
+                     (url, 0, "Watch real-time aircraft positions on a map")}
+                )
                 break
 
     # skyaware978
     for url in candidates['skyaware978']:
         if match_title(results.get(url), "SkyAware"):
-            pages.update({"SkyAware UAT Tracking Interface": (url, 0)})
+            pages.update(
+                {"Live Aircraft Map (SkyAware UAT)":
+                 (url, 0, "Watch real-time UAT aircraft positions on a map")}
+            )
             break
 
     # graphs1090
     for url in candidates['graphs1090']:
         if match_title(results.get(url), "graphs1090"):
-            pages.update({"graphs1090 Statistics Interface": (url, 0)})
+            pages.update(
+                {"System Statistics":
+                 (url, 0, "Graphs of your system's performance")}
+            )
             break
 
     # skystats
     for url in candidates['skystats']:
         if match_title(results.get(url), "Skystats"):
-            pages.update({"Skystats": (url, 0)})
+            pages.update(
+                {"Skystats":
+                 (url, 0, "Summary of all the flights encountered by your tracking system")}
+            )
             break
 
     # planefence
     planefence_url = candidates['planefence'][0]
     if match_title(results.get(planefence_url), "Planefence"):
-        pages.update({"Planefence": (planefence_url, 0)})
+        pages.update(
+            {"Planefence":
+             (planefence_url, 0, "Overview of the flights encountered in your specified area")}
+        )
 
     return pages
 

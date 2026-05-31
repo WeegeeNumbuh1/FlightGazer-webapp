@@ -63,7 +63,7 @@
         </p>
         </div>
     </noscript>
-    <div class="status-indicator" style="text-align:center; margin-top:10px; margin-bottom:2px;">
+    <div class="status-indicator" style="text-align:center; margin-top:10px; margin-bottom:2px;" title="Current FlightGazer status">
         <span style="display:inline-block; width:18px; height:18px; border-radius:50%; vertical-align:middle; margin-right:7px; background: {{ status_color }}; border: 2px solid #222;"></span>
         <span style="font-size:1.05em; vertical-align:middle;">
             {% if status == 'running' %}FlightGazer is running
@@ -84,22 +84,22 @@
             <span id="serviceStatusMsg" style="color:#eda907;text-align: center;"></span>
         </div>
     </div>
-    <div class="version-text">
+    <div class="version-text" title="Current version of FlightGazer">
         Version {{ version }}
-        <span id="update_text" style="color:#16b85f;text-align: center; font-size: 0.7em;"></span>
+        <span id="update_text" style="color:#16b85f;text-align: center; font-size: 0.7em;" title="Go to the Updates page to check out the changes!"></span>
     </div>
     <div class="footer">
         <!-- web-app <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer" title="View the source code">v.{{ webapp_version }}</a>
         <br><i>Made by WeegeeNumbuh1</i> -->
     </div>
     <div class="main-btns">
-        <a href="{{ url_for('config_page') }}" class="btn btn-primary">Configure Settings</a>
-        <a href="{{ url_for('details_page') }}" class="btn btn-secondary">Details and Logs</a>
-        <a href="{{ url_for('updates_page') }}" class="btn btn-secondary">Check for Updates</a>
-        <a href="{{ url_for('startup_options') }}" class="btn btn-secondary">Change Startup Options</a>
-        <a href="{{ url_for('reference_guide') }}" class="btn btn-secondary" target="_blank">Help &amp; Reference</a>
+        <a href="{{ url_for('config_page') }}" class="btn btn-primary" title="Configure features like display layouts, colors, and aircraft tracking options">Configure Settings</a>
+        <a href="{{ url_for('details_page') }}" class="btn btn-secondary" title="View FlightGazer logs and check its current state">Details and Logs</a>
+        <a href="{{ url_for('updates_page') }}" class="btn btn-secondary" title="Check for & install the latest FlightGazer version">Check for Updates</a>
+        <a href="{{ url_for('startup_options') }}" class="btn btn-secondary" title="Advanced -- Change how FlightGazer runs">Change Startup Options</a>
+        <a href="{{ url_for('reference_guide') }}" class="btn btn-secondary" target="_blank" title="View tips, display output meanings, and get help with FlightGazer">Help &amp; Reference</a>
     </div>
-    <div class="quick-access-btns" id="quickAccessBtns" style="margin-top:32px; text-align:center;">
+    <div class="quick-access-btns" id="quickAccessBtns" style="margin-top:32px; text-align:center;" title="Shortcuts to other running services on this system">
         <!-- Show something (if available) before the page updates this section -->
         {% if localpages %}
             Quick links (opens a new tab)<br>
@@ -428,6 +428,7 @@ It\'s recommended to bookmark this page for easy access.\n\
                 const url = page[0];
                 link.href = url;
                 const btnPriority = page[1];
+                const linkTips = page[2];
                 link.target = '_blank';
                 link.rel = 'noopener noreferrer';
                 if (btnPriority < 1 || btnPriority > 2) {
@@ -442,6 +443,7 @@ It\'s recommended to bookmark this page for easy access.\n\
                 }
                 link.style.margin = '6px 8px';
                 link.style.minWidth = '220px';
+                link.title = linkTips;
                 link.textContent = label;
                 quickAccessDiv.appendChild(link);
             }
