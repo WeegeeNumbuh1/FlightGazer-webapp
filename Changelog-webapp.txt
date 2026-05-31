@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.0.7 - 2026-05-31
+    - Fix "back to home" button on the Config page,
+      which went back two levels of history instead of the expected one level
+
 v.1.0.6 - 2026-05-31
     - Change link names for some of the quick links
     - Add tooltips for the link buttons and configuration tabs

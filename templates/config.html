@@ -1114,7 +1114,6 @@ function goHome() {
         } else { // opened a new tab/window; just close it (browser should go to the referring tab)
             close();
         }
-        window.history.back();
     } else {
         // Direct access or from elsewhere: navigate to home (adds one entry)
         window.location.href = homeUrl;
