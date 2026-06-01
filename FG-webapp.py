@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.0.7 --- 2026-05-31"
+VERSION = "v.1.0.8 --- 2026-05-31"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'

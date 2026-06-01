@@ -21,6 +21,7 @@
         .monospace { font-family: monospace; }
         .sticky-col { position: sticky; left: 0; background-color: #fff; z-index: 1; }
         .form-control { max-width: 600px; min-width: 320px; }
+        .form-control-color { outline-style: dashed; padding: 0.25rem; }
         .form-select { max-width: 400px; }
     </style>
 <script>
@@ -167,7 +168,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                 <label for="API_KEY" class="form-label setting-label">API Key</label>
                 <div class="help-text">
                     Put your FlightAware API key here. Leave blank to not use the API.<br>
-                    <h5>Having an API key will enable the journey readout (the origin and departure info) for an aircraft.</h5><br>
+                    <h5>Having an API key will enable the journey readout (route info) for aircraft that enter your area.</h5><br>
                     Don't have one? Sign up at <a href="https://www.flightaware.com/commercial/aeroapi/#pricing-cards" target="_blank" rel="noopener noreferrer">FlightAware</a>
                     <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
                         <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">

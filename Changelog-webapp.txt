@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.0.8 - 2026-05-31
+    - Fix long-standing typo on config page (existed since v.0.17.0)
+    - Improve interaction hint for selecting a custom color in the color config section
+
 v.1.0.7 - 2026-05-31
     - Fix "back to home" button on the Config page,
       which went back two levels of history instead of the expected one level
