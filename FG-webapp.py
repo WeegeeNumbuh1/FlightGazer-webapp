@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.0.8 --- 2026-05-31"
+VERSION = "v.1.0.9 --- 2026-06-02"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -1758,7 +1758,7 @@ def reference_guide():
             found = False
             for available_key in key_view:
                 if lookup_key in available_key:
-                    if isinstance((adsb_root_ := localpages[available_key]), str):
+                    if isinstance((adsb_root_ := localpages[available_key][0]), str):
                         adsb_info = adsb_root_ + '/info'
                         adsb_logs = adsb_root_ + '/logs'
                         found = True
