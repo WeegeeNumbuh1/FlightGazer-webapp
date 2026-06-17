@@ -369,10 +369,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                     <div class="help-text">
                         Set the speed at which the scrolling text moves across the display.<br>
                         <details><summary>More details</summary>
-                        Recommended to keep this value between 20 - 30 for readability. Higher values may not be achievable depending on system conditions and configurations, especially if using the display emulator.<br>
+                        Recommended to keep this value between 20 - 40 for readability. Higher values may not be achievable depending on system conditions and configurations, especially if using the display emulator.<br>
                         Note: if using the emulator, the framerate is capped to 25 FPS, unless the emulator configuration is also changed correspondingly.
                         </details>
-                        <i>Default: 25</i>
+                        <i>Default: 30</i>
                     </div>
                     <div class="input-group">
                         <input type="range" class="form-range" min="10" max="50" id="SCROLLING_SPEED" name="SCROLLING_SPEED" value="{{ config.SCROLLING_SPEED }}" oninput="SCROLLING_SPEED_value.value = this.value; SCROLLING_SPEED_num.value = this.value">

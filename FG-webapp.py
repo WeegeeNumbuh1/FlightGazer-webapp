@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.0.9 --- 2026-06-02"
+VERSION = "v.1.0.10 --- 2026-06-17"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -306,9 +306,9 @@ def local_webpage_prober() -> dict:
     - Find adsb.im
         - Either at root IP address or at port 1099
     - Find tar1090
-        - Either at /tar1090 or port 8080
+        - Either at /tar1090 or ports 1090, 8080
     - Find graphs1090
-        - Either at /graphs1090 or port 8542
+        - Either at /graphs1090, 1099/graphs1090, or port 8542
     - Port 8888
         - The Display Emulator
     - Find Skystats
@@ -316,7 +316,7 @@ def local_webpage_prober() -> dict:
     - Find FA's SkyAware
         - /skyaware or port 8080 (handled with the tar1090 logic)
     - Find SkyAware UAT
-        - Either at /skyaware978 or port 8978
+        - Either at /skyaware978, 1091/skyaware978, or port 8978
     - Port 8088
         - Planefence
 
@@ -351,10 +351,26 @@ def local_webpage_prober() -> dict:
     candidates = {
         'adsb_root': [root, adsbim],
         'display_emulator': [f"http://{CURRENT_IP}:8888", "http://localhost:8888"],
-        'tar1090': [f"http://{CURRENT_IP}/tar1090", f"http://{CURRENT_IP}:8080"],
-        'skyaware': [f"http://{CURRENT_IP}/skyaware"],
-        'skyaware978': [f"http://{CURRENT_IP}/skyaware978", f"http://{CURRENT_IP}:8978"],
-        'graphs1090': [f"http://{CURRENT_IP}/graphs1090", f"http://{CURRENT_IP}:8542"],
+        'tar1090': [
+            f"http://{CURRENT_IP}/tar1090",
+            f"http://{CURRENT_IP}:1090",
+            f"http://{CURRENT_IP}:8080"
+            ],
+        'skyaware': [
+            f"http://{CURRENT_IP}/skyaware",
+            f"http://{CURRENT_IP}:1093"
+            ],
+        'skyaware978': [
+            f"http://{CURRENT_IP}/skyaware978",
+            f"http://{CURRENT_IP}/dump978",
+            f"http://{CURRENT_IP}:1091/skyaware978",
+            f"http://{CURRENT_IP}:8080"
+            ],
+        'graphs1090': [
+            f"http://{CURRENT_IP}/graphs1090",
+            f"http://{CURRENT_IP}:1090/graphs1090",
+            f"http://{CURRENT_IP}:8542"
+            ],
         'skystats': [f"http://{CURRENT_IP}/skystats", f"http://{CURRENT_IP}:5173"],
         'planefence': [f"http://{CURRENT_IP}:8088"],
     }
@@ -391,12 +407,11 @@ def local_webpage_prober() -> dict:
             case x if "SDR Setup" in x:
                 pages.update(
                     {"⚠️ SDR Disconnected! Click Here to Investigate/Fix":
-                     (root, 2, "Your SDR is having issues, please check on it")}
+                    (root, 2, "Your SDR is having issues, please check on it")}
                 )
                 RUNNING_ADSBIM = True
-            # case _: # something else is running here, link it anyway
-            #     pages.update({f"{local_page}"[:100]: root})
-    else:
+
+    if len(pages) == 0:
         local_page = results.get(adsbim)
         if match_title(local_page, "Feeder Homepage"):
             pages.update(
