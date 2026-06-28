@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.0.10 --- 2026-06-17"
+VERSION = "v.1.0.11 --- 2026-06-27"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -803,7 +803,11 @@ def probing_thread() -> None:
     stage2 = 32
     while True:
         if not localpages_timestamp or (monotonic() - localpages_timestamp > 15):
-            localpages = local_webpage_prober()
+            try:
+                localpages = local_webpage_prober()
+            except Exception as e:
+                localpages = {}
+                main_logger.exception(f"Local webpage prober failed: {e}")
             localpages_timestamp = monotonic()
         probing_cycle_count += 1
         if probing_cycle_count < stage1:
@@ -867,9 +871,13 @@ def api_localpages():
     if not localpages_timestamp or (monotonic() - localpages_timestamp > 15):
         # prevent spamming the local page discovery
         main_logger.debug("Running local webpage prober")
-        localpages = local_webpage_prober()
+        try:
+            localpages = local_webpage_prober()
+            main_logger.debug("Local webpage prober finished")
+        except Exception as e:
+            localpages = {}
+            main_logger.exception(f"Local webpage prober failed: {e}")
         localpages_timestamp = monotonic()
-        main_logger.debug("Local webpage prober finished")
     else:
         main_logger.debug("Local webpage cache still valid, using this instead")
     return jsonify(localpages)
@@ -1287,9 +1295,9 @@ def details_migrate_log():
         with open(MIGRATE_LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
             content = tail(f, 1000)
         header_line = ''
+        log_content_split = content
+        content = ''.join(log_content_split[-200:])
         if line_count > 200:
-            log_content_split = content
-            content = ''.join(log_content_split[-200:])
             header_line = (
                 f'<div class="logline"><i>Showing the latest 200 lines (out of {line_count})</i>.<br>'
                 'Download the file for complete data.<br><br></div>'
@@ -1310,7 +1318,7 @@ def details_migrate_log():
             return html
     except Exception as e:
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
-        return html + '<span style="color:#f66;font-family:monospace">Log file not found.<br>{e.__class__.__name__}: {e}</span></body></html>'
+        return html + f'<span style="color:#f66;font-family:monospace">Log file not found.<br>{e.__class__.__name__}: {e}</span></body></html>'
 
 @app.route('/details/download_migrate_log')
 def download_migrate_log():

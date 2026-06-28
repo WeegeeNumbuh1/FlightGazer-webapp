@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.0.11 - 2026-06-27
+    - Added support for new setting in FlightGazer v.11.4.0
+    - Minor fix for reading the migration log when below 200 lines
+
 v.1.0.10 - 2026-06-17
     - Improved link handling for more adsb.im container ports
     - Add new reference to airspy output

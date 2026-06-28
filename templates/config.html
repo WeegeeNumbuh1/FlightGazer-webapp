@@ -638,6 +638,17 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
                 </div>
             </div>
             <div class="mt-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="NO_DUMP978_SEARCH" name="NO_DUMP978_SEARCH" {% if config.NO_DUMP978_SEARCH %}checked{% endif %}>
+                    <label class="form-check-label setting-label" for="NO_DUMP978_SEARCH">No dump978 Search</label>
+                </div>
+                <div class="help-text">
+                    When enabled, FlightGazer does not check for dump978 instances at startup, shortening startup times.<br>
+                    If you're tracking UAT aircraft (U.S. only) and want FlightGazer to use this data, disable this setting.<br>
+                    <i>Default: Enabled</i>
+                </div>
+            </div>
+            <div class="mt-3">
                 <label for="CUSTOM_DUMP1090_LOCATION" class="form-label setting-label">Custom dump1090 Location</label>
                 <div class="help-text">
                     URL of your dump1090 install if it's in a different location or on a different network device.<br>
@@ -1367,6 +1378,7 @@ $(document).ready(function() {
         data['ENABLE_TWO_BRIGHTNESS'] = form.ENABLE_TWO_BRIGHTNESS && form.ENABLE_TWO_BRIGHTNESS.checked;
         data['USE_SUNRISE_SUNSET'] = form.USE_SUNRISE_SUNSET && form.USE_SUNRISE_SUNSET.checked;
         data['PREFER_LOCAL'] = form.PREFER_LOCAL && form.PREFER_LOCAL.checked;
+        data['NO_DUMP978_SEARCH'] = form.NO_DUMP978_SEARCH && form.NO_DUMP978_SEARCH.checked;
         data['HAT_PWM_ENABLED'] = form.HAT_PWM_ENABLED && form.HAT_PWM_ENABLED.checked;
         data['FASTER_REFRESH'] = form.FASTER_REFRESH && form.FASTER_REFRESH.checked;
         data['NO_GROUND_TRACKING'] = form.NO_GROUND_TRACKING && form.NO_GROUND_TRACKING.checked;
