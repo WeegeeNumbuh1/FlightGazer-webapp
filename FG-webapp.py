@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.0.11 --- 2026-06-27"
+VERSION = "v.1.0.12 --- 2026-07-07"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -104,7 +104,8 @@ try:
 except Exception:
     FLASK_VER = "Unknown"
 
-webapp_session = requests.session()
+webapp_session = requests.Session()
+outward_session = requests.Session()
 # note: unlike in the main FlightGazer application where we bother to clean up after outselves
 # we just let systemd/gunicorn kill these threads off when this exits (no `ThreadPool.shutdown()`)
 prober_tp = CF.ThreadPoolExecutor(max_workers=10, thread_name_prefix='LocalSiteProberWorker')
@@ -720,17 +721,21 @@ def update_fetcher() -> None:
     ver_file = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version'
     new_changelog = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt'
     if remote_ver is None:
-        remote_ver = requests.get(ver_file, timeout=10).text.strip()
-        remote_changelog_ = requests.get(new_changelog, timeout=10).text
+        remote_ver_resp = outward_session.get(ver_file, timeout=5)
+        remote_ver_resp.raise_for_status()
+        remote_ver = remote_ver_resp.text.strip()
+        remote_changelog_ = outward_session.get(new_changelog, timeout=5).text
         main_logger.info(f"Got changelog: {len(remote_changelog_) / 1024:.3f}KiB")
         remote_changelog = updated_changelog.write(remote_changelog_)
         main_logger.info(f"Version available online: {remote_ver}")
     else:
-        remote_ver_ = requests.get(ver_file, timeout=10).text.strip()
+        remote_ver_resp = outward_session.get(ver_file, timeout=5)
+        remote_ver_resp.raise_for_status()
+        remote_ver_ = remote_ver_resp.text.strip()
         if remote_ver_ != remote_ver:
             main_logger.info(f"Version available online: {remote_ver}")
             remote_ver = remote_ver_
-            remote_changelog_ = requests.get(new_changelog, timeout=10).text
+            remote_changelog_ = outward_session.get(new_changelog, timeout=5).text
             main_logger.info(f"Got changelog: {len(remote_changelog_) / 1024:.3f}KiB")
             remote_changelog = updated_changelog.write(remote_changelog_)
         else:
@@ -1069,6 +1074,7 @@ def update_config():
         'EXTENDED_DETAILS',
         'DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT',
         'API_PERSISTENT_CACHE',
+        'NO_DUMP978_SEARCH',
     ]
     # List of all numeric settings that may be missing
     numeric_keys = [
