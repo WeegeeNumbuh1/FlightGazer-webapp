@@ -5,6 +5,11 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.1.0 - 2026-07-17
+    - HTML reformatting and cleanups
+    - Add adsb.im helper scripts for the webapp installer
+    - Cleanups to the uninstaller and updater scripts
+
 v.1.0.12 - 2026-07-07
     - Improved HTTP error handling when checking for updates and use connection pooling
 

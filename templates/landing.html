@@ -1,187 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlightGazer - Home ({{ hostname }} at {{ ip_address }})</title>
-    <meta name="author" content="WeegeeNumbuh1">
-    <meta name="description" content="FlightGazer main landing page.">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        body { background: #181818; color: #fff; padding-bottom: 72px; }
-        .logo-container { text-align: center; margin-top: 24px; }
-        .logo-img { max-width: 340px; width: 100%; height: auto; }
-        .version-text { text-align: center; font-size: 1em; margin: 12px 0 32px 0; }
-        .main-btns { display: flex; flex-direction: column; align-items: center; gap: 22px; margin-top: 10px; }
-        .main-btns .btn { min-width: 260px; font-size: 1.15em; }
-        .quick-access-btns { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px; }
-        .quick-access-btns .btn { width: 260px; }
-        .footer { text-align: left; position: fixed; bottom: 24px; left: 24px; font-size: 0.5em; color:rgba(169, 169, 169, 0.6)}
-        .small-status {text-align: center; font-size: 0.6em; color:grey;}
-    </style>
-    <script type="text/javascript">
-    window.addEventListener("pageshow", function(event) {
-        var historyTraversal = event.persisted ||
-                            (typeof window.performance != "undefined" &&
-                                window.performance.navigation.type === 2);
-        if (historyTraversal) {
-        window.location.reload();
-        }
-    });
-    </script>
-</head>
-<body>
-    <div id="top-buttons" class="container py-4">
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:absolute;top:1.5rem;right:0.75rem;z-index:10;" title="Change Theme">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
-    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
-    </svg>
-    </button>
-    <button id="bookmarkBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:absolute;top:1.5rem;left:0.75rem;z-index:9;" title="About">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
-    </svg>
-    </button>
-    </div>
-    {% set status_color = '#3ecf4a' if status == 'running' else ('#888' if status == 'stopped' else '#e53935') %}
-    <div class="logo-container">
-        <a href="https://github.com/WeegeeNumbuh1/FlightGazer?tab=readme-ov-file#readme-top" target="_blank" rel="noopener noreferrer" title="View the project on GitHub!">
-            <img src="{{ url_for('static', filename='FlightGazer-logo.png') }}" width="340" height="133" alt="FlightGazer Logo" class="logo-img" fetchpriority=high>
-        </a>
-    </div>
-    <noscript>
-        <div class="container py-4" style="text-align:center; margin-top:10px; margin-bottom:2px;">
-        <p>
-        <h2>JavaScript is disabled in your browser.<br>
-            This is required for this web-app to work.<br>
-            Please enable JavaScript.</h2>
-        </p>
-        </div>
-    </noscript>
-    <div class="status-indicator" style="text-align:center; margin-top:10px; margin-bottom:2px;" title="Current FlightGazer status">
-        <span style="display:inline-block; width:18px; height:18px; border-radius:50%; vertical-align:middle; margin-right:7px; background: {{ status_color }}; border: 2px solid #222;"></span>
-        <span style="font-size:1.05em; vertical-align:middle;">
-            {% if status == 'running' %}FlightGazer is running
-            {% elif status == 'stopped' %}FlightGazer is not running
-            {% elif status == 'manually running' %}FlightGazer has been started manually
-            {% elif status == 'degraded' %}FlightGazer is degraded (check the logs)
-            {% else %}FlightGazer status error (check the logs){% endif %}
-        </span>
-        <div style="position: relative;margin: auto;width: 60%;">
-            <span class="small-status">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-motherboard" viewBox="0 0 16 16">
-                <path d="M11.5 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m2 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m-10 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zM5 3a1 1 0 0 0-1 1h-.5a.5.5 0 0 0 0 1H4v1h-.5a.5.5 0 0 0 0 1H4a1 1 0 0 0 1 1v.5a.5.5 0 0 0 1 0V8h1v.5a.5.5 0 0 0 1 0V8a1 1 0 0 0 1-1h.5a.5.5 0 0 0 0-1H9V5h.5a.5.5 0 0 0 0-1H9a1 1 0 0 0-1-1v-.5a.5.5 0 0 0-1 0V3H6v-.5a.5.5 0 0 0-1 0zm0 1h3v3H5zm6.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
-                <path d="M1 2a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 9H1V8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6H1V5H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 2zm1 11a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z"/>
-                </svg></span>
-            <span class="small-status" id="device-info" title="Device that FlightGazer runs on">FlightGazer IP address</span>
-        </div>
-        <div id="serviceStatus" style="position: relative;margin: auto;width: 60%;">
-            <span id="serviceStatusMsg" style="color:#eda907;text-align: center;"></span>
-        </div>
-    </div>
-    <div class="version-text" title="Current version of FlightGazer">
-        Version {{ version }}
-        <span id="update_text" style="color:#16b85f;text-align: center; font-size: 0.7em;" title="Go to the Updates page to check out the changes!"></span>
-    </div>
-    <div class="footer">
-        <!-- web-app <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer" title="View the source code">v.{{ webapp_version }}</a>
-        <br><i>Made by WeegeeNumbuh1</i> -->
-    </div>
-    <div class="main-btns">
-        <a href="{{ url_for('config_page') }}" class="btn btn-primary" title="Configure features like display layouts, colors, and aircraft tracking options">Configure Settings</a>
-        <a href="{{ url_for('details_page') }}" class="btn btn-secondary" title="View FlightGazer logs and check its current state">Details and Logs</a>
-        <a href="{{ url_for('updates_page') }}" class="btn btn-secondary" title="Check for & install the latest FlightGazer version">Check for Updates</a>
-        <a href="{{ url_for('startup_options') }}" class="btn btn-secondary" title="Advanced -- Change how FlightGazer runs">Change Startup Options</a>
-        <a href="{{ url_for('reference_guide') }}" class="btn btn-secondary" target="_blank" title="View tips, display output meanings, and get help with FlightGazer">Help &amp; Reference</a>
-    </div>
-    <div class="quick-access-btns" id="quickAccessBtns" style="margin-top:32px; text-align:center;" title="Shortcuts to other running services on this system">
-        <!-- Show something (if available) before the page updates this section -->
-        {% if localpages %}
-            Quick links (opens a new tab)<br>
-            {% for label, page in localpages.items() %}
-            <a href="{{ page[0] }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary" style="margin:6px 8px; min-width:220px;">{{ label }}</a>
-            {% endfor %}
-            {% endif %}
-            <span class="small-status">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hourglass-split" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z"/>
-                </svg>
-                <i>Refreshing links...</i></span><br>
-    </div>
-    <div id="serviceControlBtns" style="position:fixed;bottom:24px;right:24px;z-index:1000; font-size: 0.7em; color:rgba(169, 169, 169, 0.6)">
-        <div class="btn-group dropup" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)" title="FlightGazer controls">
-            <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M7.5 1v7h1V1z"/>
-            <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
-            </svg>
-            </button>
-            <ul class="dropdown-menu" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);z-index: 1001;">
-                <li><h6 class="dropdown-header" id="serviceBtnOverlay"></h6></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><button class="dropdown-item" id="startServiceBtn" title="Start FlightGazer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-play-circle" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445"/>
-                </svg>
-                    Start</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><button class="dropdown-item" id="restartServiceBtn" title="Restart FlightGazer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16" aria-hidden="true">
-                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
-                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
-                </svg>
-                    Restart</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><button class="dropdown-item" id="stopServiceBtn" title="Stop FlightGazer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-stop-circle" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                <path d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5z"/>
-                </svg>
-                    Stop</a></li>
-            </ul>
-        </div>
-    </div>
 
-    <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
-    <script>
-        function setTheme(theme) {
-            if (theme === 'light') {
-                document.body.style.background = '#f8f9fa';
-                document.body.style.color = '#222';
-                let alerts = document.querySelectorAll('.alert');
-                alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
-                document.documentElement.setAttribute("data-bs-theme", theme);
-            } else {
-                document.body.style.background = '#181818';
-                document.body.style.color = '#fff';
-                let alerts = document.querySelectorAll('.alert');
-                alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
-                document.documentElement.setAttribute("data-bs-theme", theme);
-            }
-        }
-        function getPreferredTheme() {
-            if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        function toggleTheme() {
-            let current = getPreferredTheme();
-            let next = current === 'dark' ? 'light' : 'dark';
-            localStorage.setItem('fg_theme', next);
-            setTheme(next);
-        }
-        document.getElementById('themeToggleBtn').onclick = toggleTheme;
-        setTheme(getPreferredTheme());
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
-        });
-    </script>
-    <script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlightGazer - Home ({{ hostname }} at {{ ip_address }})</title>
+  <meta name="author" content="WeegeeNumbuh1">
+  <meta name="description" content="FlightGazer main landing page.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+      padding-bottom: 72px;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .logo-img {
+      max-width: 340px;
+      width: 100%;
+      height: auto;
+    }
+
+    .version-text {
+      text-align: center;
+      font-size: 1em;
+      margin: 12px 0 32px 0;
+    }
+
+    .main-btns {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      margin-top: 10px;
+    }
+
+    .main-btns .btn {
+      min-width: 260px;
+      font-size: 1.15em;
+    }
+
+    .quick-access-btns {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .quick-access-btns .btn {
+      width: 260px;
+    }
+
+    .footer {
+      text-align: left;
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      font-size: 0.5em;
+      color: rgba(169, 169, 169, 0.6)
+    }
+
+    .small-status {
+      text-align: center;
+      font-size: 0.6em;
+      color: grey;
+    }
+  </style>
+  <script type="text/javascript">
+    window.addEventListener("pageshow", function (event) {
+      var historyTraversal = event.persisted ||
+        (typeof window.performance != "undefined" &&
+          window.performance.navigation.type === 2);
+      if (historyTraversal) {
+        window.location.reload();
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div id="top-buttons" class="container py-4">
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end"
+      style="position:absolute;top:1.5rem;right:0.75rem;z-index:10;" title="Change Theme">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278" />
+        <path
+          d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z" />
+      </svg>
+    </button>
+    <button id="bookmarkBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end"
+      style="position:absolute;top:1.5rem;left:0.75rem;z-index:9;" title="About">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2" />
+      </svg>
+    </button>
+  </div>
+  {% set status_color = '#3ecf4a' if status == 'running' else ('#888' if status == 'stopped' else '#e53935') %}
+  <div class="logo-container">
+    <a href="https://github.com/WeegeeNumbuh1/FlightGazer?tab=readme-ov-file#readme-top" target="_blank"
+      rel="noopener noreferrer" title="View the project on GitHub!">
+      <img src="{{ url_for('static', filename='FlightGazer-logo.png') }}" width="340" height="133"
+        alt="FlightGazer Logo" class="logo-img" fetchpriority=high>
+    </a>
+  </div>
+  <noscript>
+    <div class="container py-4" style="text-align:center; margin-top:10px; margin-bottom:2px;">
+      <p>
+      <h2>JavaScript is disabled in your browser.<br>
+        This is required for this web-app to work.<br>
+        Please enable JavaScript.</h2>
+      </p>
+    </div>
+  </noscript>
+  <div class="status-indicator" style="text-align:center; margin-top:10px; margin-bottom:2px;"
+    title="Current FlightGazer status">
+    <span
+      style="display:inline-block; width:18px; height:18px; border-radius:50%; vertical-align:middle; margin-right:7px; background: {{ status_color }}; border: 2px solid #222;"></span>
+    <span style="font-size:1.05em; vertical-align:middle;">
+      {% if status == 'running' %}FlightGazer is running
+      {% elif status == 'stopped' %}FlightGazer is not running
+      {% elif status == 'manually running' %}FlightGazer has been started manually
+      {% elif status == 'degraded' %}FlightGazer is degraded (check the logs)
+      {% else %}FlightGazer status error (check the logs){% endif %}
+    </span>
+    <div style="position: relative;margin: auto;width: 60%;">
+      <span class="small-status">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-motherboard"
+          viewBox="0 0 16 16">
+          <path
+            d="M11.5 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m2 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m-10 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zM5 3a1 1 0 0 0-1 1h-.5a.5.5 0 0 0 0 1H4v1h-.5a.5.5 0 0 0 0 1H4a1 1 0 0 0 1 1v.5a.5.5 0 0 0 1 0V8h1v.5a.5.5 0 0 0 1 0V8a1 1 0 0 0 1-1h.5a.5.5 0 0 0 0-1H9V5h.5a.5.5 0 0 0 0-1H9a1 1 0 0 0-1-1v-.5a.5.5 0 0 0-1 0V3H6v-.5a.5.5 0 0 0-1 0zm0 1h3v3H5zm6.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z" />
+          <path
+            d="M1 2a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 9H1V8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6H1V5H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 2zm1 11a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1z" />
+        </svg></span>
+      <span class="small-status" id="device-info" title="Device that FlightGazer runs on">FlightGazer IP address</span>
+    </div>
+    <div id="serviceStatus" style="position: relative;margin: auto;width: 60%;">
+      <span id="serviceStatusMsg" style="color:#eda907;text-align: center;"></span>
+    </div>
+  </div>
+  <div class="version-text" title="Current version of FlightGazer">
+    Version {{ version }}
+    <span id="update_text" style="color:#16b85f;text-align: center; font-size: 0.7em;"
+      title="Go to the Updates page to check out the changes!"></span>
+  </div>
+  <div class="footer">
+    <!-- web-app <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer" title="View the source code">v.{{ webapp_version }}</a>
+        <br><i>Made by WeegeeNumbuh1</i> -->
+  </div>
+  <div class="main-btns">
+    <a href="{{ url_for('config_page') }}" class="btn btn-primary"
+      title="Configure features like display layouts, colors, and aircraft tracking options">Configure Settings</a>
+    <a href="{{ url_for('details_page') }}" class="btn btn-secondary"
+      title="View FlightGazer logs and check its current state">Details and Logs</a>
+    <a href="{{ url_for('updates_page') }}" class="btn btn-secondary"
+      title="Check for & install the latest FlightGazer version">Check for Updates</a>
+    <a href="{{ url_for('startup_options') }}" class="btn btn-secondary"
+      title="Advanced -- Change how FlightGazer runs">Change Startup Options</a>
+    <a href="{{ url_for('reference_guide') }}" class="btn btn-secondary" target="_blank"
+      title="View tips, display output meanings, and get help with FlightGazer">Help &amp; Reference</a>
+  </div>
+  <div class="quick-access-btns" id="quickAccessBtns" style="margin-top:32px; text-align:center;"
+    title="Shortcuts to other running services on this system">
+    <!-- Show something (if available) before the page updates this section -->
+    {% if localpages %}
+    Quick links (opens a new tab)<br>
+    {% for label, page in localpages.items() %}
+    <a href="{{ page[0] }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary"
+      style="margin:6px 8px; min-width:220px;">{{ label }}</a>
+    {% endfor %}
+    {% endif %}
+    <span class="small-status">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hourglass-split"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z" />
+      </svg>
+      <i>Refreshing links...</i></span><br>
+  </div>
+  <div id="serviceControlBtns"
+    style="position:fixed;bottom:24px;right:24px;z-index:1000; font-size: 0.7em; color:rgba(169, 169, 169, 0.6)">
+    <div class="btn-group dropup" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"
+      title="FlightGazer controls">
+      <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-power"
+          viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M7.5 1v7h1V1z" />
+          <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
+        </svg>
+      </button>
+      <ul class="dropdown-menu"
+        style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);z-index: 1001;">
+        <li>
+          <h6 class="dropdown-header" id="serviceBtnOverlay"></h6>
+        </li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li><button class="dropdown-item" id="startServiceBtn" title="Start FlightGazer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-play-circle"
+              viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+              <path
+                d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445" />
+            </svg>
+            Start</a></li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li><button class="dropdown-item" id="restartServiceBtn" title="Restart FlightGazer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+              class="bi bi-arrow-clockwise" viewBox="0 0 16 16" aria-hidden="true">
+              <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+              <path
+                d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+            </svg>
+            Restart</a></li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li><button class="dropdown-item" id="stopServiceBtn" title="Stop FlightGazer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-stop-circle"
+              viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+              <path
+                d="M5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5z" />
+            </svg>
+            Stop</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
+  <script>
+    function setTheme(theme) {
+      if (theme === 'light') {
+        document.body.style.background = '#f8f9fa';
+        document.body.style.color = '#222';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
+        document.documentElement.setAttribute("data-bs-theme", theme);
+      } else {
+        document.body.style.background = '#181818';
+        document.body.style.color = '#fff';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
+        document.documentElement.setAttribute("data-bs-theme", theme);
+      }
+    }
+    function getPreferredTheme() {
+      if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function toggleTheme() {
+      let current = getPreferredTheme();
+      let next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('fg_theme', next);
+      setTheme(next);
+    }
+    document.getElementById('themeToggleBtn').onclick = toggleTheme;
+    setTheme(getPreferredTheme());
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+    });
+  </script>
+  <script>
     const statusURL = "{{ url_for('service_status') }}";
     const serviceRestart = "{{ url_for('restart_flightgazer') }}";
     const serviceStop = "{{ url_for('stop_flightgazer_service') }}";
@@ -191,217 +289,217 @@
     const SERVICE_BTN_TIMEOUT_MS = 30000;
 
     function setButtonsDisabled(disabled) {
-        ['startServiceBtn', 'restartServiceBtn', 'stopServiceBtn'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.disabled = disabled;
-        });
+      ['startServiceBtn', 'restartServiceBtn', 'stopServiceBtn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = disabled;
+      });
     }
 
     function saveDisableUntil(ts) {
-        try { localStorage.setItem(SERVICE_BTN_DISABLE_KEY, String(ts)); } catch(e) {}
+      try { localStorage.setItem(SERVICE_BTN_DISABLE_KEY, String(ts)); } catch (e) { }
     }
 
     function clearDisableUntil() {
-        try { localStorage.removeItem(SERVICE_BTN_DISABLE_KEY); } catch(e) {}
+      try { localStorage.removeItem(SERVICE_BTN_DISABLE_KEY); } catch (e) { }
     }
 
     function scheduleReenable(untilTs) {
-        const remaining = Math.max(0, untilTs - Date.now());
-        setTimeout(() => {
-            // only re-enable if the saved expiry has passed
-            const saved = Number(localStorage.getItem(SERVICE_BTN_DISABLE_KEY));
-            if (!saved || Date.now() >= saved) {
-                setButtonsDisabled(false);
-                serviceBtnTxt(false);
-                clearDisableUntil();
-            }
-        }, remaining);
+      const remaining = Math.max(0, untilTs - Date.now());
+      setTimeout(() => {
+        // only re-enable if the saved expiry has passed
+        const saved = Number(localStorage.getItem(SERVICE_BTN_DISABLE_KEY));
+        if (!saved || Date.now() >= saved) {
+          setButtonsDisabled(false);
+          serviceBtnTxt(false);
+          clearDisableUntil();
+        }
+      }, remaining);
     }
 
     function serviceBtnTxt(flag) {
-       const overlay = document.getElementById('serviceBtnOverlay');
-       if (flag === true) {
-           showTemporaryMessage('serviceBtnOverlay', 'You can try again in a few moments.', SERVICE_BTN_TIMEOUT_MS, "FlightGazer controls");
-       } else {
-           overlay.innerText = "FlightGazer controls";
-       }
+      const overlay = document.getElementById('serviceBtnOverlay');
+      if (flag === true) {
+        showTemporaryMessage('serviceBtnOverlay', 'You can try again in a few moments.', SERVICE_BTN_TIMEOUT_MS, "FlightGazer controls");
+      } else {
+        overlay.innerText = "FlightGazer controls";
+      }
     }
 
     function disableServiceBtns() {
-        const until = Date.now() + SERVICE_BTN_TIMEOUT_MS;
-        const overlay = document.getElementById('serviceBtnOverlay');
-        saveDisableUntil(until);
-        setButtonsDisabled(true);
-        serviceBtnTxt(true);
-        scheduleReenable(until);
+      const until = Date.now() + SERVICE_BTN_TIMEOUT_MS;
+      const overlay = document.getElementById('serviceBtnOverlay');
+      saveDisableUntil(until);
+      setButtonsDisabled(true);
+      serviceBtnTxt(true);
+      scheduleReenable(until);
     }
 
     function restoreButtonStateFromStorage() {
-        try {
-            const saved = Number(localStorage.getItem(SERVICE_BTN_DISABLE_KEY));
-            if (saved && Date.now() < saved) {
-                setButtonsDisabled(true);
-                serviceBtnTxt(true);
-                scheduleReenable(saved);
-            } else {
-                setButtonsDisabled(false);
-                serviceBtnTxt(false);
-                clearDisableUntil();
-            }
-        } catch (e) {
-            // localStorage unavailable — default behavior: don't persist
-            setButtonsDisabled(false);
+      try {
+        const saved = Number(localStorage.getItem(SERVICE_BTN_DISABLE_KEY));
+        if (saved && Date.now() < saved) {
+          setButtonsDisabled(true);
+          serviceBtnTxt(true);
+          scheduleReenable(saved);
+        } else {
+          setButtonsDisabled(false);
+          serviceBtnTxt(false);
+          clearDisableUntil();
         }
+      } catch (e) {
+        // localStorage unavailable — default behavior: don't persist
+        setButtonsDisabled(false);
+      }
     }
 
     function confirmAction(msg, cb) {
-        if (window.confirm(msg)) cb();
+      if (window.confirm(msg)) cb();
     }
     // show a message in an element and clear it after `timeout` ms,
     // but only if the element hasn't been written to again
     function showTemporaryMessage(elemId, message, timeout = 10000, restoreText) {
-        const el = document.getElementById(elemId);
-        if (!el) return;
-        // per-element message id so older timers don't clear newer messages
-        el.dataset.msgId = String((parseInt(el.dataset.msgId || '0', 10) + 1));
-        const myId = el.dataset.msgId;
-        el.innerText = message;
-        if (el._fg_clearTimeout) clearTimeout(el._fg_clearTimeout);
-        el._fg_clearTimeout = setTimeout(() => {
-            if (el.dataset.msgId === myId) {
-                el.innerText = restoreText;
-                delete el.dataset.msgId;
-                el._fg_clearTimeout = null;
-            }
-        }, timeout);
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      // per-element message id so older timers don't clear newer messages
+      el.dataset.msgId = String((parseInt(el.dataset.msgId || '0', 10) + 1));
+      const myId = el.dataset.msgId;
+      el.innerText = message;
+      if (el._fg_clearTimeout) clearTimeout(el._fg_clearTimeout);
+      el._fg_clearTimeout = setTimeout(() => {
+        if (el.dataset.msgId === myId) {
+          el.innerText = restoreText;
+          delete el.dataset.msgId;
+          el._fg_clearTimeout = null;
+        }
+      }, timeout);
     }
 
-    document.getElementById('startServiceBtn').onclick = function() {
-        confirmAction('Start FlightGazer service?', function() {
-            disableServiceBtns();
-            serviceBtnTxt(true);
-            document.getElementById('serviceStatusMsg').innerText = 'Starting...';
-            fetch(serviceStart, {method:'POST'}).then(r => r.json()).then(data => {
-                if (data.status === 'already_running') {
-                    showTemporaryMessage('serviceStatusMsg', 'FlightGazer is already running.', 15000, '');
-                    alert('FlightGazer is already running.');
-                } else if (data.status === 'started') {
-                    showTemporaryMessage('serviceStatusMsg', 'Service started.', 15000, '');
-                } else {
-                    showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000, '');
-                }
-            }).catch(error => {
-                showTemporaryMessage('serviceStatusMsg', 'Failed to start service.', 60000, '');
-            });
+    document.getElementById('startServiceBtn').onclick = function () {
+      confirmAction('Start FlightGazer service?', function () {
+        disableServiceBtns();
+        serviceBtnTxt(true);
+        document.getElementById('serviceStatusMsg').innerText = 'Starting...';
+        fetch(serviceStart, { method: 'POST' }).then(r => r.json()).then(data => {
+          if (data.status === 'already_running') {
+            showTemporaryMessage('serviceStatusMsg', 'FlightGazer is already running.', 15000, '');
+            alert('FlightGazer is already running.');
+          } else if (data.status === 'started') {
+            showTemporaryMessage('serviceStatusMsg', 'Service started.', 15000, '');
+          } else {
+            showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000, '');
+          }
+        }).catch(error => {
+          showTemporaryMessage('serviceStatusMsg', 'Failed to start service.', 60000, '');
         });
+      });
     };
-    document.getElementById('restartServiceBtn').onclick = function() {
-        confirmAction('Restart FlightGazer service?', function() {
-            disableServiceBtns();
-            serviceBtnTxt(true);
-            document.getElementById('serviceStatusMsg').innerText = 'Restarting...';
-            fetch(serviceRestart, {method:'POST'}).then(r => r.json()).then(data => {
-                if (data.status === 'success') {
-                    showTemporaryMessage('serviceStatusMsg', 'Service successfully restarted.', 15000, '');
-                } else {
-                    showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000, '');
-                }
-            }).catch(error => {
-                showTemporaryMessage('serviceStatusMsg', 'Failed to restart service.', 60000, '');
-            });
+    document.getElementById('restartServiceBtn').onclick = function () {
+      confirmAction('Restart FlightGazer service?', function () {
+        disableServiceBtns();
+        serviceBtnTxt(true);
+        document.getElementById('serviceStatusMsg').innerText = 'Restarting...';
+        fetch(serviceRestart, { method: 'POST' }).then(r => r.json()).then(data => {
+          if (data.status === 'success') {
+            showTemporaryMessage('serviceStatusMsg', 'Service successfully restarted.', 15000, '');
+          } else {
+            showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000, '');
+          }
+        }).catch(error => {
+          showTemporaryMessage('serviceStatusMsg', 'Failed to restart service.', 60000, '');
         });
+      });
     };
-    document.getElementById('stopServiceBtn').onclick = function() {
-        confirmAction('Stop FlightGazer service?', function() {
-            disableServiceBtns();
-            serviceBtnTxt(true);
-            document.getElementById('serviceStatusMsg').innerText = 'Stopping...';
-            fetch(serviceStop, {method:'POST'}).then(r => r.json()).then(data => {
-                if (data.status === 'already_stopped') {
-                    showTemporaryMessage('serviceStatusMsg', 'FlightGazer is already stopped.', 15000, '');
-                    alert('FlightGazer is already stopped.');
-                } else if (data.status === 'stopped') {
-                    showTemporaryMessage('serviceStatusMsg', 'Service stopped.', 15000, '');
-                } else {
-                    document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
-                    showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000, '');
-                }
-            }).catch(error => {
-                showTemporaryMessage('serviceStatusMsg', 'Failed to stop service.', 60000, '');
-            });
+    document.getElementById('stopServiceBtn').onclick = function () {
+      confirmAction('Stop FlightGazer service?', function () {
+        disableServiceBtns();
+        serviceBtnTxt(true);
+        document.getElementById('serviceStatusMsg').innerText = 'Stopping...';
+        fetch(serviceStop, { method: 'POST' }).then(r => r.json()).then(data => {
+          if (data.status === 'already_stopped') {
+            showTemporaryMessage('serviceStatusMsg', 'FlightGazer is already stopped.', 15000, '');
+            alert('FlightGazer is already stopped.');
+          } else if (data.status === 'stopped') {
+            showTemporaryMessage('serviceStatusMsg', 'Service stopped.', 15000, '');
+          } else {
+            document.getElementById('serviceStatusMsg').innerText = data.error || 'Error.';
+            showTemporaryMessage('serviceStatusMsg', data.error || 'Error.', 60000, '');
+          }
+        }).catch(error => {
+          showTemporaryMessage('serviceStatusMsg', 'Failed to stop service.', 60000, '');
         });
+      });
     };
-    document.getElementById("bookmarkBtn").addEventListener("click", function() {
-        alert('This is the FlightGazer-webapp (v.{{ webapp_version }}), made by WeegeeNumbuh1.\n{{ label }}\n\
+    document.getElementById("bookmarkBtn").addEventListener("click", function () {
+      alert('This is the FlightGazer-webapp (v.{{ webapp_version }}), made by WeegeeNumbuh1.\n{{ label }}\n\
 To see the source code, click the FlightGazer logo on this page.\n\n\
 It\'s recommended to bookmark this page for easy access.\n\
 - If you\'re on a computer, press ' + (navigator.userAgent.toLowerCase().indexOf('mac') != - 1 ? 'Command/Cmd' : 'CTRL') + ' + D to bookmark this page.\n\
 - If you\'re using a mobile device, open your browser\'s menu and select the option to bookmark this page.')
-  });
+    });
 
     document.getElementById("device-info").innerText = '{{ hostname }} @ {{ ip_address }}';
 
     let updateNotif = "{{ update_avail }}"
     if (updateNotif === "True") {
-        document.getElementById("update_text").innerHTML = '<br>\
+      document.getElementById("update_text").innerHTML = '<br>\
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-megaphone-fill" viewBox="0 0 16 16" aria-hidden="true">\
         <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0zm-1 .724c-2.067.95-4.539 1.481-7 1.656v6.237a25 25 0 0 1 1.088.085c2.053.204 4.038.668 5.912 1.56zm-8 7.841V4.934c-.68.027-1.399.043-2.008.053A2.02 2.02 0 0 0 0 7v2c0 1.106.896 1.996 1.994 2.009l.496.008a64 64 0 0 1 1.51.048m1.39 1.081q.428.032.85.078l.253 1.69a1 1 0 0 1-.983 1.187h-.548a1 1 0 0 1-.916-.599l-1.314-2.48a66 66 0 0 1 1.692.064q.491.026.966.06"/>\
         </svg> Update available!'
     }
 
     function updateStatusIndicator() {
-        let statusText = '';
-        let statusColor = '#888';
-        fetch(statusURL).then(r => r.json()).then(data => {
-            let status = data.status;
-            if (status === 'running') {
-                statusColor = '#3ecf4a';
-                statusText = 'FlightGazer is running';
-            } else if (status === 'stopped') {
-                statusColor = '#888';
-                statusText = 'FlightGazer is not running';
-            } else if (status === 'manually running') {
-                statusColor = '#ffd710';
-                statusText = 'FlightGazer has been started manually';
-            } else if (status === 'failed') {
-                statusColor = '#e53935';
-                statusText = 'FlightGazer status error (check the logs)';
-            } else if (status === 'degraded') {
-                statusColor = '#ffd710';
-                statusText = 'FlightGazer is degraded (check the logs)';
-            }
-            document.querySelector('.status-indicator span').style.background = statusColor;
-            document.querySelector('.status-indicator span + span').innerText = statusText;
-        }).catch(error => {
-            console.error('Could not determine status ->', error);
-            statusText = 'Could not determine status';
-            document.querySelector('.status-indicator span').style.background = statusColor;
-            document.querySelector('.status-indicator span + span').innerText = statusText;
-        })
+      let statusText = '';
+      let statusColor = '#888';
+      fetch(statusURL).then(r => r.json()).then(data => {
+        let status = data.status;
+        if (status === 'running') {
+          statusColor = '#3ecf4a';
+          statusText = 'FlightGazer is running';
+        } else if (status === 'stopped') {
+          statusColor = '#888';
+          statusText = 'FlightGazer is not running';
+        } else if (status === 'manually running') {
+          statusColor = '#ffd710';
+          statusText = 'FlightGazer has been started manually';
+        } else if (status === 'failed') {
+          statusColor = '#e53935';
+          statusText = 'FlightGazer status error (check the logs)';
+        } else if (status === 'degraded') {
+          statusColor = '#ffd710';
+          statusText = 'FlightGazer is degraded (check the logs)';
+        }
+        document.querySelector('.status-indicator span').style.background = statusColor;
+        document.querySelector('.status-indicator span + span').innerText = statusText;
+      }).catch(error => {
+        console.error('Could not determine status ->', error);
+        statusText = 'Could not determine status';
+        document.querySelector('.status-indicator span').style.background = statusColor;
+        document.querySelector('.status-indicator span + span').innerText = statusText;
+      })
     }
     let statusPollingInterval;
 
     function startStatusPolling() {
-        if (!statusPollingInterval) {
-            updateStatusIndicator();
-            statusPollingInterval = setInterval(updateStatusIndicator, 10000);
-        }
+      if (!statusPollingInterval) {
+        updateStatusIndicator();
+        statusPollingInterval = setInterval(updateStatusIndicator, 10000);
+      }
     }
 
     function stopStatusPolling() {
-        if (statusPollingInterval) {
-            clearInterval(statusPollingInterval);
-            statusPollingInterval = null;
-        }
+      if (statusPollingInterval) {
+        clearInterval(statusPollingInterval);
+        statusPollingInterval = null;
+      }
     }
 
     // Handle page visibility changes
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            stopStatusPolling();
-        } else {
-            startStatusPolling();
-        }
+      if (document.hidden) {
+        stopStatusPolling();
+      } else {
+        startStatusPolling();
+      }
     });
 
     // Initial call and start polling
@@ -409,61 +507,62 @@ It\'s recommended to bookmark this page for easy access.\n\
 
     // load and render local pages
     async function loadLocalPages() {
-        try {
-            const response = await fetch(localPagesURL);
-            const localpages = await response.json();
-            const quickAccessDiv = document.getElementById('quickAccessBtns');
+      try {
+        const response = await fetch(localPagesURL);
+        const localpages = await response.json();
+        const quickAccessDiv = document.getElementById('quickAccessBtns');
 
-            if (Object.keys(localpages).length === 0) {
-                quickAccessDiv.style.display = 'none';
-                return;
-            }
-
-            // clear existing content
-            quickAccessDiv.innerHTML = 'Quick links (opens a new tab)<br>';
-
-            // add buttons for each local page
-            for (const [label, page] of Object.entries(localpages)) {
-                const link = document.createElement('a');
-                const url = page[0];
-                link.href = url;
-                const btnPriority = page[1];
-                const linkTips = page[2];
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                if (btnPriority < 1 || btnPriority > 2) {
-                    link.className = 'btn btn-outline-secondary';
-                } else if (btnPriority === 1) {
-                    link.className = 'btn btn-success';
-                } else if (btnPriority === 2) {
-                    link.className = 'btn btn-warning';
-                    link.style.fontWeight = 'bold';
-                } else {
-                    link.className = 'btn btn-outline-secondary';
-                }
-                link.style.margin = '6px 8px';
-                link.style.minWidth = '220px';
-                link.title = linkTips;
-                link.textContent = label;
-                quickAccessDiv.appendChild(link);
-            }
-            quickAccessDiv.style.display = 'flex';
-        } catch (error) {
-            // silently fail, don't show error to user
+        if (Object.keys(localpages).length === 0) {
+          quickAccessDiv.style.display = 'none';
+          return;
         }
+
+        // clear existing content
+        quickAccessDiv.innerHTML = 'Quick links (opens a new tab)<br>';
+
+        // add buttons for each local page
+        for (const [label, page] of Object.entries(localpages)) {
+          const link = document.createElement('a');
+          const url = page[0];
+          link.href = url;
+          const btnPriority = page[1];
+          const linkTips = page[2];
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          if (btnPriority < 1 || btnPriority > 2) {
+            link.className = 'btn btn-outline-secondary';
+          } else if (btnPriority === 1) {
+            link.className = 'btn btn-success';
+          } else if (btnPriority === 2) {
+            link.className = 'btn btn-warning';
+            link.style.fontWeight = 'bold';
+          } else {
+            link.className = 'btn btn-outline-secondary';
+          }
+          link.style.margin = '6px 8px';
+          link.style.minWidth = '220px';
+          link.title = linkTips;
+          link.textContent = label;
+          quickAccessDiv.appendChild(link);
+        }
+        quickAccessDiv.style.display = 'flex';
+      } catch (error) {
+        // silently fail, don't show error to user
+      }
     }
 
     // keep other tabs/windows in sync
     window.addEventListener('storage', (e) => {
-        if (e.key === SERVICE_BTN_DISABLE_KEY) {
-            restoreButtonStateFromStorage();
-        }
+      if (e.key === SERVICE_BTN_DISABLE_KEY) {
+        restoreButtonStateFromStorage();
+      }
     });
 
     // call at startup to restore persisted state
     restoreButtonStateFromStorage();
     // load local pages on page load
     loadLocalPages();
-    </script>
+  </script>
 </body>
+
 </html>

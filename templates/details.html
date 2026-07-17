@@ -1,335 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlightGazer - Details and Logs</title>
-    <meta name="author" content="WeegeeNumbuh1">
-    <meta name="description" content="FlightGazer logs and stats viewer.">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        body { background: #181818; color: #fff; }
-        .centered { text-align: center; margin-top: 60px; }
-        .back-btn { margin-top: 40px; }
-        .faint-text { font-size: 0.9em; color: #666; margin-bottom: 0.25em; font-style: italic; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlightGazer - Details and Logs</title>
+  <meta name="author" content="WeegeeNumbuh1">
+  <meta name="description" content="FlightGazer logs and stats viewer.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+    }
+
+    .centered {
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .back-btn {
+      margin-top: 40px;
+    }
+
+    .faint-text {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 0.25em;
+      font-style: italic;
+    }
+  </style>
 </head>
+
 <body>
-<div class="container py-4">
+  <div class="container py-4">
     <button id="backToHomeBtn" class="btn btn btn-info">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16" aria-hidden="true">
-    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-    </svg>
-        Back to Home</button>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:relative;z-index:10;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill" viewBox="0 0 16 16">
-    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
-    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
-    </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+      </svg>
+      Back to Home</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end"
+      style="position:relative;z-index:10;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill"
+        viewBox="0 0 16 16">
+        <path
+          d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278" />
+        <path
+          d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z" />
+      </svg>
     </button>
     <h2 class="mb-4">Details and Logs</h2>
-    <details style="padding-bottom: 24px;"><summary>Show/Hide <b>Download</b> buttons</summary>
-    <div class="mb-2 d-flex flex-wrap gap-2" style="padding-top: 16px;">
+    <details style="padding-bottom: 24px;">
+      <summary>Show/Hide <b>Download</b> buttons</summary>
+      <div class="mb-2 d-flex flex-wrap gap-2" style="padding-top: 16px;">
         <a href="{{ url_for('download_json') }}" class="btn btn-sm btn-secondary" download>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
-        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-        </svg>
-            Live Details</a>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+            <path
+              d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+          </svg>
+          Live Details</a>
         <a href="{{ url_for('download_log') }}" class="btn btn-sm btn-secondary" download>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
-        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-        </svg>
-            Main Log</a>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+            <path
+              d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+          </svg>
+          Main Log</a>
         <a href="{{ url_for('download_init_log') }}" class="btn btn-sm btn-secondary" download>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
-        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-        </svg>
-            Initialization Log</a>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+            <path
+              d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+          </svg>
+          Initialization Log</a>
         <a href="{{ url_for('download_flybys_csv') }}" class="btn btn-sm btn-secondary" download>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
-        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-        </svg>
-            Hourly Data</a>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+            <path
+              d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+          </svg>
+          Hourly Data</a>
         <a href="{{ url_for('download_migrate_log') }}" class="btn btn-sm btn-secondary" download>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
-        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-        </svg>
-            Migration History</a>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+            <path
+              d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+          </svg>
+          Migration History</a>
         <a href="{{ url_for('download_all') }}" class="btn btn-sm btn-primary" download>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-zip" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M5 7.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v.938l.4 1.599a1 1 0 0 1-.416 1.074l-.93.62a1 1 0 0 1-1.11 0l-.929-.62a1 1 0 0 1-.415-1.074L5 8.438zm2 0H6v.938a1 1 0 0 1-.03.243l-.4 1.598.93.62.929-.62-.4-1.598A1 1 0 0 1 7 8.438z"/>
-        <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1h-2v1h-1v1h1v1h-1v1h1v1H6V5H5V4h1V3H5V2h1V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5z"/>
-        </svg>
-            Download All</a>
-    </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-zip" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M5 7.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v.938l.4 1.599a1 1 0 0 1-.416 1.074l-.93.62a1 1 0 0 1-1.11 0l-.929-.62a1 1 0 0 1-.415-1.074L5 8.438zm2 0H6v.938a1 1 0 0 1-.03.243l-.4 1.598.93.62.929-.62-.4-1.598A1 1 0 0 1 7 8.438z" />
+            <path
+              d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1h-2v1h-1v1h1v1h-1v1h1v1H6V5H5V4h1V3H5V2h1V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5z" />
+          </svg>
+          Download All</a>
+      </div>
     </details>
     <div class="mb-2 d-flex flex-wrap gap-2">
-        <button id="refreshDetailsBtn" class="btn btn-sm btn-warning" type="button" title="Refresh all logs"><span style="font-size:1.1em;"></span>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/>
-    <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
-    </svg>
-            Refresh All</button>
-        <button id="scrollToBottomBtn" class="btn btn-sm btn-success" type="button" title="Scroll log window to latest data"><span style="font-size:1.1em;"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-down" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
-        <path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+      <button id="refreshDetailsBtn" class="btn btn-sm btn-warning" type="button" title="Refresh all logs"><span
+          style="font-size:1.1em;"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat"
+          viewBox="0 0 16 16" aria-hidden="true">
+          <path
+            d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9" />
+          <path fill-rule="evenodd"
+            d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z" />
         </svg>
-            Scroll to Bottom</button>
+        Refresh All</button>
+      <button id="scrollToBottomBtn" class="btn btn-sm btn-success" type="button"
+        title="Scroll log window to latest data"><span style="font-size:1.1em;"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+          class="bi bi-chevron-double-down" viewBox="0 0 16 16" aria-hidden="true">
+          <path fill-rule="evenodd"
+            d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+          <path fill-rule="evenodd"
+            d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+        </svg>
+        Scroll to Bottom</button>
     </div>
     <div id="timestamp" class="faint-text">Data as of: [N/A]</div>
     <ul class="nav nav-tabs" id="detailsTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="live-tab" data-bs-toggle="tab" data-bs-target="#live" type="button" role="tab">Live Details</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.56.56 0 0 0-.163-.505L1.71 6.745l4.052-.576a.53.53 0 0 0 .393-.288L8 2.223l1.847 3.658a.53.53 0 0 0 .393.288l4.052.575-2.906 2.77a.56.56 0 0 0-.163.506l.694 3.957-3.686-1.894a.5.5 0 0 0-.461 0z"/>
-            </svg>
-                Main Log</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="init-log-tab" data-bs-toggle="tab" data-bs-target="#init-log" type="button" role="tab">Initialization Log</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="flybys-csv-tab" data-bs-toggle="tab" data-bs-target="#flybys-csv" type="button" role="tab">Hourly Data</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="migrate-log-tab" data-bs-toggle="tab" data-bs-target="#migrate-log" type="button" role="tab">Migration History</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <!-- neat bootstrap (v5.3) bug: don't use the word "tab" in the target name. Ask me how long it took to debug that one. -->
-            <button class="nav-link" id="reference-tab" data-bs-toggle="tab" data-bs-target="#reference" type="button" role="tab">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-            <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
-            </svg>
-                Help</button>
-        </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="live-tab" data-bs-toggle="tab" data-bs-target="#live" type="button"
+          role="tab">Live Details</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star"
+            viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.56.56 0 0 0-.163-.505L1.71 6.745l4.052-.576a.53.53 0 0 0 .393-.288L8 2.223l1.847 3.658a.53.53 0 0 0 .393.288l4.052.575-2.906 2.77a.56.56 0 0 0-.163.506l.694 3.957-3.686-1.894a.5.5 0 0 0-.461 0z" />
+          </svg>
+          Main Log</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="init-log-tab" data-bs-toggle="tab" data-bs-target="#init-log" type="button"
+          role="tab">Initialization Log</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="flybys-csv-tab" data-bs-toggle="tab" data-bs-target="#flybys-csv" type="button"
+          role="tab">Hourly Data</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="migrate-log-tab" data-bs-toggle="tab" data-bs-target="#migrate-log" type="button"
+          role="tab">Migration History</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <!-- neat bootstrap (v5.3) bug: don't use the word "tab" in the target name. Ask me how long it took to debug that one. -->
+        <button class="nav-link" id="reference-tab" data-bs-toggle="tab" data-bs-target="#reference" type="button"
+          role="tab">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-question-circle" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+            <path
+              d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94" />
+          </svg>
+          Help</button>
+      </li>
     </ul>
-    <div class="tab-content" data-bs-theme="dark" id="detailsTabsContent" style="background:#222; border-radius:0 0 8px 8px; padding:24px 18px; min-height:420px;">
-        <div class="tab-pane fade show active" id="live" role="tabpanel">
-            <div id="liveDetailsTabsContainer"></div>
-            <div id="liveDetailsTabContent" style="margin-top:18px;"></div>
-        </div>
-        <div class="tab-pane fade" id="logs" role="tabpanel">
-            <iframe id="logFrame" src="{{ url_for('details_log_html') }}" style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
-        </div>
-        <div class="tab-pane fade" id="migrate-log" role="tabpanel">
-            <iframe id="migrateLogFrame" src="{{ url_for('details_migrate_log') }}" style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
-        </div>
-        <div class="tab-pane fade" id="init-log" role="tabpanel">
-            <iframe id="initLogFrame" src="{{ url_for('details_init_log') }}" style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
-        </div>
-        <div class="tab-pane fade" id="flybys-csv" role="tabpanel">
-            <iframe id="flybysCsvFrame" src="{{ url_for('details_flybys_csv') }}" style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
-        </div>
-        <div class="tab-pane fade" id="reference" role="tabpanel">
-            <iframe id="referneceFrame" src="{{ url_for('detail_reference') }}" style="width:100%; min-height:320px; height:70vh; border:none;"></iframe>
-        </div>
+    <div class="tab-content" data-bs-theme="dark" id="detailsTabsContent"
+      style="background:#222; border-radius:0 0 8px 8px; padding:24px 18px; min-height:420px;">
+      <div class="tab-pane fade show active" id="live" role="tabpanel">
+        <div id="liveDetailsTabsContainer"></div>
+        <div id="liveDetailsTabContent" style="margin-top:18px;"></div>
+      </div>
+      <div class="tab-pane fade" id="logs" role="tabpanel">
+        <iframe id="logFrame" src="{{ url_for('details_log_html') }}"
+          style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+      </div>
+      <div class="tab-pane fade" id="migrate-log" role="tabpanel">
+        <iframe id="migrateLogFrame" src="{{ url_for('details_migrate_log') }}"
+          style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+      </div>
+      <div class="tab-pane fade" id="init-log" role="tabpanel">
+        <iframe id="initLogFrame" src="{{ url_for('details_init_log') }}"
+          style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+      </div>
+      <div class="tab-pane fade" id="flybys-csv" role="tabpanel">
+        <iframe id="flybysCsvFrame" src="{{ url_for('details_flybys_csv') }}"
+          style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+      </div>
+      <div class="tab-pane fade" id="reference" role="tabpanel">
+        <iframe id="referneceFrame" src="{{ url_for('detail_reference') }}"
+          style="width:100%; min-height:320px; height:70vh; border:none;"></iframe>
+      </div>
     </div>
-</div>
-<script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.js') }}"></script>
-<script>
-function setTheme(theme) {
-    if (theme === 'light') {
+  </div>
+  <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
+  <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+  <script>
+    function setTheme(theme) {
+      if (theme === 'light') {
         document.body.style.background = '#f8f9fa';
         document.body.style.color = '#222';
         let alerts = document.querySelectorAll('.alert');
         alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
         document.documentElement.setAttribute("data-bs-theme", theme);
-    } else {
+      } else {
         document.body.style.background = '#181818';
         document.body.style.color = '#fff';
         let alerts = document.querySelectorAll('.alert');
         alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#ffd700'; });
         document.documentElement.setAttribute("data-bs-theme", theme);
+      }
     }
-}
-function getPreferredTheme() {
-    if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-function toggleTheme() {
-    let current = getPreferredTheme();
-    let next = current === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('fg_theme', next);
-    setTheme(next);
-}
-document.getElementById('themeToggleBtn').onclick = toggleTheme;
-setTheme(getPreferredTheme());
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
-});
-</script>
-<script>
-const homeUrl = {{ url_for('landing_page') | tojson }};
-const fullHomeUrl = window.location.origin + homeUrl;
-let windowHistoryCount = window.history.length;
+    function getPreferredTheme() {
+      if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function toggleTheme() {
+      let current = getPreferredTheme();
+      let next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('fg_theme', next);
+      setTheme(next);
+    }
+    document.getElementById('themeToggleBtn').onclick = toggleTheme;
+    setTheme(getPreferredTheme());
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+    });
+  </script>
+  <script>
+    const homeUrl = {{ url_for('landing_page') | tojson }};
+    const fullHomeUrl = window.location.origin + homeUrl;
+    let windowHistoryCount = window.history.length;
 
-function goHome() {
-    if (document.referrer === fullHomeUrl) {
+    function goHome() {
+      if (document.referrer === fullHomeUrl) {
         if (windowHistoryCount > 1) {
-            window.history.back();
+          window.history.back();
         } else {
-            close();
+          close();
         }
-    } else {
+      } else {
         window.location.href = homeUrl;
+      }
     }
-}
-document.getElementById('backToHomeBtn').onclick = goHome;
-</script>
-<script>
-const detailsLiveUrl = "{{ url_for('details_live') }}";
-var timestamps = {jsonTime: ''};
-function timestampNow() {
-    return new Date().toLocaleString();
-}
-function showTimestamp(target) {
-    let property = target
-    let s = window.timestamps[property]
-    document.getElementById('timestamp').innerText = "Data as of: " + s;
-}
-function renderJson(obj, indent=0) {
-    let html = '';
-    if (typeof obj === 'object' && obj !== null) {
+    document.getElementById('backToHomeBtn').onclick = goHome;
+  </script>
+  <script>
+    const detailsLiveUrl = "{{ url_for('details_live') }}";
+    var timestamps = { jsonTime: '' };
+    function timestampNow() {
+      return new Date().toLocaleString();
+    }
+    function showTimestamp(target) {
+      let property = target
+      let s = window.timestamps[property]
+      document.getElementById('timestamp').innerText = "Data as of: " + s;
+    }
+    function renderJson(obj, indent = 0) {
+      let html = '';
+      if (typeof obj === 'object' && obj !== null) {
         if (Array.isArray(obj)) {
-            html += '[<br>';
-            obj.forEach((item, i) => {
-                html += '&nbsp;'.repeat(indent+4) + renderJson(item, indent+4) + (i < obj.length-1 ? ',' : '') + '<br>';
-            });
-            html += '&nbsp;'.repeat(indent) + ']';
+          html += '[<br>';
+          obj.forEach((item, i) => {
+            html += '&nbsp;'.repeat(indent + 4) + renderJson(item, indent + 4) + (i < obj.length - 1 ? ',' : '') + '<br>';
+          });
+          html += '&nbsp;'.repeat(indent) + ']';
         } else {
-            html += '{<br>';
-            let keys = Object.keys(obj);
-            keys.forEach((key, i) => {
-                html += '&nbsp;'.repeat(indent+4) + '<span style="color:#ffd700">"' + key + '"</span>: ' + renderJson(obj[key], indent+4) + (i < keys.length-1 ? ',' : '') + '<br>';
-            });
-            html += '&nbsp;'.repeat(indent) + '}';
+          html += '{<br>';
+          let keys = Object.keys(obj);
+          keys.forEach((key, i) => {
+            html += '&nbsp;'.repeat(indent + 4) + '<span style="color:#ffd700">"' + key + '"</span>: ' + renderJson(obj[key], indent + 4) + (i < keys.length - 1 ? ',' : '') + '<br>';
+          });
+          html += '&nbsp;'.repeat(indent) + '}';
         }
-    } else if (typeof obj === 'string') {
-        html += '<span style="color:#8cf">"' + obj.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '"</span>';
-    } else if (typeof obj === 'number') {
+      } else if (typeof obj === 'string') {
+        html += '<span style="color:#8cf">"' + obj.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '"</span>';
+      } else if (typeof obj === 'number') {
         html += '<span style="color:#6f6">' + obj + '</span>';
-    } else if (typeof obj === 'boolean') {
+      } else if (typeof obj === 'boolean') {
         html += '<span style="color:#f99">' + obj + '</span>';
-    } else if (obj === null) {
+      } else if (obj === null) {
         html += '<span style="color:#aaa">null</span>';
+      }
+      return html;
     }
-    return html;
-}
-function renderJsonIframeContent(obj) {
-    // returns a full HTML string for the iframe
-    return `<!DOCTYPE html><html><head><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>${renderJson(obj)}</body></html>`;
-}
-function loadLiveDetails() {
-    // special handling for the live details json
-    $('#liveDetailsTabsContainer').html('<em>Loading...</em>');
-    $('#liveDetailsTabContent').html('');
-    $.getJSON(detailsLiveUrl, function(data) {
+    function renderJsonIframeContent(obj) {
+      // returns a full HTML string for the iframe
+      return `<!DOCTYPE html><html><head><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>${renderJson(obj)}</body></html>`;
+    }
+    function loadLiveDetails() {
+      // special handling for the live details json
+      $('#liveDetailsTabsContainer').html('<em>Loading...</em>');
+      $('#liveDetailsTabContent').html('');
+      $.getJSON(detailsLiveUrl, function (data) {
         let keys = Object.keys(data);
         if (!keys.length) {
-            $('#liveDetailsTabsContainer').html('<em>No data</em>');
-            return;
+          $('#liveDetailsTabsContainer').html('<em>No data</em>');
+          return;
         }
         // Build tab nav
         let nav = '<ul class="nav nav-pills" id="liveDetailsTabs" role="tablist">';
-        keys.forEach(function(key, idx) {
-            nav += `<li class="nav-item" role="presentation"><button class="nav-link${idx===0?' active':''}" id="livekey-${key}-tab" data-bs-toggle="tab" data-bs-target="#livekey-${key}" type="button" role="tab">${key}</button></li>`;
+        keys.forEach(function (key, idx) {
+          nav += `<li class="nav-item" role="presentation"><button class="nav-link${idx === 0 ? ' active' : ''}" id="livekey-${key}-tab" data-bs-toggle="tab" data-bs-target="#livekey-${key}" type="button" role="tab">${key}</button></li>`;
         });
         nav += '</ul>';
         // Build tab content
         let content = '<div class="tab-content" id="liveDetailsTabsContent2" style="background:#222; border-radius:0 0 8px 8px; padding:0; min-height:320px;">';
-        keys.forEach(function(key, idx) {
-            content += `<div class="tab-pane fade${idx===0?' show active':''}" id="livekey-${key}" role="tabpanel"><iframe class="liveJsonFrame" style="width:100%;min-height:320px;height:calc(88vh - 260px);border:none;background:#222;"></iframe></div>`;
+        keys.forEach(function (key, idx) {
+          content += `<div class="tab-pane fade${idx === 0 ? ' show active' : ''}" id="livekey-${key}" role="tabpanel"><iframe class="liveJsonFrame" style="width:100%;min-height:320px;height:calc(88vh - 260px);border:none;background:#222;"></iframe></div>`;
         });
         content += '</div>';
         $('#liveDetailsTabsContainer').html(nav);
         $('#liveDetailsTabContent').html(content);
         // Write JSON to each iframe
-        keys.forEach(function(key, idx) {
-            let frame = document.querySelector(`#livekey-${key} .liveJsonFrame`);
-            if (frame) {
-                let doc = frame.contentDocument || frame.contentWindow.document;
-                doc.open();
-                doc.write(renderJsonIframeContent(data[key]));
-                doc.close();
-            }
+        keys.forEach(function (key, idx) {
+          let frame = document.querySelector(`#livekey-${key} .liveJsonFrame`);
+          if (frame) {
+            let doc = frame.contentDocument || frame.contentWindow.document;
+            doc.open();
+            doc.write(renderJsonIframeContent(data[key]));
+            doc.close();
+          }
         });
-    }).fail(function(xhr) {
+      }).fail(function (xhr) {
         $('#liveDetailsTabsContainer').html('<span style="color:#f66;font-family:monospace">Failed to load details: ' + xhr.statusText + '</span>');
         $('#liveDetailsTabContent').html('');
-    });
-    timestamps.jsonTime = timestampNow();
-    showTimestamp('jsonTime');
-}
-$(document).ready(function() {
-    function refreshAll() {
+      });
+      timestamps.jsonTime = timestampNow();
+      showTimestamp('jsonTime');
+    }
+    $(document).ready(function () {
+      function refreshAll() {
         loadLiveDetails();
         // Reload log iframes
         const iframeIds = ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame'];
         iframeIds.forEach(id => {
-            const frame = document.getElementById(id);
-            if (frame) {
-                frame.contentWindow.location.reload();
-            }
+          const frame = document.getElementById(id);
+          if (frame) {
+            frame.contentWindow.location.reload();
+          }
         });
-    }
-    loadLiveDetails();
-    // $('#live-tab').on('shown.bs.tab', function() {
-    //     // loadLiveDetails();
-    //     showTimestamp('jsonTime');
-    // });
-    $('#refreshDetailsBtn').on('click', function() {
-            refreshAll();
-        }
-    );
-    // enable/disable the scroll button depending on active tab
-    function updateScrollBtnState(targetSelector) {
-        const enabledTabs = ['#logs','#migrate-log','#init-log','#flybys-csv'];
+      }
+      loadLiveDetails();
+      // $('#live-tab').on('shown.bs.tab', function() {
+      //     // loadLiveDetails();
+      //     showTimestamp('jsonTime');
+      // });
+      $('#refreshDetailsBtn').on('click', function () {
+        refreshAll();
+      }
+      );
+      // enable/disable the scroll button depending on active tab
+      function updateScrollBtnState(targetSelector) {
+        const enabledTabs = ['#logs', '#migrate-log', '#init-log', '#flybys-csv'];
         const ok = enabledTabs.includes(targetSelector);
         $('#scrollToBottomBtn').prop('disabled', !ok);
-    }
-    updateScrollBtnState('#live');
+      }
+      updateScrollBtnState('#live');
 
-    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+      $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
         const target = $(e.target).attr('data-bs-target') || $(e.target).data('bs-target');
         updateScrollBtnState(target);
-    });
+      });
 
-    // Auto-scroll log iframes to bottom when loaded
-    function scrollAllLogFramesToBottom() {
-        ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame'].forEach(function(id) {
-            let iframe = document.getElementById(id);
-            if (iframe) {
-                setTimeout(function() {
-                    try {
-                        let doc = iframe.contentDocument || iframe.contentWindow.document;
-                        iframe.contentWindow.scrollTo(0, doc.body.scrollHeight);
-                    } catch(e) {}
-                }, 100);
-            }
+      // Auto-scroll log iframes to bottom when loaded
+      function scrollAllLogFramesToBottom() {
+        ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame'].forEach(function (id) {
+          let iframe = document.getElementById(id);
+          if (iframe) {
+            setTimeout(function () {
+              try {
+                let doc = iframe.contentDocument || iframe.contentWindow.document;
+                iframe.contentWindow.scrollTo(0, doc.body.scrollHeight);
+              } catch (e) { }
+            }, 100);
+          }
         });
-    }
-    $('#logFrame, #migrateLogFrame, #initLogFrame, #flybysCsvFrame').on('load', function() {
+      }
+      $('#logFrame, #migrateLogFrame, #initLogFrame, #flybysCsvFrame').on('load', function () {
         scrollAllLogFramesToBottom();
-    });
-    $('#scrollToBottomBtn').on('click', function() {
+      });
+      $('#scrollToBottomBtn').on('click', function () {
         scrollAllLogFramesToBottom();
+      });
     });
-});
-</script>
+  </script>
 </body>
+
 </html>

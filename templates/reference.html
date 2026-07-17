@@ -1,734 +1,959 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlightGazer - Help &amp; Reference</title>
-    <meta name="author" content="WeegeeNumbuh1">
-    <meta name="description" content="FlightGazer reference and related project links page.">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        body { background: #181818; color: #fff; padding-bottom: 72px; }
-        .centered { text-align: center; margin-top: 60px; }
-        .back-btn { margin-top: 40px; }
-        .help-text { font-size: 0.95em; color: #666; margin-bottom: 0.5em; }
-        .inline-image { max-width: 256px; }
-        .table-padding { padding: 16px; }
-        .monospace { font-family: monospace; }
-        tbody tr:nth-child(even) { background-color: rgba(150, 150, 150, 0.1); } thead { border-bottom-width: 1px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlightGazer - Help &amp; Reference</title>
+  <meta name="author" content="WeegeeNumbuh1">
+  <meta name="description" content="FlightGazer reference and related project links page.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+      padding-bottom: 72px;
+    }
+
+    .centered {
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .back-btn {
+      margin-top: 40px;
+    }
+
+    .help-text {
+      font-size: 0.95em;
+      color: #666;
+      margin-bottom: 0.5em;
+    }
+
+    .inline-image {
+      max-width: 256px;
+    }
+
+    .table-padding {
+      padding: 16px;
+    }
+
+    .monospace {
+      font-family: monospace;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: rgba(150, 150, 150, 0.1);
+    }
+
+    thead {
+      border-bottom-width: 1px;
+    }
+  </style>
 </head>
+
 <body>
-<div class="container py-4">
+  <div class="container py-4">
     <button id="closeWindow" class="btn btn btn-info">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-        </svg>
-        Close this tab/window</button>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:relative;z-index:10;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
-    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
-    </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+      </svg>
+      Close this tab/window</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end"
+      style="position:relative;z-index:10;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278" />
+        <path
+          d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z" />
+      </svg>
     </button>
     <h2 class="mb-4">Help and Reference Guide</h2>
     <div id="subheader" class="help-text"></div>
     <div id="sys-info-link" class="help-text"></div>
-</div>
-<div id="bottomRightAnchor" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
-</div>
-<svg aria-hidden="true" style="display:none">
-  <symbol id="external-link-icon" viewBox="0 0 24 24">
-    <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"/>
-      <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"/>
-    </g>
-  </symbol>
-</svg>
-<div class="container py-4" id="display-layout">
+  </div>
+  <div id="bottomRightAnchor" style="position:fixed;bottom:24px;right:24px;z-index:1000;">
+  </div>
+  <svg aria-hidden="true" style="display:none">
+    <symbol id="external-link-icon" viewBox="0 0 24 24">
+      <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5" />
+        <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5" />
+      </g>
+    </symbol>
+  </svg>
+  <div class="container py-4" id="display-layout">
     <h4>Display Layout Reference</h4>
-<details><summary><b>Expand/Collapse</b></summary>
-    <div class="help-text"><i>Valid for FlightGazer v.8.1.0 and newer.</i></div>
-<table cellpadding="16">
-<thead>
-</thead>
-<tbody>
-<tr>
-    <td>
-        <h4>Clock</h4>
-        <img src="{{ url_for('static', filename='FG_clock-annotated.png') }}" alt="FlightGazer clock layout" class="inline-image">
-    </td>
-</tr>
-<tr>
-    <td>
-        <ol type="1">
-        <li>Time, day of week, date</li>
-        <li>Center readout</li>
-        <li>Flyby counter – Number of aircraft that have been in your designated area today</li>
-        <li>Tracking counter – How many aircraft your receiver is currently tracking</li>
-        <li>Range – The distance of the farthest aircraft your receiver can detect</li>
-        </ol>
-    </td>
-</tr>
-<tr>
-    <td>
-        <h4>Journey Readout</h4>
-        <img src="{{ url_for('static', filename='FG_default-journey-annotated.png') }}" alt="FlightGazer journey layout" class="inline-image">
-    </td>
-</tr>
-<tr>
-    <td>
-        <ol type="1">
-        <li>Aircraft's callsign</li>
-        <li>Aircraft's current distance and direction from your site</li>
-        <li>Country of the aircraft</li>
-        <li>Current altitude of the aircraft</li>
-        <li>Current speed of the aircraft</li>
-        <li>Time the aircraft has spent in the air</li>
-        <li>Origin airport</li>
-        <li>Destination airport</li>
-        <li>Current count of aircraft in your specified tracking area</li>
-        <li>UAT indicator (aircraft info is being sent over Universal Access Transceiver, 978MHz - U.S. Only)</li>
-        <li>Progress bar indicating how long the current aircraft will be displayed</li>
-        </ol>
-    </td>
-</tr>
-<tr>
-    <td>
-        <h4>Journey Plus</h4>
-        <img src="{{ url_for('static', filename='FG_journey-plus-annotated.png') }}" alt="FlightGazer journey plus" class="inline-image">
-    </td>
-</tr>
-<tr>
-    <td>
-        <ol type="1">
-        <li>Scrolling marquee (enabled with <span class="monospace">Show Even More Info</span>) or aircraft ground track and vertical speed</li>
-        <li>Ground track of the aircraft (or RSSI of signal when <span class="monospace">Show Even More Info</span> is disabled)</li>
-        </ol>
-</tr>
-<tr>
-    <td>
-        <h4>Enhanced Readout</h4>
-        <img src="{{ url_for('static', filename='FG_enhanced-readout-annotated.png') }}" alt="FlightGazer enhanced readout" class="inline-image">
-    </td>
-</tr>
-<tr>
-<td>
-    <ol type="1">
-    <li>Current position of the aircraft</li>
-    <li>Ground track of the aircraft</li>
-    <li>Current vertical speed of the aircraft</li>
-    <li>RSSI – (Received Signal Strength Index)<br>how strong of a signal from the aircraft as detected by the receiver (in
-     <a href="https://en.wikipedia.org/wiki/DBFS" target="_blank" rel="noopener noreferrer">dBFS</a>
-    <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-        <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-    </svg>)</li>
-    </ol>
-</td>
-</tr>
-</tbody>
-</table>
-<div style="margin-top: 24px; text-align: center;">
-    <button type="button" onClick="document.getElementById('display-layout').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-        </svg>
-        Scroll back up</button>
-</div>
-</details>
-</div>
-<div class="container py-4" id="output-reference">
-    <h4>Output Reference &amp; Troubleshooting</h4>
-    <details><summary><b>Expand/Collapse</b></summary>
-        <div class="help-text"><i>Valid for FlightGazer v.10.1.0 and newer.</i></div>
-    <div style="overflow-x: auto;">
-    <table cellpadding="8">
-    <thead style="position: sticky; top: 0; z-index: 1;">
-    <tr>
-        <th><h5>Output</h5></th>
-        <th><h5>Meaning / Cause</h5></th>
-        <th><h5>Remedy / Information</h5></th>
-    </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                <p><b>Clock</b></p>
-<pre><code>
-FLYBY  TRKG  RNGE
-N/A    N/A   N/A </code></pre>
-<i>- or -</i>
-<pre><code>
-FLYBY  TRKG  RNGE
-123    N/A   N/A </code></pre>
-            </td>
-            <td>
-                <ul>
-                    <li>Failed to connect to receiver at startup.</li>
-                    <li>Communication with the receiver has temporarily stopped due to instability.</li>
-                </ul>
-            </td>
-            <td>
-                <ul>
-                    <li>Receiver service (<code>dump1090</code>) is not running/stopped. Check for errors for that service.</li>
-                    <li>The SDR hardware or its connection (USB port, cables, etc.) may be degraded. Check on these components.</li>
-                    <li>The current system may be overloaded. Check on the system.</li>
-                    <li>If operating on a remote instance of <code>dump1090</code>, check the network or remote system.</li>
-                    <li>Additionally, check the FlightGazer logs.</li>
-                    <li>After fixing the underlying issue, restart FlightGazer.</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p><b>Clock</b></p>
-<pre><code>
-FLYBY  TRKG  RNGE
-N/A    123   N/A </code></pre>
-            </td>
-            <td><ul><li>Location is not set in receiver.</li></ul></td>
-            <td><ul><li>Set your location for <code>dump1090</code>. Then, restart FlightGazer.</li>
-            <li>Advanced: if using a GPS receiver on the system, check to see if the service is running and has obtained a GPS fix.</li></ul></td>
-        </tr>
-        <tr>
-            <td>
-                <p><b>Journey</b></p>
-                <code>--- ▶ ---</code>
-            </td>
-            <td>
-                <ul>
-                <li>Waiting for API to send a result.</li>
-                <li>API is not in use.</li>
-                <li>An API limit has been reached.</li>
-                <li>Aircraft is on the ground.</li>
-                </ul>
-            </td>
-            <td>
-                <ul><li>Normal occurrence.</li></ul>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p><b>Journey</b></p>
-                <code>N/A ▶ ---</code>
-            </td>
-            <td>
-                <ul>
-                <li>Aircraft blocked from tracking.</li>
-                <li>Aircraft detected before API was able to.</li>
-            </td>
-            <td><ul><li>For aircraft that are not blocked from tracking: try using a lower <span class="monospace">FLYBY_STALENESS</span> value.</li></ul></td>
-        </tr>
-        <tr>
-            <td>
-                <p><b>Journey</b></p>
-                <code>latitude ▶ longitude</code>
-            </td>
-            <td><ul>
-                <li>API returned a result that could not be associated with an airport.</li>
-                <li>This represents the coordinates of which this aircraft was first detected/tracked by the API.</li>
-            </ul></td>
-            <td><ul><li>Rare, but normal occurrence.</li></ul></td>
-        </tr>
-        <tr>
-            <td>
-                <p><b>Journey</b></p>
-                <code>ABC ▶ -DEF</code>
-            </td>
-            <td><ul>
-                <li>This flight was diverted to this destination.</li>
-            </ul></td>
-            <td><ul><li>Rare, but normal occurrence.</li></ul></td>
-        </tr>
-        <tr>
-            <td>
-                <p><b>Journey</b></p>
-                <code>-DEF ▶ GHI</code>
-            </td>
-            <td><ul>
-                <li>This flight was diverted and is now flying to its intended destination.</li>
-            </ul></td>
-            <td><ul><li>Rare, but normal occurrence.</li></ul></td>
-        </tr>
-        <tr>
-            <td>
-                <p><b>Journey</b></p>
-                <code>!API ▶ FAIL</code>
-            </td>
-            <td><ul><li>API call for this flight failed.</li></ul></td>
-            <td>
-                <ul>
-                <li>API service may be down, wait until the service is restored.</li>
-                <li>You might have been rate limited. If this keeps happening, try using a smaller <span class="monospace">RANGE</span>.</li>
-                <li>You may have an issue with your API key. Contact FlightAware.</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p><b>Journey</b></p>
-                <code>!CON ▶ FAIL</code>
-            </td>
-            <td><ul><li>Could not connect to the API.</li></ul></td>
-            <td><ul><li>Check your network connection.</li></ul></td>
-        </tr>
-        <tr>
-            <td><p><b>Callsign</b></p><code>!ABC123</code></td>
-            <td><ul><li>This aircraft has declared an emergency.</li></ul></td>
-            <td><ul><li>Rare occurrence; FlightGazer will track this aircraft for as long
-                 as it's detected or the aircraft is no longer experiencing an emergency.</li></ul></td>
-        </tr>
-        <tr>
-            <td><p><b>Callsign</b></p><code>ABC123*</code></td>
-            <td><ul><li>This aircraft is being tracked because of the <span class="monospace">Follow This Aircraft</span> setting.</li></ul></td>
-            <td><ul><li>Expected operation.</li></ul></td>
-        </tr>
-        <tr>
-            <td><p><b>Show Even More Info</b></p><q> <code>LADD Aircraft</code> </q></td>
-            <td><ul><li>Limiting Aircraft Data Displayed - <i><q>Please don't track me.</q></i></li></ul></td>
-            <td><ul><li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More Information</a>
-                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-                </svg>
-        </li></ul></td>
-        </tr>
-        <tr>
-            <td><p><b>Show Even More Info</b></p><q> <code>PIA Aircraft</code> </q></td>
-            <td><ul><li>(U.S. only) Privacy ICAO Address - <i><q>Good luck figuring out who I am.</q></i></li></ul></td>
-            <td><ul><li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank" rel="noopener noreferrer">More Information</a>
-                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-                </svg>
-            </li></ul></td>
-        </tr>
-        <tr>
-            <td><p><b>Show Even More Info</b></p><q> <code>TIS-B Contact</code> </q></td>
-            <td><ul><li>Traffic Information Service – Broadcast - broadcast information sent by ground stations corresponding to an aircraft; cannot be tied to a registration or aircraft type and is used for collision avoidance.</li></ul></td>
-            <td><ul><li><a href="https://en.wikipedia.org/wiki/Traffic_information_service_%E2%80%93_broadcast" target="_blank" rel="noopener noreferrer">More Information</a>
-        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-        </svg>
-            </li></ul></td>
-        </tr>
-    </tbody>
-</table>
-</div>
-<div style="margin-top: 24px; text-align: center;">
-    <button type="button" onClick="document.getElementById('output-reference').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-        </svg>
-        Scroll back up</button>
-</div>
-</details>
-</div>
-
-<div class="container py-4" id="center-row">
-    <h4>Clock Center Row &amp; Abbreviations</h4>
-    <details><summary><b>Expand/Collapse</b></summary>
-    <div class="help-text"><i>Valid for FlightGazer v.11.3.0 and newer.</i></div>
-<div style="margin: 20px 0; overflow-x: auto;">
-  <table cellpadding="8">
-    <thead>
-      <tr>
-        <th>Layout
-        </th>
-        <th>Description
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-            <code>▲--:-- ▼--:--</code>
-        </td>
-        <td>
-            Sunrise &amp; Sunset
-        </td>
-      </tr>
-      <tr>
-        <td>
-            <code>G##.# N##.# L##%</code><br>
-            <i>or</i><br>
-            <code>G##.# N##.# PF##</code>
-        </td>
-        <td>
-            <code>G</code> = Receiver gain<br>
-            <code>N</code> = Noise (negative value, higher is better)<br>
-            <code>L</code> = Loud signals (percentage, lower is better)<br>
-            <code>PF</code> = (<i>Airspy only</i>) Preamble filter level<br>
-        </td>
-      </tr>
-      <tr>
-        <td>
-            <code>ABC wk## d###</code>
-        </td>
-        <td>
-            <code>ABC</code> = Month abbreviation<br>
-            <code>wk</code> = Week number of the year<br>
-            <code>d</code> = Day number of the year
-        </td>
-      </tr>
-      <tr>
-        <td>
-            <code>##.#° ABCD ▼##</code>
-        </td>
-        <td>
-            Outside temperature (Celcius or Fahrenheit)<br>
-            <code>ABCD</code> = Prevailing weather condition<br>
-            Wind direction and speed (knots, mph, or m/s)
-        </td>
-      </tr>
-      <tr>
-        <td>
-            <code>D##° V#.# C####</code>
-        </td>
-        <td>
-            <code>D</code> = Dew point (same unit as temperature)<br>
-            <code>V</code> = Visibility (miles or kilometers)<br>
-            <code>C</code> = Estimated cloud base (feet or meters)
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="help-text"><i>Weather data is for informational purposes only and not to be used for flight planning.</i></div>
-  <details open><summary>Weather condition meanings</summary>
-    <div class="help-text"><i>Modifiers:</i><br>
-        <code>+</code> = Heavy<br>
-        <code>-</code> = Light<br>
-    </div>
-    <div style="overflow-x: auto;">
-    <table cellpadding="8">
+    <details>
+      <summary><b>Expand/Collapse</b></summary>
+      <div class="help-text"><i>Valid for FlightGazer v.8.1.0 and newer.</i></div>
+      <table cellpadding="16">
         <thead>
-        <tr>
-            <th>Weather<br>Abbreviation
-            </th>
-            <th>Description
-            </th>
-        </tr>
         </thead>
         <tbody>
-        <tr>
-            <td><code>TSTM</code> / <code>TSM</code>
+          <tr>
+            <td>
+              <h4>Clock</h4>
+              <img src="{{ url_for('static', filename='FG_clock-annotated.png') }}" alt="FlightGazer clock layout"
+                class="inline-image">
             </td>
-            <td>Thunderstorm
+          </tr>
+          <tr>
+            <td>
+              <ol type="1">
+                <li>Time, day of week, date</li>
+                <li>Center readout</li>
+                <li>Flyby counter – Number of aircraft that have been in your designated area today</li>
+                <li>Tracking counter – How many aircraft your receiver is currently tracking</li>
+                <li>Range – The distance of the farthest aircraft your receiver can detect</li>
+              </ol>
             </td>
-        </tr>
-        <tr>
-            <td><code>DRZL</code> / <code>DZL</code>
+          </tr>
+          <tr>
+            <td>
+              <h4>Journey Readout</h4>
+              <img src="{{ url_for('static', filename='FG_default-journey-annotated.png') }}"
+                alt="FlightGazer journey layout" class="inline-image">
             </td>
-            <td>Drizzle
+          </tr>
+          <tr>
+            <td>
+              <ol type="1">
+                <li>Aircraft's callsign</li>
+                <li>Aircraft's current distance and direction from your site</li>
+                <li>Country of the aircraft</li>
+                <li>Current altitude of the aircraft</li>
+                <li>Current speed of the aircraft</li>
+                <li>Time the aircraft has spent in the air</li>
+                <li>Origin airport</li>
+                <li>Destination airport</li>
+                <li>Current count of aircraft in your specified tracking area</li>
+                <li>UAT indicator (aircraft info is being sent over Universal Access Transceiver, 978MHz - U.S. Only)
+                </li>
+                <li>Progress bar indicating how long the current aircraft will be displayed</li>
+              </ol>
             </td>
-        </tr>
-        <tr>
-            <td><code>RN</code>
+          </tr>
+          <tr>
+            <td>
+              <h4>Journey Plus</h4>
+              <img src="{{ url_for('static', filename='FG_journey-plus-annotated.png') }}"
+                alt="FlightGazer journey plus" class="inline-image">
             </td>
-            <td>Rain
+          </tr>
+          <tr>
+            <td>
+              <ol type="1">
+                <li>Scrolling marquee (enabled with <span class="monospace">Show Even More Info</span>) or aircraft
+                  ground track and vertical speed</li>
+                <li>Ground track of the aircraft (or RSSI of signal when <span class="monospace">Show Even More
+                    Info</span> is disabled)</li>
+              </ol>
+          </tr>
+          <tr>
+            <td>
+              <h4>Enhanced Readout</h4>
+              <img src="{{ url_for('static', filename='FG_enhanced-readout-annotated.png') }}"
+                alt="FlightGazer enhanced readout" class="inline-image">
             </td>
-        </tr>
-        <tr>
-            <td><code>FZRN</code>
+          </tr>
+          <tr>
+            <td>
+              <ol type="1">
+                <li>Current position of the aircraft</li>
+                <li>Ground track of the aircraft</li>
+                <li>Current vertical speed of the aircraft</li>
+                <li>RSSI – (Received Signal Strength Index)<br>how strong of a signal from the aircraft as detected by
+                  the receiver (in
+                  <a href="https://en.wikipedia.org/wiki/DBFS" target="_blank" rel="noopener noreferrer">dBFS</a>
+                  <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer"
+                    role="img" aria-label="More info">
+                    <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                  </svg>)
+                </li>
+              </ol>
             </td>
-            <td>Freezing Rain
-            </td>
-        </tr>
-        <tr>
-            <td><code>SHWR</code> / <code>SHR</code>
-            </td>
-            <td>Rain Showers
-            </td>
-        </tr>
-        <tr>
-            <td><code>SNW</code>
-            </td>
-            <td>Snow
-            </td>
-        </tr>
-        <tr>
-            <td><code>RSMX</code>
-            </td>
-            <td>Mixed Rain and Snow
-            </td>
-        </tr>
-        <tr>
-            <td><code>SSHR</code>
-            </td>
-            <td>Snow Showers
-            </td>
-        </tr>
-        <tr>
-            <td><code>SMKE</code>
-            </td>
-            <td>Smoke
-            </td>
-        </tr>
-        <tr>
-            <td><code>SQLL</code>
-            </td>
-            <td>Squall
-            </td>
-        </tr>
-        <tr>
-            <td><code>CLR</code>
-            </td>
-            <td>Clear Sky
-            </td>
-        </tr>
-        <tr>
-            <td><code>cFEW</code>
-            </td>
-            <td>Few Clouds
-            </td>
-        </tr>
-        <tr>
-            <td><code>cSCT</code>
-            </td>
-            <td>Scattered Clouds
-            </td>
-        </tr>
-        <tr>
-            <td><code>cBKN</code>
-            </td>
-            <td>Broken Clouds
-            </td>
-        </tr>
-        <tr>
-            <td><code>OVRC</code>
-            </td>
-            <td>Overcast
-            </td>
-        </tr>
+          </tr>
         </tbody>
-    </table>
-    </div>
-  </details>
-</div>
-<div style="margin-top: 24px; text-align: center;">
-    <button type="button" onClick="document.getElementById('center-row').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-        </svg>
-        Scroll back up</button>
-</div>
-</details>
-</div>
-
-<div class="container py-4" id="neat-tricks">
-    <h4>Tips &amp; Tricks</h4>
-    <details><summary><b>Expand/Collapse</b></summary>
-    <ul>
-    <li><b>Turning off the screen at night</b></li>
-<i>Configure Settings → Brightness</i><br><br>
-Enable <span class="monospace">Dynamic Brightness</span> and set <span class="monospace">Secondary Brightness</span> to <span class="monospace">0</span><br>
-If you don't want it to turn off at sunset, disable <span class="monospace">Use Sunrise/Sunset</span> then set <span class="monospace">Brightness Switch Time</span>.<br>
-<i>Note: FlightGazer will still be running *and* driving the screen, even with a brightness of 0.</i><br><br>
-
-<li><b>Only turn on the screen when there's an aircraft nearby (no clock)</b></li>
-<i>Configure Settings → Brightness</i><br><br>
-Set <span class="monospace">Brightness</span> to <span class="monospace">0</span> and disable <span class="monospace">Dynamic Brightness</span>.<br>
-Enable and set <span class="monospace">Active Plane Display Brightness</span> to the desired value.<br>
-<i>Note: If you use <code>NO_FILTER</code> mode and follow this tip, the display will remain blank.</i><br><br>
-
-<li><b>Hiding elements on the display</b></li>
-<i>Configure Settings → Colors</i><br><br>
-Simply set the display element to 'BLACK'<br><br>
-
-<li><b>Extending the life of the physical display</b></li>
-The display is a wear item.<br>
-Over time, some of the pixels may become dimmer or their ability to reproduce accurate color is hindered.<br>
-To delay this effect, lower the brightness of the display.<br>
-</ul>
-
-<details><summary><b>More Technical Tips (Expand/Collapse)</b></summary>
-<ul>
-<li><b>Accessing FlightGazer's data/state programmatically</b></li>
-Visit the <code>/data/current_state.json</code> endpoint to poll FlightGazer's current state.<br>
-You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack) to access running stats and other information like aircraft details and more.<br>
-The details on how to interpret this JSON
- <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/state-file-schema.md" target="_blank" rel="noopener noreferrer">can be viewed here</a>
-<svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-  <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-</svg>
-.
-<br><br>
-<li><b>Other API endpoints for this webapp</b></li>
-The below endpoints return JSON objects:
-<ul>
-    <li><code>/api/status</code> (what drives the status message on the landing page)</li>
-    <li><code>/api/localpages</code> (list of other relevant pages accessible on this system)</li>
-</ul>
-It's recommended to not poll these too often (status about every minute, localpages once an hour).<br>
-<br>
-
-<li><b>Viewing FlightGazer in a terminal</b></li>
-Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal running on this (<span id="device_name"></span>) system. <br>
-You'll need to get <code>ssh</code> access to this system, then use the command <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br>
-</ul>
-</details>
-
-<br>
-<ul>
-<li><b>Additional Tips and Tricks</b></li>
-<a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/tips-n-tricks.md" target="_blank" rel="noopener noreferrer">Check this document.</a>
-<svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-  <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-</svg>
-
-</ul>
-
-<div style="margin-top: 24px; text-align: center;">
-    <button type="button" onClick="document.getElementById('neat-tricks').scrollIntoView()" class="btn btn-sm btn-outline-secondary scroll-up">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-        </svg>
-        Scroll back up</button>
-</div>
+      </table>
+      <div style="margin-top: 24px; text-align: center;">
+        <button type="button" onClick="document.getElementById('display-layout').scrollIntoView()"
+          class="btn btn-sm btn-outline-secondary scroll-up">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+            <path fill-rule="evenodd"
+              d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+          </svg>
+          Scroll back up</button>
+      </div>
     </details>
-</div>
-<div class="container py-4" id="issues-feedback">
-    <h4>Reporting Issues and Sending Feedback</h4>
-    <details><summary><b>Expand/Collapse</b></summary>
-        <i>Recommended:</i>
+  </div>
+  <div class="container py-4" id="output-reference">
+    <h4>Output Reference &amp; Troubleshooting</h4>
+    <details>
+      <summary><b>Expand/Collapse</b></summary>
+      <div class="help-text"><i>Valid for FlightGazer v.10.1.0 and newer.</i></div>
+      <div style="overflow-x: auto;">
+        <table cellpadding="8">
+          <thead style="position: sticky; top: 0; z-index: 1;">
+            <tr>
+              <th>
+                <h5>Output</h5>
+              </th>
+              <th>
+                <h5>Meaning / Cause</h5>
+              </th>
+              <th>
+                <h5>Remedy / Information</h5>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <p><b>Clock</b></p>
+                <pre><code>
+FLYBY  TRKG  RNGE
+N/A    N/A   N/A </code></pre>
+                <i>- or -</i>
+                <pre><code>
+FLYBY  TRKG  RNGE
+123    N/A   N/A </code></pre>
+              </td>
+              <td>
+                <ul>
+                  <li>Failed to connect to receiver at startup.</li>
+                  <li>Communication with the receiver has temporarily stopped due to instability.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Receiver service (<code>dump1090</code>) is not running/stopped. Check for errors for that
+                    service.</li>
+                  <li>The SDR hardware or its connection (USB port, cables, etc.) may be degraded. Check on these
+                    components.</li>
+                  <li>The current system may be overloaded. Check on the system.</li>
+                  <li>If operating on a remote instance of <code>dump1090</code>, check the network or remote system.
+                  </li>
+                  <li>Additionally, check the FlightGazer logs.</li>
+                  <li>After fixing the underlying issue, restart FlightGazer.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Clock</b></p>
+                <pre><code>
+FLYBY  TRKG  RNGE
+N/A    123   N/A </code></pre>
+              </td>
+              <td>
+                <ul>
+                  <li>Location is not set in receiver.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Set your location for <code>dump1090</code>. Then, restart FlightGazer.</li>
+                  <li>Advanced: if using a GPS receiver on the system, check to see if the service is running and has
+                    obtained a GPS fix.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Journey</b></p>
+                <code>--- ▶ ---</code>
+              </td>
+              <td>
+                <ul>
+                  <li>Waiting for API to send a result.</li>
+                  <li>API is not in use.</li>
+                  <li>An API limit has been reached.</li>
+                  <li>Aircraft is on the ground.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Normal occurrence.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Journey</b></p>
+                <code>N/A ▶ ---</code>
+              </td>
+              <td>
+                <ul>
+                  <li>Aircraft blocked from tracking.</li>
+                  <li>Aircraft detected before API was able to.</li>
+              </td>
+              <td>
+                <ul>
+                  <li>For aircraft that are not blocked from tracking: try using a lower <span
+                      class="monospace">FLYBY_STALENESS</span> value.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Journey</b></p>
+                <code>latitude ▶ longitude</code>
+              </td>
+              <td>
+                <ul>
+                  <li>API returned a result that could not be associated with an airport.</li>
+                  <li>This represents the coordinates of which this aircraft was first detected/tracked by the API.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Rare, but normal occurrence.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Journey</b></p>
+                <code>ABC ▶ -DEF</code>
+              </td>
+              <td>
+                <ul>
+                  <li>This flight was diverted to this destination.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Rare, but normal occurrence.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Journey</b></p>
+                <code>-DEF ▶ GHI</code>
+              </td>
+              <td>
+                <ul>
+                  <li>This flight was diverted and is now flying to its intended destination.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Rare, but normal occurrence.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Journey</b></p>
+                <code>!API ▶ FAIL</code>
+              </td>
+              <td>
+                <ul>
+                  <li>API call for this flight failed.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>API service may be down, wait until the service is restored.</li>
+                  <li>You might have been rate limited. If this keeps happening, try using a smaller <span
+                      class="monospace">RANGE</span>.</li>
+                  <li>You may have an issue with your API key. Contact FlightAware.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Journey</b></p>
+                <code>!CON ▶ FAIL</code>
+              </td>
+              <td>
+                <ul>
+                  <li>Could not connect to the API.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Check your network connection.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Callsign</b></p><code>!ABC123</code>
+              </td>
+              <td>
+                <ul>
+                  <li>This aircraft has declared an emergency.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Rare occurrence; FlightGazer will track this aircraft for as long
+                    as it's detected or the aircraft is no longer experiencing an emergency.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Callsign</b></p><code>ABC123*</code>
+              </td>
+              <td>
+                <ul>
+                  <li>This aircraft is being tracked because of the <span class="monospace">Follow This Aircraft</span>
+                    setting.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>Expected operation.</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Show Even More Info</b></p><q> <code>LADD Aircraft</code> </q>
+              </td>
+              <td>
+                <ul>
+                  <li>Limiting Aircraft Data Displayed - <i><q>Please don't track me.</q></i></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><a href="https://www.faa.gov/pilots/ladd" target="_blank" rel="noopener noreferrer">More
+                      Information</a>
+                    <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer"
+                      role="img" aria-label="More info">
+                      <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                    </svg>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Show Even More Info</b></p><q> <code>PIA Aircraft</code> </q>
+              </td>
+              <td>
+                <ul>
+                  <li>(U.S. only) Privacy ICAO Address - <i><q>Good luck figuring out who I am.</q></i></li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><a href="https://www.faa.gov/air_traffic/technology/equipadsb/privacy" target="_blank"
+                      rel="noopener noreferrer">More Information</a>
+                    <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer"
+                      role="img" aria-label="More info">
+                      <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                    </svg>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p><b>Show Even More Info</b></p><q> <code>TIS-B Contact</code> </q>
+              </td>
+              <td>
+                <ul>
+                  <li>Traffic Information Service – Broadcast - broadcast information sent by ground stations
+                    corresponding to an aircraft; cannot be tied to a registration or aircraft type and is used for
+                    collision avoidance.</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li><a href="https://en.wikipedia.org/wiki/Traffic_information_service_%E2%80%93_broadcast"
+                      target="_blank" rel="noopener noreferrer">More Information</a>
+                    <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer"
+                      role="img" aria-label="More info">
+                      <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+                    </svg>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 24px; text-align: center;">
+        <button type="button" onClick="document.getElementById('output-reference').scrollIntoView()"
+          class="btn btn-sm btn-outline-secondary scroll-up">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+            <path fill-rule="evenodd"
+              d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+          </svg>
+          Scroll back up</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="container py-4" id="center-row">
+    <h4>Clock Center Row &amp; Abbreviations</h4>
+    <details>
+      <summary><b>Expand/Collapse</b></summary>
+      <div class="help-text"><i>Valid for FlightGazer v.11.3.0 and newer.</i></div>
+      <div style="margin: 20px 0; overflow-x: auto;">
+        <table cellpadding="8">
+          <thead>
+            <tr>
+              <th>Layout
+              </th>
+              <th>Description
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>▲--:-- ▼--:--</code>
+              </td>
+              <td>
+                Sunrise &amp; Sunset
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>G##.# N##.# L##%</code><br>
+                <i>or</i><br>
+                <code>G##.# N##.# PF##</code>
+              </td>
+              <td>
+                <code>G</code> = Receiver gain<br>
+                <code>N</code> = Noise (negative value, higher is better)<br>
+                <code>L</code> = Loud signals (percentage, lower is better)<br>
+                <code>PF</code> = (<i>Airspy only</i>) Preamble filter level<br>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>ABC wk## d###</code>
+              </td>
+              <td>
+                <code>ABC</code> = Month abbreviation<br>
+                <code>wk</code> = Week number of the year<br>
+                <code>d</code> = Day number of the year
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>##.#° ABCD ▼##</code>
+              </td>
+              <td>
+                Outside temperature (Celcius or Fahrenheit)<br>
+                <code>ABCD</code> = Prevailing weather condition<br>
+                Wind direction and speed (knots, mph, or m/s)
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>D##° V#.# C####</code>
+              </td>
+              <td>
+                <code>D</code> = Dew point (same unit as temperature)<br>
+                <code>V</code> = Visibility (miles or kilometers)<br>
+                <code>C</code> = Estimated cloud base (feet or meters)
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="help-text"><i>Weather data is for informational purposes only and not to be used for flight
+            planning.</i></div>
+        <details open>
+          <summary>Weather condition meanings</summary>
+          <div class="help-text"><i>Modifiers:</i><br>
+            <code>+</code> = Heavy<br>
+            <code>-</code> = Light<br>
+          </div>
+          <div style="overflow-x: auto;">
+            <table cellpadding="8">
+              <thead>
+                <tr>
+                  <th>Weather<br>Abbreviation
+                  </th>
+                  <th>Description
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>TSTM</code> / <code>TSM</code>
+                  </td>
+                  <td>Thunderstorm
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>DRZL</code> / <code>DZL</code>
+                  </td>
+                  <td>Drizzle
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>RN</code>
+                  </td>
+                  <td>Rain
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>FZRN</code>
+                  </td>
+                  <td>Freezing Rain
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>SHWR</code> / <code>SHR</code>
+                  </td>
+                  <td>Rain Showers
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>SNW</code>
+                  </td>
+                  <td>Snow
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>RSMX</code>
+                  </td>
+                  <td>Mixed Rain and Snow
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>SSHR</code>
+                  </td>
+                  <td>Snow Showers
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>SMKE</code>
+                  </td>
+                  <td>Smoke
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>SQLL</code>
+                  </td>
+                  <td>Squall
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>CLR</code>
+                  </td>
+                  <td>Clear Sky
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>cFEW</code>
+                  </td>
+                  <td>Few Clouds
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>cSCT</code>
+                  </td>
+                  <td>Scattered Clouds
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>cBKN</code>
+                  </td>
+                  <td>Broken Clouds
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>OVRC</code>
+                  </td>
+                  <td>Overcast
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+      <div style="margin-top: 24px; text-align: center;">
+        <button type="button" onClick="document.getElementById('center-row').scrollIntoView()"
+          class="btn btn-sm btn-outline-secondary scroll-up">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+            <path fill-rule="evenodd"
+              d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+          </svg>
+          Scroll back up</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="container py-4" id="neat-tricks">
+    <h4>Tips &amp; Tricks</h4>
+    <details>
+      <summary><b>Expand/Collapse</b></summary>
+      <ul>
+        <li><b>Turning off the screen at night</b></li>
+        <i>Configure Settings → Brightness</i><br><br>
+        Enable <span class="monospace">Dynamic Brightness</span> and set <span class="monospace">Secondary
+          Brightness</span> to <span class="monospace">0</span><br>
+        If you don't want it to turn off at sunset, disable <span class="monospace">Use Sunrise/Sunset</span> then set
+        <span class="monospace">Brightness Switch Time</span>.<br>
+        <i>Note: FlightGazer will still be running *and* driving the screen, even with a brightness of 0.</i><br><br>
+
+        <li><b>Only turn on the screen when there's an aircraft nearby (no clock)</b></li>
+        <i>Configure Settings → Brightness</i><br><br>
+        Set <span class="monospace">Brightness</span> to <span class="monospace">0</span> and disable <span
+          class="monospace">Dynamic Brightness</span>.<br>
+        Enable and set <span class="monospace">Active Plane Display Brightness</span> to the desired value.<br>
+        <i>Note: If you use <code>NO_FILTER</code> mode and follow this tip, the display will remain blank.</i><br><br>
+
+        <li><b>Hiding elements on the display</b></li>
+        <i>Configure Settings → Colors</i><br><br>
+        Simply set the display element to 'BLACK'<br><br>
+
+        <li><b>Extending the life of the physical display</b></li>
+        The display is a wear item.<br>
+        Over time, some of the pixels may become dimmer or their ability to reproduce accurate color is hindered.<br>
+        To delay this effect, lower the brightness of the display.<br>
+      </ul>
+
+      <details>
+        <summary><b>More Technical Tips (Expand/Collapse)</b></summary>
         <ul>
-            <li>Read the Troubleshooting section above</li>
-            <li>👉 <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/FAQs.md" target="_blank" rel="noopener noreferrer">Read the FAQ's.</a>
-                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-                <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-                </svg>
-            </li>
-            <li><a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/support-links.md" target="_blank" rel="noopener noreferrer">Additional support links</a>
-                <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-                <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-                </svg>
-            </li>
+          <li><b>Accessing FlightGazer's data/state programmatically</b></li>
+          Visit the <code>/data/current_state.json</code> endpoint to poll FlightGazer's current state.<br>
+          You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack) to access running stats and
+          other information like aircraft details and more.<br>
+          The details on how to interpret this JSON
+          <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/state-file-schema.md" target="_blank"
+            rel="noopener noreferrer">can be viewed here</a>
+          <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+            aria-label="More info">
+            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+          </svg>
+          .
+          <br><br>
+          <li><b>Other API endpoints for this webapp</b></li>
+          The below endpoints return JSON objects:
+          <ul>
+            <li><code>/api/status</code> (what drives the status message on the landing page)</li>
+            <li><code>/api/localpages</code> (list of other relevant pages accessible on this system)</li>
+          </ul>
+          It's recommended to not poll these too often (status about every minute, localpages once an hour).<br>
+          <br>
+
+          <li><b>Viewing FlightGazer in a terminal</b></li>
+          Fun fact, FlightGazer is a terminal-centric script. When it's running, its output is sent to a terminal
+          running on this (<span id="device_name"></span>) system. <br>
+          You'll need to get <code>ssh</code> access to this system, then use the command
+          <code>sudo tmux attach -d -t FlightGazer</code> to see this output.<br>
         </ul>
-        Found a bug regarding the FlightGazer software or want to suggest some features?<br>
-        <br>(The below links require a GitHub account)
-        <ul>
+      </details>
+
+      <br>
+      <ul>
+        <li><b>Additional Tips and Tricks</b></li>
+        <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/tips-n-tricks.md" target="_blank"
+          rel="noopener noreferrer">Check this document.</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+          aria-label="More info">
+          <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg>
+
+      </ul>
+
+      <div style="margin-top: 24px; text-align: center;">
+        <button type="button" onClick="document.getElementById('neat-tricks').scrollIntoView()"
+          class="btn btn-sm btn-outline-secondary scroll-up">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+            <path fill-rule="evenodd"
+              d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+          </svg>
+          Scroll back up</button>
+      </div>
+    </details>
+  </div>
+  <div class="container py-4" id="issues-feedback">
+    <h4>Reporting Issues and Sending Feedback</h4>
+    <details>
+      <summary><b>Expand/Collapse</b></summary>
+      <i>Recommended:</i>
+      <ul>
+        <li>Read the Troubleshooting section above</li>
+        <li>👉 <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/FAQs.md" target="_blank"
+            rel="noopener noreferrer">Read the FAQ's.</a>
+          <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+            aria-label="More info">
+            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+          </svg>
+        </li>
+        <li><a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/support-links.md" target="_blank"
+            rel="noopener noreferrer">Additional support links</a>
+          <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+            aria-label="More info">
+            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+          </svg>
+        </li>
+      </ul>
+      Found a bug regarding the FlightGazer software or want to suggest some features?<br>
+      <br>(The below links require a GitHub account)
+      <ul>
         <li>For the main program:
-         <a href="https://github.com/WeegeeNumbuh1/FlightGazer/issues" target="_blank" rel="noopener noreferrer">Create an issue here</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>
+          <a href="https://github.com/WeegeeNumbuh1/FlightGazer/issues" target="_blank" rel="noopener noreferrer">Create
+            an issue here</a>
+          <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+            aria-label="More info">
+            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+          </svg>
         </li>
         <li>For this web-app:
-         <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp/issues" target="_blank" rel="noopener noreferrer">Create an issue here</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>
+          <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp/issues" target="_blank"
+            rel="noopener noreferrer">Create an issue here</a>
+          <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+            aria-label="More info">
+            <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+          </svg>
         </li>
-        </ul>
-        <i>Before sending a bug report, try updating first.<br>
-        When sending a bug report, attach the log files.<br>These are available by going to the "Details and Logs" page and downloading them.</i>
+      </ul>
+      <i>Before sending a bug report, try updating first.<br>
+        When sending a bug report, attach the log files.<br>These are available by going to the "Details and Logs" page
+        and downloading them.</i>
     </details>
-</div>
-<div class="container py-4" id="sources">
+  </div>
+  <div class="container py-4" id="sources">
     <h4>Sources &amp; License</h4>
-    <details><summary><b>Expand/Collapse</b></summary>
-    <ul>
+    <details>
+      <summary><b>Expand/Collapse</b></summary>
+      <ul>
         <li><b>Airline names/operators</b></li>
-        Data is sourced from the related <a href="https://github.com/WeegeeNumbuh1/FlightGazer-airlines-db" target="_blank" rel="noopener noreferrer">
-            FlightGazer-airlines-db</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg> database, ultimately based on publications by the
-         <a href="https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html" target="_blank" rel="noopener noreferrer">FAA</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>.
+        Data is sourced from the related <a href="https://github.com/WeegeeNumbuh1/FlightGazer-airlines-db"
+          target="_blank" rel="noopener noreferrer">
+          FlightGazer-airlines-db</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+          aria-label="More info">
+          <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg> database, ultimately based on publications by the
+        <a href="https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html" target="_blank"
+          rel="noopener noreferrer">FAA</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+          aria-label="More info">
+          <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg>.
         <li><b>Aircraft types, registrations, and owners</b></li>
         Data is sourced from wiedehopf's <code>tar1090-db</code> repository, available on
-         <a href="https://github.com/wiedehopf/tar1090-db/tree/csv" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>.<br>
+        <a href="https://github.com/wiedehopf/tar1090-db/tree/csv" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+          aria-label="More info">
+          <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg>.<br>
         The actual database is maintained by
-         <a href="https://www.mictronics.de/aircraft-database/export.php" target="_blank" rel="noopener noreferrer">Mictronics</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>
+        <a href="https://www.mictronics.de/aircraft-database/export.php" target="_blank"
+          rel="noopener noreferrer">Mictronics</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+          aria-label="More info">
+          <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg>
         and supported by many volunteers.
-    </ul>
-    <hr>
-    <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer" title="View the source code of this web-app on GitHub">
-        <img src="{{ url_for('static', filename='FlightGazer-logo_webapp.png') }}" width="192" height="120" alt="FlightGazer Webapp Logo" class="logo-img">
-    </a>
-        <ul class="list-unstyled">
+      </ul>
+      <hr>
+      <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer"
+        title="View the source code of this web-app on GitHub">
+        <img src="{{ url_for('static', filename='FlightGazer-logo_webapp.png') }}" width="192" height="120"
+          alt="FlightGazer Webapp Logo" class="logo-img">
+      </a>
+      <ul class="list-unstyled">
         <li><b>Web-app changelog</b></li>
         The latest available one is
-         <a href="https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer-webapp/refs/heads/master/Changelog-webapp.txt" target="_blank" rel="noopener noreferrer">viewable here</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>
-            .
+        <a href="https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer-webapp/refs/heads/master/Changelog-webapp.txt"
+          target="_blank" rel="noopener noreferrer">viewable here</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+          aria-label="More info">
+          <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg>
+        .
         <li><b>License</b></li>
         FlightGazer and this web application are copyright
-         <a href="https://github.com/WeegeeNumbuh1" target="_blank" rel="noopener noreferrer">WeegeeNumbuh1</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg> and are licensed under the
-         <a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank" rel="noopener noreferrer">GNU General Public License v3</a>
-            <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img" aria-label="More info">
-              <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
-            </svg>.<br>
+        <a href="https://github.com/WeegeeNumbuh1" target="_blank" rel="noopener noreferrer">WeegeeNumbuh1</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+          aria-label="More info">
+          <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg> and are licensed under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.txt" target="_blank" rel="noopener noreferrer">GNU General Public
+          License v3</a>
+        <svg class="icon external-link" width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer" role="img"
+          aria-label="More info">
+          <use href="#external-link-icon" xlink:href="#external-link-icon"></use>
+        </svg>.<br>
         The source code is available by clicking on the FlightGazer logo on the main landing page.<br>
-        </ul>
-        <p>
-<pre><code>This program is distributed in the hope that it will be useful,
+      </ul>
+      <p>
+      <pre><code>This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.</code></pre>
-        </p>
+      </p>
     </details>
-</div>
-<script>
+  </div>
+  <script>
     function setTheme(theme) {
-        if (theme === 'light') {
-            document.body.style.background = '#f8f9fa';
-            document.body.style.color = '#222';
-            let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
-            document.documentElement.setAttribute("data-bs-theme", theme);
-        } else {
-            document.body.style.background = '#181818';
-            document.body.style.color = '#fff';
-            let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
-            document.documentElement.setAttribute("data-bs-theme", theme);
-        }
+      if (theme === 'light') {
+        document.body.style.background = '#f8f9fa';
+        document.body.style.color = '#222';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
+        document.documentElement.setAttribute("data-bs-theme", theme);
+      } else {
+        document.body.style.background = '#181818';
+        document.body.style.color = '#fff';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
+        document.documentElement.setAttribute("data-bs-theme", theme);
+      }
     }
     function getPreferredTheme() {
-        if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     function toggleTheme() {
-        let current = getPreferredTheme();
-        let next = current === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('fg_theme', next);
-        setTheme(next);
+      let current = getPreferredTheme();
+      let next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('fg_theme', next);
+      setTheme(next);
     }
     document.getElementById('themeToggleBtn').onclick = toggleTheme;
     setTheme(getPreferredTheme());
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+      if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
     });
-</script>
-<script>
+  </script>
+  <script>
     document.getElementById('closeWindow').onclick = closeWindow;
     function closeWindow() {
-        close();
+      close();
     }
     let showText = "{{ is_adsbim }}";
     if (showText === "True") {
-        document.getElementById("subheader").innerHTML = '\
+      document.getElementById("subheader").innerHTML = '\
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-megaphone-fill" viewBox="0 0 16 16" aria-hidden="true">\
         <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0zm-1 .724c-2.067.95-4.539 1.481-7 1.656v6.237a25 25 0 0 1 1.088.085c2.053.204 4.038.668 5.912 1.56zm-8 7.841V4.934c-.68.027-1.399.043-2.008.053A2.02 2.02 0 0 0 0 7v2c0 1.106.896 1.996 1.994 2.009l.496.008a64 64 0 0 1 1.51.048m1.39 1.081q.428.032.85.078l.253 1.69a1 1 0 0 1-.983 1.187h-.548a1 1 0 0 1-.916-.599l-1.314-2.48a66 66 0 0 1 1.692.064q.491.026.966.06"/>\
         </svg>\
@@ -738,11 +963,12 @@ GNU General Public License for more details.</code></pre>
                 <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>\
                 <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>\
             </g></svg>'
-        document.getElementById("sys-info-link").innerHTML = '\
+      document.getElementById("sys-info-link").innerHTML = '\
         <a href="{{ adsb_info }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">View Your System Info</a>\
         <a href="{{ adsb_logs }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">View System Logs</a>'
     }
     document.getElementById("device_name").innerHTML = '<code>{{ device_name }}</code>'
-</script>
+  </script>
 </body>
+
 </html>

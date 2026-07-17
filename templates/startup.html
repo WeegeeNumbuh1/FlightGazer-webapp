@@ -1,125 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlightGazer - Startup Options</title>
-    <meta name="author" content="WeegeeNumbuh1">
-    <meta name="description" content="FlightGazer startup options editor page.">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        body { background: #181818; color: #fff; }
-        .centered { text-align: center; margin-top: 60px; }
-        .back-btn { margin-top: 40px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlightGazer - Startup Options</title>
+  <meta name="author" content="WeegeeNumbuh1">
+  <meta name="description" content="FlightGazer startup options editor page.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+    }
+
+    .centered {
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .back-btn {
+      margin-top: 40px;
+    }
+  </style>
 </head>
+
 <body>
-<div class="container py-4">
+  <div class="container py-4">
     <button id="backToHomeBtn" class="btn btn btn-info">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-        </svg>
-        Back to Home</button>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:relative;z-index:10;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
-    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
-    </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+      </svg>
+      Back to Home</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end"
+      style="position:relative;z-index:10;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278" />
+        <path
+          d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z" />
+      </svg>
     </button>
     <h2 class="mb-4">Change Startup Options</h2>
     <h4>⚠️ Only enable these if you know what you're doing! ⚠️</h4>
     <h5>(Default is leaving these all unchecked)</h5>
     <form id="startupOptionsForm">
-        <div id="startupOptionsCheckboxes" class="mb-3"></div>
-        <button type="button" id="applyStartupBtn" class="btn btn-success">Apply</button>
+      <div id="startupOptionsCheckboxes" class="mb-3"></div>
+      <button type="button" id="applyStartupBtn" class="btn btn-success">Apply</button>
     </form>
     <div style="margin-top:8px;">
-    <span id="startupStatus" style="color:#eda907;"></span>
+      <span id="startupStatus" style="color:#eda907;"></span>
     </div>
-</div>
-<script>
-const homeUrl = {{ url_for('landing_page') | tojson }};
-const fullHomeUrl = window.location.origin + homeUrl;
-let windowHistoryCount = window.history.length;
+  </div>
+  <script>
+    const homeUrl = {{ url_for('landing_page') | tojson }};
+    const fullHomeUrl = window.location.origin + homeUrl;
+    let windowHistoryCount = window.history.length;
 
-function goHome() {
-    if (document.referrer === fullHomeUrl) {
+    function goHome() {
+      if (document.referrer === fullHomeUrl) {
         if (windowHistoryCount > 1) {
-            window.history.back();
+          window.history.back();
         } else {
-            close();
+          close();
         }
-    } else {
+      } else {
         window.location.href = homeUrl;
+      }
     }
-}
-document.getElementById('backToHomeBtn').onclick = goHome;
-</script>
-<script>
+    document.getElementById('backToHomeBtn').onclick = goHome;
+  </script>
+  <script>
     function setTheme(theme) {
-        if (theme === 'light') {
-            document.body.style.background = '#f8f9fa';
-            document.body.style.color = '#222';
-            let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
-        } else {
-            document.body.style.background = '#181818';
-            document.body.style.color = '#fff';
-            let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
-        }
+      if (theme === 'light') {
+        document.body.style.background = '#f8f9fa';
+        document.body.style.color = '#222';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
+      } else {
+        document.body.style.background = '#181818';
+        document.body.style.color = '#fff';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
+      }
     }
     function getPreferredTheme() {
-        if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     function toggleTheme() {
-        let current = getPreferredTheme();
-        let next = current === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('fg_theme', next);
-        setTheme(next);
+      let current = getPreferredTheme();
+      let next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('fg_theme', next);
+      setTheme(next);
     }
     document.getElementById('themeToggleBtn').onclick = toggleTheme;
     setTheme(getPreferredTheme());
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+      if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
     });
-</script>
-<script>
-const startupOptionsUrl = "{{ url_for('get_startup_options') }}";
-const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
+  </script>
+  <script>
+    const startupOptionsUrl = "{{ url_for('get_startup_options') }}";
+    const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
     function loadStartupOptions() {
-        fetch(startupOptionsUrl).then(r => r.json()).then(data => {
-            if (data.error) {
-                document.getElementById('startupStatus').innerText = data.error;
-                document.getElementById('applyStartupBtn').disabled = true;
-                return;
-            }
-            let html = '';
-            data.options.forEach(opt => {
-                html += `<div class='form-check'><input class='form-check-input' type='checkbox' id='flag_${opt.flag}' value='${opt.flag}'${data.flags.includes(opt.flag)?' checked':''}><label class='form-check-label' for='flag_${opt.flag}'>${opt.name} <span style='color:#ffd700;font-family:monospace;'>${opt.flag}</span></label></div>`;
-            });
-            document.getElementById('startupOptionsCheckboxes').innerHTML = html;
+      fetch(startupOptionsUrl).then(r => r.json()).then(data => {
+        if (data.error) {
+          document.getElementById('startupStatus').innerText = data.error;
+          document.getElementById('applyStartupBtn').disabled = true;
+          return;
+        }
+        let html = '';
+        data.options.forEach(opt => {
+          html += `<div class='form-check'><input class='form-check-input' type='checkbox' id='flag_${opt.flag}' value='${opt.flag}'${data.flags.includes(opt.flag) ? ' checked' : ''}><label class='form-check-label' for='flag_${opt.flag}'>${opt.name} <span style='color:#ffd700;font-family:monospace;'>${opt.flag}</span></label></div>`;
         });
+        document.getElementById('startupOptionsCheckboxes').innerHTML = html;
+      });
     }
-    document.getElementById('applyStartupBtn').onclick = function() {
-        if (!window.confirm('Are you sure you want to apply these options?')) return;
-        let checked = Array.from(document.querySelectorAll('#startupOptionsCheckboxes input:checked')).map(cb => cb.value);
-        document.getElementById('startupStatus').innerText = 'Applying changes...';
-        fetch(setStartupOptionsUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({flags: checked})}).then(r => r.json()).then(data => {
-            if (data.status === 'success') {
-                document.getElementById('startupStatus').innerText = 'Startup options updated and systemd reloaded. A service restart is required to see the changes.';
-            } else {
-                document.getElementById('startupStatus').innerText = data.error || 'Error.';
-            }
-            document.getElementById('applyStartupBtn').disabled = true;
-        });
+    document.getElementById('applyStartupBtn').onclick = function () {
+      if (!window.confirm('Are you sure you want to apply these options?')) return;
+      let checked = Array.from(document.querySelectorAll('#startupOptionsCheckboxes input:checked')).map(cb => cb.value);
+      document.getElementById('startupStatus').innerText = 'Applying changes...';
+      fetch(setStartupOptionsUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ flags: checked }) }).then(r => r.json()).then(data => {
+        if (data.status === 'success') {
+          document.getElementById('startupStatus').innerText = 'Startup options updated and systemd reloaded. A service restart is required to see the changes.';
+        } else {
+          document.getElementById('startupStatus').innerText = data.error || 'Error.';
+        }
+        document.getElementById('applyStartupBtn').disabled = true;
+      });
     };
     loadStartupOptions();
-</script>
+  </script>
 </body>
+
 </html>

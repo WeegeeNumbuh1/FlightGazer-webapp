@@ -1,9 +1,9 @@
 #!/bin/bash
 {
 # Uninstall script for FlightGazer's web interface
-# Last updated: v.0.10.2
+# Last updated: v.1.1.0
 # by: WeegeeNumbuh1
-BASEDIR=$(cd `dirname -- $0` && pwd)
+BASEDIR="$(cd "$(dirname -- "$0")" && pwd)"
 GREEN='\033[0;32m'
 ORANGE='\033[0;33m'
 RED='\033[0;31m'
@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 echo -ne "\033]0;FlightGazer Web Interface Uninstaller\007" # set window title
 echo -e "\n${ORANGE}>>> FlightGazer web interface uninstall script started."
 echo -e "${GREEN}>>> Setting up...${NC}"
-if [ `id -u` -ne 0 ]; then
+if [ $(id -u) -ne 0 ]; then
 	>&2 echo -e "${RED}>>> ERROR: This script must be run as root.${NC}"
 	sleep 1s
 	exit 1
@@ -24,12 +24,25 @@ if [ ! -f "${BASEDIR}/FG-webapp.py" ]; then
 	exit 1
 fi
 
+if [ -f '/opt/adsb/os.adsb.feeder.image' ] || [ -f '/opt/adsb/adsb.im.version' ]; then
+	ADSBIM=1
+else
+	ADSBIM=0
+fi
+
 echo "> Removing systemd service..."
 systemctl stop flightgazer-webapp.service
 systemctl disable flightgazer-webapp.service
+systemctl disable flightgazer-proxy.service >/dev/null 2>&1
 rm -f /etc/systemd/system/flightgazer-webapp.service 2>&1
+rm -f /etc/systemd/system/flightgazer-proxy.service >/dev/null 2>&1
 systemctl daemon-reload 2>&1
 systemctl reset-failed 2>&1
+# note: we don't remove the proxy stuff added to adsb.im because it's designed
+# to detect the webapp service (it won't proxy since it's gone)
+if [ $ADSBIM -eq 1 ]; then
+	systemd-run --scope -p "Delegate=yes" systemctl restart adsb-setup.service >/dev/null 2>&1
+fi
 
 if command -v nginx >/dev/null 2>&1; then
 	echo "> Removing nginx FlightGazer webapp config..."

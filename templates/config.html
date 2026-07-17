@@ -1,824 +1,1089 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlightGazer Config Editor</title>
-    <meta name="author" content="WeegeeNumbuh1">
-    <meta name="description" content="FlightGazer configuration page.">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        .help-text { font-size: 0.95em; color: #666; margin-bottom: 0.5em; max-width: 720px;}
-        .tab-content { margin-top: 1.5em; }
-        .apply-btn { display: none; position: fixed; bottom: 30px; right: 30px; z-index: 1000; }
-        .api-schedule-table-outer { overflow-x: auto; }
-        .api-schedule-table td, .api-schedule-table th { text-align: center; vertical-align: middle; }
-        .color-preview { width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; }
-        .setting-label { font-weight: 600; font-size: 1.08em; color: #7b86ff; }
-        .form-range { background-color: #0e0e0e12; padding-left: 8px; padding-right: 8px; max-width: 600px; }
-        .inline-image { max-width: 256px; }
-        .monospace { font-family: monospace; }
-        .sticky-col { position: sticky; left: 0; background-color: #fff; z-index: 1; }
-        .form-control { max-width: 600px; min-width: 320px; }
-        .form-control-color { outline-style: dashed; padding: 0.25rem; }
-        .form-select { max-width: 400px; }
-    </style>
-<script>
-function setTheme(theme) {
-    if (theme === 'light') {
-        document.documentElement.setAttribute("data-bs-theme", theme);
-    } else {
-        document.documentElement.setAttribute("data-bs-theme", theme);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlightGazer Config Editor</title>
+  <meta name="author" content="WeegeeNumbuh1">
+  <meta name="description" content="FlightGazer configuration page.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <style>
+    .help-text {
+      font-size: 0.95em;
+      color: #666;
+      margin-bottom: 0.5em;
+      max-width: 720px;
     }
-}
-function getPreferredTheme() {
-    if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-setTheme(getPreferredTheme());
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
-});
-</script>
+
+    .tab-content {
+      margin-top: 1.5em;
+    }
+
+    .apply-btn {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+    }
+
+    .api-schedule-table-outer {
+      overflow-x: auto;
+    }
+
+    .api-schedule-table td,
+    .api-schedule-table th {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .color-preview {
+      width: 2em;
+      height: 2em;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .setting-label {
+      font-weight: 600;
+      font-size: 1.08em;
+      color: #7b86ff;
+    }
+
+    .form-range {
+      background-color: #0e0e0e12;
+      padding-left: 8px;
+      padding-right: 8px;
+      max-width: 600px;
+    }
+
+    .inline-image {
+      max-width: 256px;
+    }
+
+    .monospace {
+      font-family: monospace;
+    }
+
+    .sticky-col {
+      position: sticky;
+      left: 0;
+      background-color: #fff;
+      z-index: 1;
+    }
+
+    .form-control {
+      max-width: 600px;
+      min-width: 320px;
+    }
+
+    .form-control-color {
+      outline-style: dashed;
+      padding: 0.25rem;
+    }
+
+    .form-select {
+      max-width: 400px;
+    }
+  </style>
+  <script>
+    function setTheme(theme) {
+      if (theme === 'light') {
+        document.documentElement.setAttribute("data-bs-theme", theme);
+      } else {
+        document.documentElement.setAttribute("data-bs-theme", theme);
+      }
+    }
+    function getPreferredTheme() {
+      if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    setTheme(getPreferredTheme());
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+    });
+  </script>
 </head>
+
 <body>
-<div class="container py-4" style="margin-bottom:6em;">
+  <div class="container py-4" style="margin-bottom:6em;">
     <button id="backToHomeBtn" class="btn btn btn-info">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16" aria-hidden="true">
-    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-    </svg>
-        Back to Home</button>
-    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:relative;z-index:10;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
-    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
-    </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+      </svg>
+      Back to Home</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end"
+      style="position:relative;z-index:10;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278" />
+        <path
+          d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z" />
+      </svg>
     </button>
     <h2>FlightGazer Configuration Editor</h2>
     <div class="help-text"><i>Hint: Configure of all your settings first before pressing the "Save" button.</i></div>
     <ul class="nav nav-tabs" id="configTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" title="Define your tracking area">General</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api" type="button" role="tab" title="Enable and configure how FlightGazer gets aircraft route information">API / Journey Info</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="screen-tab" data-bs-toggle="tab" data-bs-target="#screen" type="button" role="tab" title="Configure how FlightGazer displays information">Display Layouts</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="brightness-tab" data-bs-toggle="tab" data-bs-target="#brightness" type="button" role="tab" title="Change how bright the display is">Brightness</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab" title="Advanced FlightGazer settings">Advanced</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="rgb-tab" data-bs-toggle="tab" data-bs-target="#rgb" type="button" role="tab" title="Change low-level settings for the physical display">RGB-Matrix</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="colors-tab" data-bs-toggle="tab" data-bs-target="#colors" type="button" role="tab" title="Configure colors for every element on the display">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-palette" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
-            <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8m-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7"/>
-            </svg>
-                Colors</button>
-        </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button"
+          role="tab" title="Define your tracking area">General</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api" type="button" role="tab"
+          title="Enable and configure how FlightGazer gets aircraft route information">API / Journey Info</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="screen-tab" data-bs-toggle="tab" data-bs-target="#screen" type="button" role="tab"
+          title="Configure how FlightGazer displays information">Display Layouts</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="brightness-tab" data-bs-toggle="tab" data-bs-target="#brightness" type="button"
+          role="tab" title="Change how bright the display is">Brightness</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button"
+          role="tab" title="Advanced FlightGazer settings">Advanced</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rgb-tab" data-bs-toggle="tab" data-bs-target="#rgb" type="button" role="tab"
+          title="Change low-level settings for the physical display">RGB-Matrix</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="colors-tab" data-bs-toggle="tab" data-bs-target="#colors" type="button" role="tab"
+          title="Configure colors for every element on the display">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-palette"
+            viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+            <path
+              d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8m-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7" />
+          </svg>
+          Colors</button>
+      </li>
     </ul>
     <form id="configForm">
-    <div class="tab-content">
+      <div class="tab-content">
         <!-- General Tab -->
         <div class="tab-pane fade show active" id="general" role="tabpanel">
+          <div class="help-text">
+            <details>
+              <summary>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                  class="bi bi-info-circle" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                  <path
+                    d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
+                </svg>
+                <b>Tip: Good starting points...</b>
+              </summary>
+              <br>
+              <dl>
+                <dt><i>&ldquo;If I can hear it, I want to track it.&rdquo;</i>
+                <dd>15000ft, 2nmi (This works well for most locations.)</dd>
+                </dt>
+                <dt><i>&ldquo;If I can see the contrails, I want to track it.&rdquo;</i>
+                <dd>50000ft, 5nmi</dd>
+                </dt>
+                <dt><i>&ldquo;It's very quiet around here.&rdquo;</i>
+                <dd>50000ft, 10nmi</ul>
+                  </dt>
+                <dt><i>&ldquo;I can see the runway lights from my backyard.&rdquo;</i>
+                <dd>5000ft, 1.5nmi</dd>
+                </dt>
+              </dl>
+              </summary>
+          </div>
+          <div class="mt-3">
+            <label class="form-label setting-label">Units</label>
             <div class="help-text">
-                <details><summary>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16" aria-hidden="true">
-                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
-                    </svg>
-                    <b>Tip: Good starting points...</b></summary>
-                    <br>
-                <dl>
-                    <dt><i>&ldquo;If I can hear it, I want to track it.&rdquo;</i><dd>15000ft, 2nmi (This works well for most locations.)</dd></dt>
-                    <dt><i>&ldquo;If I can see the contrails, I want to track it.&rdquo;</i><dd>50000ft, 5nmi</dd></dt>
-                    <dt><i>&ldquo;It's very quiet around here.&rdquo;</i><dd>50000ft, 10nmi</ul></dt>
-                    <dt><i>&ldquo;I can see the runway lights from my backyard.&rdquo;</i><dd>5000ft, 1.5nmi</dd></dt>
-                </dl>
-                </summary>
+              <ul>
+                <li>Aeronautical (nmi, ft, kt, ft/min) [default]</li>
+                <li>Metric (km, m, km/h, m/s)</li>
+                <li>U.S. Customary (mi, ft, mph, ft/min)</li>
+              </ul>
             </div>
-            <div class="mt-3">
-                <label class="form-label setting-label">Units</label>
-                <div class="help-text">
-                    <ul>
-                        <li>Aeronautical (nmi, ft, kt, ft/min) [default]</li>
-                        <li>Metric (km, m, km/h, m/s)</li>
-                        <li>U.S. Customary (mi, ft, mph, ft/min)</li>
-                    </ul>
-                </div>
-                <select class="form-select" id="UNITS" name="UNITS">
-                    <option value="0" {% if config.UNITS == 0 %}selected{% endif %}>Aeronautical</option>
-                    <option value="1" {% if config.UNITS == 1 %}selected{% endif %}>Metric</option>
-                    <option value="2" {% if config.UNITS == 2 %}selected{% endif %}>U.S. Customary</option>
-                </select>
+            <select class="form-select" id="UNITS" name="UNITS">
+              <option value="0" {% if config.UNITS==0 %}selected{% endif %}>Aeronautical</option>
+              <option value="1" {% if config.UNITS==1 %}selected{% endif %}>Metric</option>
+              <option value="2" {% if config.UNITS==2 %}selected{% endif %}>U.S. Customary</option>
+            </select>
+          </div>
+          <div class="mt-3">
+            <label for="HEIGHT_LIMIT" class="form-label setting-label">Height Limit</label>
+            <div class="help-text">
+              Aircraft at an altitude lower than this will be considered for detailed tracking on the display.<br>
+              <i>Default: 15000 feet</i>
             </div>
-            <div class="mt-3">
-                <label for="HEIGHT_LIMIT" class="form-label setting-label">Height Limit</label>
-                <div class="help-text">
-                    Aircraft at an altitude lower than this will be considered for detailed tracking on the display.<br>
-                    <i>Default: 15000 feet</i>
-                </div>
-                <div class="input-group">
-                    <!-- Limits when (UNITS = 0 or 2): min="2500", max="75000"
+            <div class="input-group">
+              <!-- Limits when (UNITS = 0 or 2): min="2500", max="75000"
                     (UNITS = 1): min="760", max="22860" -->
-                    <input type="range" class="form-range" min="2500" max="75000" step="5" id="HEIGHT_LIMIT" name="HEIGHT_LIMIT" value="{{ config.HEIGHT_LIMIT }}" oninput="HEIGHT_LIMIT_num.value = this.value">
-                    <input type="number" class="form-control" min="2500" max="75000" step="5" id="HEIGHT_LIMIT_num" value="{{ config.HEIGHT_LIMIT }}" style="max-width:100px; min-width: 100px; margin-left:8px;" oninput="HEIGHT_LIMIT.value = this.value">
-                    <span id="aUnit" style="margin-left: 8px; align-content: center;"></span>
-                </div>
+              <input type="range" class="form-range" min="2500" max="75000" step="5" id="HEIGHT_LIMIT"
+                name="HEIGHT_LIMIT" value="{{ config.HEIGHT_LIMIT }}" oninput="HEIGHT_LIMIT_num.value = this.value">
+              <input type="number" class="form-control" min="2500" max="75000" step="5" id="HEIGHT_LIMIT_num"
+                value="{{ config.HEIGHT_LIMIT }}" style="max-width:100px; min-width: 100px; margin-left:8px;"
+                oninput="HEIGHT_LIMIT.value = this.value">
+              <span id="aUnit" style="margin-left: 8px; align-content: center;"></span>
             </div>
-            <div class="mt-3">
-                <label for="RANGE" class="form-label setting-label">Range</label>
-                <div class="help-text">
-                    Aircraft within this radius from your location will be considered for detailed tracking on the display.<br>
-                    This setting does not limit the range of your receiver.<br>
-                    To see how big of an area a certain radius is on a map, <a href="https://www.mapdevelopers.com/draw-circle-tool.php" target="_blank" rel="noopener noreferrer">use this online tool</a>
-                    <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                        <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                            <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                        </g>
-                    </svg> (opens a new tab).<br>
-                    <i>If you are near an airport or inline with a runway, 2 nmi (2.3 mi, 3.7 km) or less works best.</i><br>
-                </div>
-                <div class="input-group">
-                    <!-- Limits when (UNITS = 0): min="0.5" max="20"
+          </div>
+          <div class="mt-3">
+            <label for="RANGE" class="form-label setting-label">Range</label>
+            <div class="help-text">
+              Aircraft within this radius from your location will be considered for detailed tracking on the
+              display.<br>
+              This setting does not limit the range of your receiver.<br>
+              To see how big of an area a certain radius is on a map, <a
+                href="https://www.mapdevelopers.com/draw-circle-tool.php" target="_blank" rel="noopener noreferrer">use
+                this online tool</a>
+              <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                  <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+              </svg> (opens a new tab).<br>
+              <i>If you are near an airport or inline with a runway, 2 nmi (2.3 mi, 3.7 km) or less works best.</i><br>
+            </div>
+            <div class="input-group">
+              <!-- Limits when (UNITS = 0): min="0.5" max="20"
                     (UNITS = 1): min="0.9" max="37"
                     (UNITS = 2): min="0.6" max="23" -->
-                    <input type="range" class="form-range" min="0.5" max="20" step="0.1" id="RANGE" name="RANGE" value="{{ config.RANGE }}" oninput="RANGE_num.value = this.value">
-                    <input type="number" class="form-control" min="0.5" max="20" step="0.1" id="RANGE_num" value="{{ config.RANGE }}" style="max-width:100px; min-width: 100px; margin-left:8px;" oninput="RANGE.value = this.value">
-                    <span id="dUnit" style="margin-left: 8px; align-content: center;"></span>
-                    <!-- <output id="RANGE_value" style="margin-left:8px;">{{ config.RANGE }}</output> -->
-                </div>
+              <input type="range" class="form-range" min="0.5" max="20" step="0.1" id="RANGE" name="RANGE"
+                value="{{ config.RANGE }}" oninput="RANGE_num.value = this.value">
+              <input type="number" class="form-control" min="0.5" max="20" step="0.1" id="RANGE_num"
+                value="{{ config.RANGE }}" style="max-width:100px; min-width: 100px; margin-left:8px;"
+                oninput="RANGE.value = this.value">
+              <span id="dUnit" style="margin-left: 8px; align-content: center;"></span>
+              <!-- <output id="RANGE_value" style="margin-left:8px;">{{ config.RANGE }}</output> -->
             </div>
+          </div>
         </div>
         <!-- API Tab -->
         <div class="tab-pane fade" id="api" role="tabpanel">
-            <div class="mt-3">
-                <label for="API_KEY" class="form-label setting-label">API Key</label>
-                <div class="help-text">
-                    Put your FlightAware API key here. Leave blank to not use the API.<br>
-                    <h5>Having an API key will enable the journey readout (route info) for aircraft that enter your area.</h5><br>
-                    Don't have one? Sign up at <a href="https://www.flightaware.com/commercial/aeroapi/#pricing-cards" target="_blank" rel="noopener noreferrer">FlightAware</a>
-                    <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                        <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                            <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                        </g>
-                    </svg>.<br><i>(There is a free Personal tier, billing information required)</i>
-                </div>
-                <input type="text" class="form-control" id="API_KEY" name="API_KEY" value="{{ config.API_KEY }}" style="font-family: monospace;" maxlength="50" pattern="[0-9a-zA-Z]+" spellcheck="false" autocomplete="off">
+          <div class="mt-3">
+            <label for="API_KEY" class="form-label setting-label">API Key</label>
+            <div class="help-text">
+              Put your FlightAware API key here. Leave blank to not use the API.<br>
+              <h5>Having an API key will enable the journey readout (route info) for aircraft that enter your area.</h5>
+              <br>
+              Don't have one? Sign up at <a href="https://www.flightaware.com/commercial/aeroapi/#pricing-cards"
+                target="_blank" rel="noopener noreferrer">FlightAware</a>
+              <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                  <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+              </svg>.<br><i>(There is a free Personal tier, billing information required)</i>
             </div>
-            <hr>
-            <div class="mt-3">
-                <label for="API_DAILY_LIMIT" class="form-label setting-label">API Daily Limit</label>
-                <div class="help-text">
-                    Type in an integer to limit the amount of API calls in a day.<br>
-                    Leave this blank for unlimited calls.
-                </div>
-                <input type="number" step="1" class="form-control" id="API_DAILY_LIMIT" name="API_DAILY_LIMIT" value="{{ config.API_DAILY_LIMIT or '' }}" min="1" max="10000">
+            <input type="text" class="form-control" id="API_KEY" name="API_KEY" value="{{ config.API_KEY }}"
+              style="font-family: monospace;" maxlength="50" pattern="[0-9a-zA-Z]+" spellcheck="false"
+              autocomplete="off">
+          </div>
+          <hr>
+          <div class="mt-3">
+            <label for="API_DAILY_LIMIT" class="form-label setting-label">API Daily Limit</label>
+            <div class="help-text">
+              Type in an integer to limit the amount of API calls in a day.<br>
+              Leave this blank for unlimited calls.
             </div>
-            <div class="mt-3">
-                <label for="API_COST_LIMIT" class="form-label setting-label">API Cost Limit</label>
-                <div class="help-text">
-                    Limit API usage of the provided API key based on its running cost from the past 30 days. (ex: $10.00)<br>
-                    <details><summary>More details</summary>
-                    If the cost reaches or exceeds this value, API calls will stop and will not resume until there are credits available again.<br>
-                    If the cost upon startup exceeds this value, the API will not be used but will start if there are credits available at a later time.<br>
-                    </details>
-                    Leave this blank to have no limit. (Not recommended)
-                </div>
-                <input type="number" step="0.01" class="form-control" id="API_COST_LIMIT" name="API_COST_LIMIT" value="{{ config.API_COST_LIMIT }}" min="0.01" max="10000">
+            <input type="number" step="1" class="form-control" id="API_DAILY_LIMIT" name="API_DAILY_LIMIT"
+              value="{{ config.API_DAILY_LIMIT or '' }}" min="1" max="10000">
+          </div>
+          <div class="mt-3">
+            <label for="API_COST_LIMIT" class="form-label setting-label">API Cost Limit</label>
+            <div class="help-text">
+              Limit API usage of the provided API key based on its running cost from the past 30 days. (ex: $10.00)<br>
+              <details>
+                <summary>More details</summary>
+                If the cost reaches or exceeds this value, API calls will stop and will not resume until there are
+                credits available again.<br>
+                If the cost upon startup exceeds this value, the API will not be used but will start if there are
+                credits available at a later time.<br>
+              </details>
+              Leave this blank to have no limit. (Not recommended)
             </div>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="API_PERSISTENT_CACHE" name="API_PERSISTENT_CACHE" {% if config.API_PERSISTENT_CACHE %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="API_PERSISTENT_CACHE">Enable Persistent Cache</label>
-                </div>
-                <div class="help-text">
-                    When an API result is for a commercial flight, save the result so that the API doesn't have to be called when the same flight appears again.
-                    <details><summary>More details</summary>
-                        <ul>
-                        <li>Keeps results from the past 30 days.</li>
-                        <li>Results from general aviation flights will not be stored.</li>
-                        <li>Journey information may be inaccurate and flight duration times will not be present when data is used from this cache.</li>
-                        <li>Calls to both the API and this cache will stop if any API limit is reached.</li>
-                        </ul>
-                    Recommended for high traffic areas with consistent scheduled flights, e.g. near a major airport.</details>
-                </div>
+            <input type="number" step="0.01" class="form-control" id="API_COST_LIMIT" name="API_COST_LIMIT"
+              value="{{ config.API_COST_LIMIT }}" min="0.01" max="10000">
+          </div>
+          <div class="mt-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="API_PERSISTENT_CACHE" name="API_PERSISTENT_CACHE" {%
+                if config.API_PERSISTENT_CACHE %}checked{% endif %}>
+              <label class="form-check-label setting-label" for="API_PERSISTENT_CACHE">Enable Persistent Cache</label>
             </div>
-            <hr>
-            <div class="mt-3">
-                <label class="form-label setting-label">API Schedule</label>
-                <div class="help-text">
-                    Set hours when the API can be used. Recommended so you can stretch your API limits further (ex: not using the API when asleep or at work)<br>
-                    <details><summary>More details</summary>
-                    A checkmark indicates the API can be used at the specified day and hour.<br>
-                    If this setting is disabled, the API can be used at all times.</details>
-                    <i>On mobile screens, you might need to scroll to the right →</i>
-                </div>
-                <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" id="API_SCHEDULE_ENABLED" name="API_SCHEDULE_ENABLED" {% if config.API_SCHEDULE.ENABLED %}checked{% endif %}>
-                    <label class="form-check-label" for="API_SCHEDULE_ENABLED">Enable API Schedule</label>
-                </div>
-                <div class="api-schedule-table-outer">
-                <table class="table table-bordered api-schedule-table">
-                    <thead>
-                        <tr><th style="background-color: #666;"></th><th colspan="12" style="background-color: rgb(255, 238, 160); color: #000;">&ldquo;AM&rdquo;</th><th colspan="12" style="background-color: rgb(198, 229, 241); color: #000;">&ldquo;PM&rdquo;</th></tr>
-                        <tr><th class="sticky-col" style="background-color: rgb(192, 192, 192); color: #000;">Hour →<br>Day ↓</th>{% for h in range(0,24) %}<th>{{ h }}</th>{% endfor %}</tr>
-                    </thead>
-                    <tbody>
-                    {% for day in ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'] %}
-                        <tr>
-                            <td class="sticky-col">{{ day.title() }}</td>
-                            {% set am = config.API_SCHEDULE[day]['0-11'] %}
-                            {% set pm = config.API_SCHEDULE[day]['12-23'] %}
-                            {% for i in range(12) %}
-                                <td style="padding: 12px;"><input type="checkbox" class="api-hour" data-day="{{day}}" data-hour="{{i}}" {% if am[i]=='x' %}checked{% endif %}></td>
-                            {% endfor %}
-                            {% for i in range(12) %}
-                                <td style="padding: 12px;"><input type="checkbox" class="api-hour" data-day="{{day}}" data-hour="{{i+12}}" {% if pm[i]=='x' %}checked{% endif %}></td>
-                            {% endfor %}
-                        </tr>
+            <div class="help-text">
+              When an API result is for a commercial flight, save the result so that the API doesn't have to be called
+              when the same flight appears again.
+              <details>
+                <summary>More details</summary>
+                <ul>
+                  <li>Keeps results from the past 30 days.</li>
+                  <li>Results from general aviation flights will not be stored.</li>
+                  <li>Journey information may be inaccurate and flight duration times will not be present when data is
+                    used from this cache.</li>
+                  <li>Calls to both the API and this cache will stop if any API limit is reached.</li>
+                </ul>
+                Recommended for high traffic areas with consistent scheduled flights, e.g. near a major airport.
+              </details>
+            </div>
+          </div>
+          <hr>
+          <div class="mt-3">
+            <label class="form-label setting-label">API Schedule</label>
+            <div class="help-text">
+              Set hours when the API can be used. Recommended so you can stretch your API limits further (ex: not using
+              the API when asleep or at work)<br>
+              <details>
+                <summary>More details</summary>
+                A checkmark indicates the API can be used at the specified day and hour.<br>
+                If this setting is disabled, the API can be used at all times.
+              </details>
+              <i>On mobile screens, you might need to scroll to the right →</i>
+            </div>
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" id="API_SCHEDULE_ENABLED" name="API_SCHEDULE_ENABLED" {%
+                if config.API_SCHEDULE.ENABLED %}checked{% endif %}>
+              <label class="form-check-label" for="API_SCHEDULE_ENABLED">Enable API Schedule</label>
+            </div>
+            <div class="api-schedule-table-outer">
+              <table class="table table-bordered api-schedule-table">
+                <thead>
+                  <tr>
+                    <th style="background-color: #666;"></th>
+                    <th colspan="12" style="background-color: rgb(255, 238, 160); color: #000;">&ldquo;AM&rdquo;</th>
+                    <th colspan="12" style="background-color: rgb(198, 229, 241); color: #000;">&ldquo;PM&rdquo;</th>
+                  </tr>
+                  <tr>
+                    <th class="sticky-col" style="background-color: rgb(192, 192, 192); color: #000;">Hour →<br>Day ↓
+                    </th>{% for h in range(0,24) %}<th>{{ h }}</th>{% endfor %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for day in ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'] %}
+                  <tr>
+                    <td class="sticky-col">{{ day.title() }}</td>
+                    {% set am = config.API_SCHEDULE[day]['0-11'] %}
+                    {% set pm = config.API_SCHEDULE[day]['12-23'] %}
+                    {% for i in range(12) %}
+                    <td style="padding: 12px;"><input type="checkbox" class="api-hour" data-day="{{day}}"
+                        data-hour="{{i}}" {% if am[i]=='x' %}checked{% endif %}></td>
                     {% endfor %}
-                    </tbody>
-                </table>
-                </div>
+                    {% for i in range(12) %}
+                    <td style="padding: 12px;"><input type="checkbox" class="api-hour" data-day="{{day}}"
+                        data-hour="{{i+12}}" {% if pm[i]=='x' %}checked{% endif %}></td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
-            <div style="margin-top: 24px; text-align: left;">
-                <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-                    <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-                    </svg>
-                    Scroll back up</button>
-            </div>
+          </div>
+          <div style="margin-top: 24px; text-align: left;">
+            <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd"
+                  d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+                <path fill-rule="evenodd"
+                  d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+              </svg>
+              Scroll back up</button>
+          </div>
         </div>
         <!-- Screen Output Tab -->
         <div class="tab-pane fade" id="screen" role="tabpanel">
+          <div class="help-text">
+            <i>See also:</i> <a href="{{ url_for('reference_guide') }}" class="btn btn-outline-secondary"
+              target="_blank" title="Don't know what all the values on the display mean? This page explains it.">Layout
+              Reference</a>
+          </div>
+          <div class="mt-3">
+            <img src="{{ url_for('static', filename='FG-journey-plus-default.png') }}" class="inline-image">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="JOURNEY_PLUS" name="JOURNEY_PLUS" {% if
+                config.JOURNEY_PLUS %}checked{% endif %}>
+              <label class="form-check-label setting-label" for="JOURNEY_PLUS">Journey Plus</label>
+            </div>
             <div class="help-text">
-                <i>See also:</i> <a href="{{ url_for('reference_guide') }}" class="btn btn-outline-secondary" target="_blank" title="Don't know what all the values on the display mean? This page explains it.">Layout Reference</a>
+              A hybrid between <span class="monospace">Enhanced Readout</span> and the default journey
+              (origin/destination) display.<br>
+              Highly recommended if you prefer information density.<br>
+              <details>
+                <summary>More details</summary>
+                Adds:
+                <ul>
+                  <li>Track (example: <code>T▼180°</code>)
+                    <ul>
+                      <li>The direction the aircraft is traveling over the ground (0° = North, 90° = East, etc.)</li>
+                    </ul>
+                  </li>
+                  <li>Vertical Speed (example: <code>V+1234</code>)
+                    <ul>
+                      <li>The rate of climb or descent (default: feet/min; meters/sec if using Metric)</li>
+                    </ul>
+                  </li>
+                  <li>RSSI - Received Signal Strength Index
+                    <ul>
+                      <li>Strength of the signal from the aircraft as detected from your receiver (in dBFS)</li>
+                      <li>This takes the place of the Time (that the aircraft is airborne) readout in the bottom right
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </details>
+            </div>
+          </div>
+          <hr>
+          <div>
+            <div class="mt-3">
+              <img src="{{ url_for('static', filename='FG-enhanced-readout.png') }}" class="inline-image">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT" name="ENHANCED_READOUT" {% if
+                  config.ENHANCED_READOUT %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="ENHANCED_READOUT">Enhanced Readout</label>
+              </div>
+              <div class="help-text">
+                Replaces the journey (origin/destination) readout with more spatial information.<br>
+                If the API is not used, it's recommended to enable this or leave the below setting enabled.<br>
+                <details>
+                  <summary>More details</summary>
+                  Journey information in this layout is replaced with the following:
+                  <ul>
+                    <li>Aircraft coordinates (latitude and longitude)</li>
+                    <li>Track</li>
+                    <li>Vertical Speed</li>
+                  </ul>
+                  And swaps the Time readout in the bottom right with:
+                  <ul>
+                    <li>RSSI</li>
+                  </ul>
+                  When enabled, disables the API even if a valid key is present.
+                </details>
+              </div>
             </div>
             <div class="mt-3">
-                <img src="{{ url_for('static', filename='FG-journey-plus-default.png') }}" class="inline-image">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="JOURNEY_PLUS" name="JOURNEY_PLUS" {% if config.JOURNEY_PLUS %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="JOURNEY_PLUS">Journey Plus</label>
-                </div>
-                <div class="help-text">
-                    A hybrid between <span class="monospace">Enhanced Readout</span> and the default journey (origin/destination) display.<br>
-                    Highly recommended if you prefer information density.<br>
-                    <details><summary>More details</summary>
-                    Adds:
-                    <ul>
-                    <li>Track (example: <code>T▼180°</code>)
-                        <ul>
-                            <li>The direction the aircraft is traveling over the ground (0° = North, 90° = East, etc.)</li>
-                        </ul>
-                    </li>
-                    <li>Vertical Speed (example: <code>V+1234</code>)
-                        <ul>
-                            <li>The rate of climb or descent (default: feet/min; meters/sec if using Metric)</li>
-                        </ul>
-                    </li>
-                    <li>RSSI - Received Signal Strength Index
-                        <ul>
-                            <li>Strength of the signal from the aircraft as detected from your receiver (in dBFS)</li>
-                            <li>This takes the place of the Time (that the aircraft is airborne) readout in the bottom right</li>
-                        </ul>
-                    </li>
-                    </ul>
-                    </details>
-                </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT_AS_FALLBACK"
+                  name="ENHANCED_READOUT_AS_FALLBACK" {% if config.ENHANCED_READOUT_AS_FALLBACK %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="ENHANCED_READOUT_AS_FALLBACK">Enhanced Readout as
+                  Fallback</label>
+              </div>
+              <div class="help-text">
+                Switch to <span class="monospace">Enhanced Readout</span> if API is unavailable or any of the API limits
+                are reached.<br>
+                When the API can be used again, the display will switch back to the other layouts.<br>
+                <details>
+                  <summary>More details</summary>
+                  Only works when <span class="monospace">Enhanced Readout</span> is disabled.<br>
+                  This setting is recommended to be left enabled unless you prefer the other layouts even when journey
+                  information is unavailable.
+                </details>
+              </div>
             </div>
-            <hr>
-            <div>
-                <div class="mt-3">
-                    <img src="{{ url_for('static', filename='FG-enhanced-readout.png') }}" class="inline-image">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT" name="ENHANCED_READOUT" {% if config.ENHANCED_READOUT %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="ENHANCED_READOUT">Enhanced Readout</label>
-                    </div>
-                    <div class="help-text">
-                        Replaces the journey (origin/destination) readout with more spatial information.<br>
-                        If the API is not used, it's recommended to enable this or leave the below setting enabled.<br>
-                        <details><summary>More details</summary>
-                        Journey information in this layout is replaced with the following:
-                        <ul>
-                            <li>Aircraft coordinates (latitude and longitude)</li>
-                            <li>Track</li>
-                            <li>Vertical Speed</li>
-                        </ul>
-                        And swaps the Time readout in the bottom right with:
-                        <ul>
-                            <li>RSSI</li>
-                        </ul>
-                        When enabled, disables the API even if a valid key is present.
-                    </details>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ENHANCED_READOUT_AS_FALLBACK" name="ENHANCED_READOUT_AS_FALLBACK" {% if config.ENHANCED_READOUT_AS_FALLBACK %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="ENHANCED_READOUT_AS_FALLBACK">Enhanced Readout as Fallback</label>
-                    </div>
-                    <div class="help-text">
-                        Switch to <span class="monospace">Enhanced Readout</span> if API is unavailable or any of the API limits are reached.<br>
-                        When the API can be used again, the display will switch back to the other layouts.<br>
-                        <details><summary>More details</summary>
-                        Only works when <span class="monospace">Enhanced Readout</span> is disabled.<br>
-                        This setting is recommended to be left enabled unless you prefer the other layouts even when journey information is unavailable.
-                        </details>
-                    </div>
-                </div>
+          </div>
+          <hr>
+          <div>
+            <div class="mt-3">
+              <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-JourneyPlus.png') }}" class="inline-image">
+              <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-EnhancedReadout.png') }}"
+                class="inline-image">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="SHOW_EVEN_MORE_INFO" name="SHOW_EVEN_MORE_INFO" {%
+                  if config.SHOW_EVEN_MORE_INFO %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="SHOW_EVEN_MORE_INFO">Show Even More Info</label>
+              </div>
+              <div class="help-text">
+                Display additional info such as aircraft type, airline, owner, and journey details as a scrolling
+                marquee/ticker.<br>
+                Only works with the <span class="monospace">Journey Plus</span> or <span class="monospace">Enhanced
+                  Readout</span> modes.<br>
+                <details>
+                  <summary>More details</summary>
+                  When using <span class="monospace">Journey Plus</span>:
+                  <ul>
+                    <li>Replaces the center readout (Vertical Speed is unavailable)</li>
+                    <li>Replaces RSSI with Track in the bottom right</li>
+                  </ul>
+                  Disable this feature if it's too distracting.
+                </details>
+              </div>
             </div>
-            <hr>
-            <div>
-                <div class="mt-3">
-                    <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-JourneyPlus.png') }}" class="inline-image">
-                    <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-EnhancedReadout.png') }}" class="inline-image">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="SHOW_EVEN_MORE_INFO" name="SHOW_EVEN_MORE_INFO" {% if config.SHOW_EVEN_MORE_INFO %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="SHOW_EVEN_MORE_INFO">Show Even More Info</label>
-                    </div>
-                    <div class="help-text">
-                        Display additional info such as aircraft type, airline, owner, and journey details as a scrolling marquee/ticker.<br>
-                        Only works with the <span class="monospace">Journey Plus</span> or <span class="monospace">Enhanced Readout</span> modes.<br>
-                        <details><summary>More details</summary>
-                        When using <span class="monospace">Journey Plus</span>:
-                    <ul>
-                        <li>Replaces the center readout (Vertical Speed is unavailable)</li>
-                        <li>Replaces RSSI with Track in the bottom right</li>
-                    </ul>
-                    Disable this feature if it's too distracting.
-                        </details>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <label for="SCROLLING_SPEED" class="form-label setting-label">Scrolling Speed</label>
-                    <div class="help-text">
-                        Set the speed at which the scrolling text moves across the display.<br>
-                        <details><summary>More details</summary>
-                        Recommended to keep this value between 20 - 40 for readability. Higher values may not be achievable depending on system conditions and configurations, especially if using the display emulator.<br>
-                        Note: if using the emulator, the framerate is capped to 25 FPS, unless the emulator configuration is also changed correspondingly.
-                        </details>
-                        <i>Default: 30</i>
-                    </div>
-                    <div class="input-group">
-                        <input type="range" class="form-range" min="10" max="50" id="SCROLLING_SPEED" name="SCROLLING_SPEED" value="{{ config.SCROLLING_SPEED }}" oninput="SCROLLING_SPEED_value.value = this.value; SCROLLING_SPEED_num.value = this.value">
-                        <output id="SCROLLING_SPEED_value" style="margin-left:8px;">{{ config.SCROLLING_SPEED }}</output>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="EXTENDED_DETAILS" name="EXTENDED_DETAILS" {% if config.EXTENDED_DETAILS %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="EXTENDED_DETAILS">Extended Details</label>
-                    </div>
-                    <div class="help-text">Add an aircraft's registration and its current transponder ("squawk") code on the <span class="monospace">Show Even More Info</span> marquee.<br>
-                        The registration is only shown if the aircraft is not using its registration as its callsign. (ex: commercial flights, vanity military callsigns, etc.)</div>
-                </div>
+            <div class="mt-3">
+              <label for="SCROLLING_SPEED" class="form-label setting-label">Scrolling Speed</label>
+              <div class="help-text">
+                Set the speed at which the scrolling text moves across the display.<br>
+                <details>
+                  <summary>More details</summary>
+                  Recommended to keep this value between 20 - 40 for readability. Higher values may not be achievable
+                  depending on system conditions and configurations, especially if using the display emulator.<br>
+                  Note: if using the emulator, the framerate is capped to 25 FPS, unless the emulator configuration is
+                  also changed correspondingly.
+                </details>
+                <i>Default: 30</i>
+              </div>
+              <div class="input-group">
+                <input type="range" class="form-range" min="10" max="50" id="SCROLLING_SPEED" name="SCROLLING_SPEED"
+                  value="{{ config.SCROLLING_SPEED }}"
+                  oninput="SCROLLING_SPEED_value.value = this.value; SCROLLING_SPEED_num.value = this.value">
+                <output id="SCROLLING_SPEED_value" style="margin-left:8px;">{{ config.SCROLLING_SPEED }}</output>
+              </div>
             </div>
-            <hr>
-            <div>
-                <div class="mt-3">
-                    <img src="{{ url_for('static', filename='FG-clock-24hr.png') }}" class="inline-image">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="CLOCK_24HR" name="CLOCK_24HR" {% if config.CLOCK_24HR %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="CLOCK_24HR">24 Hour Clock</label>
-                    </div>
-                    <div class="help-text">When enabled, time is shown using 24 hours.</div>
-                </div>
-                <div class="mt-3">
-                    <img src="{{ url_for('static', filename='FG-default-journey.png') }}" class="inline-image">
-                    <img src="{{ url_for('static', filename='FG-default-journey-alt.png') }}" class="inline-image">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ALTERNATIVE_FONT" name="ALTERNATIVE_FONT" {% if config.ALTERNATIVE_FONT %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="ALTERNATIVE_FONT">Alternative Font</label>
-                    </div>
-                    <div class="help-text">
-                        Use a less squared-off font for the narrow text on the display.<br>
-                        Helps when trying to distingush characters such as '<span class="monospace">0</span>' vs '<span class="monospace">O</span>' or '<span class="monospace">S</span>' vs '<span class="monospace">5</span>'.
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <img src="{{ url_for('static', filename='FG-prefer-ICAO.png') }}" class="inline-image">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="PREFER_ICAO_CODES" name="PREFER_ICAO_CODES" {% if config.PREFER_ICAO_CODES %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="PREFER_ICAO_CODES">Prefer ICAO Codes</label>
-                    </div>
-                    <div class="help-text">Use ICAO (4 letter) codes instead of the default IATA (3 letter) codes for airports.</div>
-                </div>
-                <div class="mt-3">
-                    <img src="{{ url_for('static', filename='FG-switch-progress-bar.png') }}" class="inline-image">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="DISPLAY_SWITCH_PROGRESS_BAR" name="DISPLAY_SWITCH_PROGRESS_BAR" {% if config.DISPLAY_SWITCH_PROGRESS_BAR %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="DISPLAY_SWITCH_PROGRESS_BAR">Display Switch Progress Bar</label>
-                    </div>
-                    <div class="help-text">Show a progress bar at the bottom of the aircraft info screen that represents how long the current aircraft will remain on display.<br>
-                        Only appears when two (2) or more aircraft are present in the area.</div>
-                </div>
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="EXTENDED_DETAILS" name="EXTENDED_DETAILS" {% if
+                  config.EXTENDED_DETAILS %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="EXTENDED_DETAILS">Extended Details</label>
+              </div>
+              <div class="help-text">Add an aircraft's registration and its current transponder ("squawk") code on the
+                <span class="monospace">Show Even More Info</span> marquee.<br>
+                The registration is only shown if the aircraft is not using its registration as its callsign. (ex:
+                commercial flights, vanity military callsigns, etc.)</div>
             </div>
-            <hr>
-            <div>
-                <img src="{{ url_for('static', filename='FG-clock-centerrow.png') }}" class="inline-image">
-                <div class="mt-3">
-                    <label for="CLOCK_CENTER_ROW_ROW1" class="form-label setting-label">Clock Center Row 1</label>
-                    <div class="help-text">Select the main readout in the center section of the clock display.<br>
-                    <i>Note: for the weather options, you can set your API key in the Advanced section.</i></div>
-                    <select class="form-select" id="CLOCK_CENTER_ROW_ROW1" name="CLOCK_CENTER_ROW_ROW1">
-                        <option value="0" {% if config.CLOCK_CENTER_ROW.ROW1 == 0 %}selected{% endif %}>Don't use</option>
-                        <option value="1" {% if config.CLOCK_CENTER_ROW.ROW1 == 1 %}selected{% endif %}>Sunrise/Sunset</option>
-                        <option value="2" {% if config.CLOCK_CENTER_ROW.ROW1 == 2 %}selected{% endif %}>ADS-B receiver stats</option>
-                        <option value="3" {% if config.CLOCK_CENTER_ROW.ROW1 == 3 %}selected{% endif %}>Extended calendar info</option>
-                        <option value="4" {% if config.CLOCK_CENTER_ROW.ROW1 == 4 %}selected{% endif %}>Current weather (requires OpenWeather API)</option>
-                        <option value="5" {% if config.CLOCK_CENTER_ROW.ROW1 == 5 %}selected{% endif %}>Extended observations (requires OpenWeather API)</option>
-                    </select>
-                </div>
-                <div class="mt-3">
-                    <label for="CLOCK_CENTER_ROW_ROW2" class="form-label setting-label">Clock Center Row 2</label>
-                    <div class="help-text">
-                        Add an additional line of info in the center section of the clock display.<br>
-                        <details><summary>More details</summary>
-                        If the above setting is set to "Don't use" and this setting is enabled, this will force the use of a smaller font on the clock display.
-                        </details>
-                    </div>
-                    <select class="form-select" id="CLOCK_CENTER_ROW_ROW2" name="CLOCK_CENTER_ROW_ROW2">
-                        <option value="0" {% if config.CLOCK_CENTER_ROW.ROW2 == 0 %}selected{% endif %}>Don't use</option>
-                        <option value="1" {% if config.CLOCK_CENTER_ROW.ROW2 == 1 %}selected{% endif %}>Sunrise/Sunset</option>
-                        <option value="2" {% if config.CLOCK_CENTER_ROW.ROW2 == 2 %}selected{% endif %}>ADS-B receiver stats</option>
-                        <option value="3" {% if config.CLOCK_CENTER_ROW.ROW2 == 3 %}selected{% endif %}>Extended calendar info</option>
-                        <option value="4" {% if config.CLOCK_CENTER_ROW.ROW2 == 4 %}selected{% endif %}>Current weather (requires OpenWeather API)</option>
-                        <option value="5" {% if config.CLOCK_CENTER_ROW.ROW2 == 5 %}selected{% endif %}>Extended observations (requires OpenWeather API)</option>
-                    </select>
-                </div>
-                <div class="mt-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="CLOCK_CENTER_ROW_CYCLE" name="CLOCK_CENTER_ROW_CYCLE" {% if config.CLOCK_CENTER_ROW_CYCLE %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="CLOCK_CENTER_ROW_CYCLE">Cycle Between Center Row Options</label>
-                    </div>
-                    <div class="help-text">Automatically cycle through all available clock center row options every 10 seconds. Overrides above settings.<br>
-                        If the Weather API is available, this will cycle through those display options as well.
-                    </div>
-                </div>
+          </div>
+          <hr>
+          <div>
+            <div class="mt-3">
+              <img src="{{ url_for('static', filename='FG-clock-24hr.png') }}" class="inline-image">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="CLOCK_24HR" name="CLOCK_24HR" {% if
+                  config.CLOCK_24HR %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="CLOCK_24HR">24 Hour Clock</label>
+              </div>
+              <div class="help-text">When enabled, time is shown using 24 hours.</div>
             </div>
-            <div style="margin-top: 24px; text-align: left;">
-                <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-                    <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-                    </svg>
-                    Scroll back up</button>
+            <div class="mt-3">
+              <img src="{{ url_for('static', filename='FG-default-journey.png') }}" class="inline-image">
+              <img src="{{ url_for('static', filename='FG-default-journey-alt.png') }}" class="inline-image">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ALTERNATIVE_FONT" name="ALTERNATIVE_FONT" {% if
+                  config.ALTERNATIVE_FONT %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="ALTERNATIVE_FONT">Alternative Font</label>
+              </div>
+              <div class="help-text">
+                Use a less squared-off font for the narrow text on the display.<br>
+                Helps when trying to distingush characters such as '<span class="monospace">0</span>' vs '<span
+                  class="monospace">O</span>' or '<span class="monospace">S</span>' vs '<span
+                  class="monospace">5</span>'.
+              </div>
             </div>
+            <div class="mt-3">
+              <img src="{{ url_for('static', filename='FG-prefer-ICAO.png') }}" class="inline-image">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="PREFER_ICAO_CODES" name="PREFER_ICAO_CODES" {% if
+                  config.PREFER_ICAO_CODES %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="PREFER_ICAO_CODES">Prefer ICAO Codes</label>
+              </div>
+              <div class="help-text">Use ICAO (4 letter) codes instead of the default IATA (3 letter) codes for
+                airports.</div>
+            </div>
+            <div class="mt-3">
+              <img src="{{ url_for('static', filename='FG-switch-progress-bar.png') }}" class="inline-image">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="DISPLAY_SWITCH_PROGRESS_BAR"
+                  name="DISPLAY_SWITCH_PROGRESS_BAR" {% if config.DISPLAY_SWITCH_PROGRESS_BAR %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="DISPLAY_SWITCH_PROGRESS_BAR">Display Switch Progress
+                  Bar</label>
+              </div>
+              <div class="help-text">Show a progress bar at the bottom of the aircraft info screen that represents how
+                long the current aircraft will remain on display.<br>
+                Only appears when two (2) or more aircraft are present in the area.</div>
+            </div>
+          </div>
+          <hr>
+          <div>
+            <img src="{{ url_for('static', filename='FG-clock-centerrow.png') }}" class="inline-image">
+            <div class="mt-3">
+              <label for="CLOCK_CENTER_ROW_ROW1" class="form-label setting-label">Clock Center Row 1</label>
+              <div class="help-text">Select the main readout in the center section of the clock display.<br>
+                <i>Note: for the weather options, you can set your API key in the Advanced section.</i>
+              </div>
+              <select class="form-select" id="CLOCK_CENTER_ROW_ROW1" name="CLOCK_CENTER_ROW_ROW1">
+                <option value="0" {% if config.CLOCK_CENTER_ROW.ROW1==0 %}selected{% endif %}>Don't use</option>
+                <option value="1" {% if config.CLOCK_CENTER_ROW.ROW1==1 %}selected{% endif %}>Sunrise/Sunset</option>
+                <option value="2" {% if config.CLOCK_CENTER_ROW.ROW1==2 %}selected{% endif %}>ADS-B receiver stats
+                </option>
+                <option value="3" {% if config.CLOCK_CENTER_ROW.ROW1==3 %}selected{% endif %}>Extended calendar info
+                </option>
+                <option value="4" {% if config.CLOCK_CENTER_ROW.ROW1==4 %}selected{% endif %}>Current weather (requires
+                  OpenWeather API)</option>
+                <option value="5" {% if config.CLOCK_CENTER_ROW.ROW1==5 %}selected{% endif %}>Extended observations
+                  (requires OpenWeather API)</option>
+              </select>
+            </div>
+            <div class="mt-3">
+              <label for="CLOCK_CENTER_ROW_ROW2" class="form-label setting-label">Clock Center Row 2</label>
+              <div class="help-text">
+                Add an additional line of info in the center section of the clock display.<br>
+                <details>
+                  <summary>More details</summary>
+                  If the above setting is set to "Don't use" and this setting is enabled, this will force the use of a
+                  smaller font on the clock display.
+                </details>
+              </div>
+              <select class="form-select" id="CLOCK_CENTER_ROW_ROW2" name="CLOCK_CENTER_ROW_ROW2">
+                <option value="0" {% if config.CLOCK_CENTER_ROW.ROW2==0 %}selected{% endif %}>Don't use</option>
+                <option value="1" {% if config.CLOCK_CENTER_ROW.ROW2==1 %}selected{% endif %}>Sunrise/Sunset</option>
+                <option value="2" {% if config.CLOCK_CENTER_ROW.ROW2==2 %}selected{% endif %}>ADS-B receiver stats
+                </option>
+                <option value="3" {% if config.CLOCK_CENTER_ROW.ROW2==3 %}selected{% endif %}>Extended calendar info
+                </option>
+                <option value="4" {% if config.CLOCK_CENTER_ROW.ROW2==4 %}selected{% endif %}>Current weather (requires
+                  OpenWeather API)</option>
+                <option value="5" {% if config.CLOCK_CENTER_ROW.ROW2==5 %}selected{% endif %}>Extended observations
+                  (requires OpenWeather API)</option>
+              </select>
+            </div>
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="CLOCK_CENTER_ROW_CYCLE"
+                  name="CLOCK_CENTER_ROW_CYCLE" {% if config.CLOCK_CENTER_ROW_CYCLE %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="CLOCK_CENTER_ROW_CYCLE">Cycle Between Center Row
+                  Options</label>
+              </div>
+              <div class="help-text">Automatically cycle through all available clock center row options every 10
+                seconds. Overrides above settings.<br>
+                If the Weather API is available, this will cycle through those display options as well.
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 24px; text-align: left;">
+            <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd"
+                  d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+                <path fill-rule="evenodd"
+                  d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+              </svg>
+              Scroll back up</button>
+          </div>
         </div>
         <!-- Brightness Tab -->
         <div class="tab-pane fade" id="brightness" role="tabpanel">
+          <div class="mt-3">
+            <label for="BRIGHTNESS" class="form-label setting-label">Brightness</label>
+            <div class="help-text">Set the default LED brightness.</div>
+            <div class="input-group">
+              <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS" name="BRIGHTNESS"
+                value="{{ config.BRIGHTNESS }}"
+                oninput="BRIGHTNESS_value.value = this.value; BRIGHTNESS_num.value = this.value">
+              <!-- <input type="number" class="form-control" min="0" max="100" id="BRIGHTNESS_num" value="{{ config.BRIGHTNESS }}" style="max-width:100px; margin-left:8px;" oninput="BRIGHTNESS.value = this.value; BRIGHTNESS_value.value = this.value"> -->
+              <output id="BRIGHTNESS_value" style="margin-left:8px;">{{ config.BRIGHTNESS }}</output>
+            </div>
+          </div>
+          <hr>
+          <div>
             <div class="mt-3">
-                <label for="BRIGHTNESS" class="form-label setting-label">Brightness</label>
-                <div class="help-text">Set the default LED brightness.</div>
-                <div class="input-group">
-                    <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS" name="BRIGHTNESS" value="{{ config.BRIGHTNESS }}" oninput="BRIGHTNESS_value.value = this.value; BRIGHTNESS_num.value = this.value">
-                    <!-- <input type="number" class="form-control" min="0" max="100" id="BRIGHTNESS_num" value="{{ config.BRIGHTNESS }}" style="max-width:100px; margin-left:8px;" oninput="BRIGHTNESS.value = this.value; BRIGHTNESS_value.value = this.value"> -->
-                    <output id="BRIGHTNESS_value" style="margin-left:8px;">{{ config.BRIGHTNESS }}</output>
-                </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE"
+                  name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none
+                  and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS !='' %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE">Active Plane
+                  Display Brightness</label>
+              </div>
+              <div class="help-text">
+                Use a different brightness when tracking an aircraft. Toggle to enable and set value.<br>
+                This setting is unaffected by <span class="monospace">Dynamic Brightness</span>.
+              </div>
+              <div class="input-group">
+                <input type="range" class="form-range" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS"
+                  name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS"
+                  value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}"
+                  oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num.value = this.value"
+                  {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS==''
+                  %}disabled{% endif %}>
+                <!-- <input type="number" class="form-control" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" style="max-width:100px; margin-left:8px;" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}> -->
+                <output id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value" style="margin-left:8px;">{{
+                  config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and
+                  config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}</output>
+              </div>
             </div>
-            <hr>
-            <div>
-                <div class="mt-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE">Active Plane Display Brightness</label>
-                    </div>
-                    <div class="help-text">
-                        Use a different brightness when tracking an aircraft. Toggle to enable and set value.<br>
-                        This setting is unaffected by <span class="monospace">Dynamic Brightness</span>.
-                    </div>
-                    <div class="input-group">
-                        <input type="range" class="form-range" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" name="ACTIVE_PLANE_DISPLAY_BRIGHTNESS" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}>
-                        <!-- <input type="number" class="form-control" min="0" max="100" id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_num" value="{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}" style="max-width:100px; margin-left:8px;" oninput="ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value = this.value; ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value.value = this.value" {% if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is none or config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS == '' %}disabled{% endif %}> -->
-                        <output id="ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value" style="margin-left:8px;">{{ config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS if config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS is not none and config.ACTIVE_PLANE_DISPLAY_BRIGHTNESS != '' else 50 }}</output>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT" name="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT" {% if config.DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT">Disable Active Brightness at Night</label>
-                    </div>
-                    <div class="help-text">Enable this to reduce disturbances at night while retaining the <span class="monospace">Active Plane Display Brightness</span> functionality during the daytime.<br>
-                    If <span class="monospace">Active Plane Display Brightness</span> or <span class="monospace">Dynamic Brightness</span> are disabled, this setting will have no effect.
-                    </div>
-                </div>
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT"
+                  name="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT" {% if config.DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT %}checked{%
+                  endif %}>
+                <label class="form-check-label setting-label" for="DISABLE_ACTIVE_BRIGHTNESS_AT_NIGHT">Disable Active
+                  Brightness at Night</label>
+              </div>
+              <div class="help-text">Enable this to reduce disturbances at night while retaining the <span
+                  class="monospace">Active Plane Display Brightness</span> functionality during the daytime.<br>
+                If <span class="monospace">Active Plane Display Brightness</span> or <span class="monospace">Dynamic
+                  Brightness</span> are disabled, this setting will have no effect.
+              </div>
             </div>
-            <hr>
-            <div>
-                <div class="mt-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ENABLE_TWO_BRIGHTNESS" name="ENABLE_TWO_BRIGHTNESS" {% if config.ENABLE_TWO_BRIGHTNESS %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="ENABLE_TWO_BRIGHTNESS">Dynamic Brightness</label>
-                    </div>
-                    <div class="help-text">
-                        Enable dynamic switching of brightness based on time-of-day.<br>
-                        If this setting is disabled, the below settings won't do anything.
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <label for="BRIGHTNESS_2" class="form-label setting-label">Secondary Brightness</label>
-                    <div class="help-text">Used from sunset to sunrise ("night").</div>
-                    <div class="input-group">
-                        <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS_2" name="BRIGHTNESS_2" value="{{ config.BRIGHTNESS_2 }}" oninput="BRIGHTNESS_2_value.value = this.value; BRIGHTNESS_2_num.value = this.value">
-                        <!-- <input type="number" class="form-control" min="0" max="100" id="BRIGHTNESS_2_num" value="{{ config.BRIGHTNESS_2 }}" style="max-width:100px; margin-left:8px;" oninput="BRIGHTNESS_2.value = this.value; BRIGHTNESS_2_value.value = this.value"> -->
-                        <output id="BRIGHTNESS_2_value" style="margin-left:8px;">{{ config.BRIGHTNESS_2 }}</output>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="USE_SUNRISE_SUNSET" name="USE_SUNRISE_SUNSET" {% if config.USE_SUNRISE_SUNSET %}checked{% endif %}>
-                        <label class="form-check-label setting-label" for="USE_SUNRISE_SUNSET">Use Sunrise/Sunset</label>
-                    </div>
-                    <div class="help-text">
-                        Use your site's sunrise and sunset times to adjust brightness.<br>
-                        Overrides the below setting when enabled.
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <label class="form-label setting-label">Brightness Switch Time</label>
-                    <div class="help-text">
-                        Set the time of day to switch brightness levels.<br>
-                        This setting is the fallback in case sunrise and sunset times can't be determined for your location.<br>
-                    </div>
-                    <div class="row g-2" style="max-width: 420px;">
-                        <div class="col">
-                            <label for="BRIGHTNESS_SWITCH_TIME_Sunrise" class="form-label">Sunrise</label>
-                            <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunrise" name="BRIGHTNESS_SWITCH_TIME_Sunrise" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunrise }}" style="max-width: 200px; min-width: 150px;" required>
-                        </div>
-                        <div class="col">
-                            <label for="BRIGHTNESS_SWITCH_TIME_Sunset" class="form-label">Sunset</label>
-                            <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunset" name="BRIGHTNESS_SWITCH_TIME_Sunset" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunset }}" style="max-width: 200px; min-width: 150px;" required>
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <hr>
+          <div>
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ENABLE_TWO_BRIGHTNESS" name="ENABLE_TWO_BRIGHTNESS"
+                  {% if config.ENABLE_TWO_BRIGHTNESS %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="ENABLE_TWO_BRIGHTNESS">Dynamic Brightness</label>
+              </div>
+              <div class="help-text">
+                Enable dynamic switching of brightness based on time-of-day.<br>
+                If this setting is disabled, the below settings won't do anything.
+              </div>
             </div>
-            <div style="margin-top: 24px; text-align: left;">
-                <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-                    <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-                    </svg>
-                    Scroll back up</button>
+            <div class="mt-3">
+              <label for="BRIGHTNESS_2" class="form-label setting-label">Secondary Brightness</label>
+              <div class="help-text">Used from sunset to sunrise ("night").</div>
+              <div class="input-group">
+                <input type="range" class="form-range" min="0" max="100" id="BRIGHTNESS_2" name="BRIGHTNESS_2"
+                  value="{{ config.BRIGHTNESS_2 }}"
+                  oninput="BRIGHTNESS_2_value.value = this.value; BRIGHTNESS_2_num.value = this.value">
+                <!-- <input type="number" class="form-control" min="0" max="100" id="BRIGHTNESS_2_num" value="{{ config.BRIGHTNESS_2 }}" style="max-width:100px; margin-left:8px;" oninput="BRIGHTNESS_2.value = this.value; BRIGHTNESS_2_value.value = this.value"> -->
+                <output id="BRIGHTNESS_2_value" style="margin-left:8px;">{{ config.BRIGHTNESS_2 }}</output>
+              </div>
             </div>
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="USE_SUNRISE_SUNSET" name="USE_SUNRISE_SUNSET" {% if
+                  config.USE_SUNRISE_SUNSET %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="USE_SUNRISE_SUNSET">Use Sunrise/Sunset</label>
+              </div>
+              <div class="help-text">
+                Use your site's sunrise and sunset times to adjust brightness.<br>
+                Overrides the below setting when enabled.
+              </div>
+            </div>
+            <div class="mt-3">
+              <label class="form-label setting-label">Brightness Switch Time</label>
+              <div class="help-text">
+                Set the time of day to switch brightness levels.<br>
+                This setting is the fallback in case sunrise and sunset times can't be determined for your location.<br>
+              </div>
+              <div class="row g-2" style="max-width: 420px;">
+                <div class="col">
+                  <label for="BRIGHTNESS_SWITCH_TIME_Sunrise" class="form-label">Sunrise</label>
+                  <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunrise"
+                    name="BRIGHTNESS_SWITCH_TIME_Sunrise" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunrise }}"
+                    style="max-width: 200px; min-width: 150px;" required>
+                </div>
+                <div class="col">
+                  <label for="BRIGHTNESS_SWITCH_TIME_Sunset" class="form-label">Sunset</label>
+                  <input type="time" class="form-control" id="BRIGHTNESS_SWITCH_TIME_Sunset"
+                    name="BRIGHTNESS_SWITCH_TIME_Sunset" value="{{ config.BRIGHTNESS_SWITCH_TIME.Sunset }}"
+                    style="max-width: 200px; min-width: 150px;" required>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 24px; text-align: left;">
+            <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd"
+                  d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+                <path fill-rule="evenodd"
+                  d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+              </svg>
+              Scroll back up</button>
+          </div>
         </div>
         <!-- Advanced Tab -->
         <div class="tab-pane fade" id="advanced" role="tabpanel">
-            <div class="mt-3">
-                <label for="FLYBY_STALENESS" class="form-label setting-label">Flyby Staleness</label>
-                <div class="help-text">
-                    If the same aircraft appears again before this time (in minutes), do not consider it as a new flyby and assume the last API results still apply (if the API is enabled).<br>
-                    <details><summary>More details</summary>
-                    A lower value may raise the daily flyby count and number of API calls in a day, but is useful if you live very close to an airport/runway.<br>
-                    <i>The default value works well for both general aviation and multi-hop commercial flights.</i>
-                    </details>
-                    <i>Default: 30</i>
-                </div>
-                <div class="input-group">
-                    <input type="range" class="form-range" min="2" max="720" id="FLYBY_STALENESS" name="FLYBY_STALENESS" value="{{ config.FLYBY_STALENESS }}" oninput="FLYBY_STALENESS_num.value = this.value">
-                    <input type="number" class="form-control" min="2" max="720" id="FLYBY_STALENESS_num" value="{{ config.FLYBY_STALENESS }}" style="max-width:100px; min-width: 100px; margin-left:8px;" oninput="FLYBY_STALENESS.value = this.value; FLYBY_STALENESS_value.value = this.value">
-                    <!-- <output id="FLYBY_STALENESS_value" style="margin-left:8px;">{{ config.FLYBY_STALENESS }}</output> -->
-                </div>
+          <div class="mt-3">
+            <label for="FLYBY_STALENESS" class="form-label setting-label">Flyby Staleness</label>
+            <div class="help-text">
+              If the same aircraft appears again before this time (in minutes), do not consider it as a new flyby and
+              assume the last API results still apply (if the API is enabled).<br>
+              <details>
+                <summary>More details</summary>
+                A lower value may raise the daily flyby count and number of API calls in a day, but is useful if you
+                live very close to an airport/runway.<br>
+                <i>The default value works well for both general aviation and multi-hop commercial flights.</i>
+              </details>
+              <i>Default: 30</i>
             </div>
-            <div class="mt-3">
-                <label for="LOCATION_TIMEOUT" class="form-label setting-label">Location Timeout</label>
-                <div class="help-text">
-                    Time in seconds before an aircraft's last location is considered stale and is discarded from the total tracking count.<br>
-                    <i>Default: 60</i>
-                </div>
-                <div class="input-group">
-                    <input type="range" class="form-range" min="15" max="60" id="LOCATION_TIMEOUT" name="LOCATION_TIMEOUT" value="{{ config.LOCATION_TIMEOUT }}" oninput="LOCATION_TIMEOUT_value.value = this.value; LOCATION_TIMEOUT_num.value = this.value">
-                    <!-- <input type="number" class="form-control" min="15" max="60" id="LOCATION_TIMEOUT_num" value="{{ config.LOCATION_TIMEOUT }}" style="max-width:100px; margin-left:8px;" oninput="LOCATION_TIMEOUT.value = this.value; LOCATION_TIMEOUT_value.value = this.value"> -->
-                    <output id="LOCATION_TIMEOUT_value" style="margin-left:8px;">{{ config.LOCATION_TIMEOUT }}</output>
-                </div>
+            <div class="input-group">
+              <input type="range" class="form-range" min="2" max="720" id="FLYBY_STALENESS" name="FLYBY_STALENESS"
+                value="{{ config.FLYBY_STALENESS }}" oninput="FLYBY_STALENESS_num.value = this.value">
+              <input type="number" class="form-control" min="2" max="720" id="FLYBY_STALENESS_num"
+                value="{{ config.FLYBY_STALENESS }}" style="max-width:100px; min-width: 100px; margin-left:8px;"
+                oninput="FLYBY_STALENESS.value = this.value; FLYBY_STALENESS_value.value = this.value">
+              <!-- <output id="FLYBY_STALENESS_value" style="margin-left:8px;">{{ config.FLYBY_STALENESS }}</output> -->
             </div>
-            <hr>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="NO_GROUND_TRACKING" name="NO_GROUND_TRACKING" {% if config.NO_GROUND_TRACKING %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="NO_GROUND_TRACKING">No Ground Tracking</label>
-                </div>
-                    <div class="help-text">If an aircraft reports that it's on the ground, do not track/stop tracking it.<br>
-                    If using <code>NO_FILTER</code> mode, this setting is ignored.<br>
-                    <i>Default: Disabled</i>
-                </div>
+          </div>
+          <div class="mt-3">
+            <label for="LOCATION_TIMEOUT" class="form-label setting-label">Location Timeout</label>
+            <div class="help-text">
+              Time in seconds before an aircraft's last location is considered stale and is discarded from the total
+              tracking count.<br>
+              <i>Default: 60</i>
             </div>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="FASTER_REFRESH" name="FASTER_REFRESH" {% if config.FASTER_REFRESH %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="FASTER_REFRESH">Faster Refresh</label>
-                </div>
-                <div class="help-text">Decrease dump1090 polling time to 1 second.<br>
-                <i>Default: Disabled</i></div>
+            <div class="input-group">
+              <input type="range" class="form-range" min="15" max="60" id="LOCATION_TIMEOUT" name="LOCATION_TIMEOUT"
+                value="{{ config.LOCATION_TIMEOUT }}"
+                oninput="LOCATION_TIMEOUT_value.value = this.value; LOCATION_TIMEOUT_num.value = this.value">
+              <!-- <input type="number" class="form-control" min="15" max="60" id="LOCATION_TIMEOUT_num" value="{{ config.LOCATION_TIMEOUT }}" style="max-width:100px; margin-left:8px;" oninput="LOCATION_TIMEOUT.value = this.value; LOCATION_TIMEOUT_value.value = this.value"> -->
+              <output id="LOCATION_TIMEOUT_value" style="margin-left:8px;">{{ config.LOCATION_TIMEOUT }}</output>
             </div>
-            <hr>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="PREFER_LOCAL" name="PREFER_LOCAL" {% if config.PREFER_LOCAL %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="PREFER_LOCAL">Prefer Local</label>
-                </div>
-                <div class="help-text">
-                    Read dump1090 data from local file system first.<br>
-                    Disable this if you're using a custom dump1090 location.<br>
-                    <i>Default: Enabled</i>
-                </div>
+          </div>
+          <hr>
+          <div class="mt-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="NO_GROUND_TRACKING" name="NO_GROUND_TRACKING" {% if
+                config.NO_GROUND_TRACKING %}checked{% endif %}>
+              <label class="form-check-label setting-label" for="NO_GROUND_TRACKING">No Ground Tracking</label>
             </div>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="NO_DUMP978_SEARCH" name="NO_DUMP978_SEARCH" {% if config.NO_DUMP978_SEARCH %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="NO_DUMP978_SEARCH">No dump978 Search</label>
-                </div>
-                <div class="help-text">
-                    When enabled, FlightGazer does not check for dump978 instances at startup, shortening startup times.<br>
-                    If you're tracking UAT aircraft (U.S. only) and want FlightGazer to use this data, disable this setting.<br>
-                    <i>Default: Enabled</i>
-                </div>
+            <div class="help-text">If an aircraft reports that it's on the ground, do not track/stop tracking it.<br>
+              If using <code>NO_FILTER</code> mode, this setting is ignored.<br>
+              <i>Default: Disabled</i>
             </div>
-            <div class="mt-3">
-                <label for="CUSTOM_DUMP1090_LOCATION" class="form-label setting-label">Custom dump1090 Location</label>
-                <div class="help-text">
-                    URL of your dump1090 install if it's in a different location or on a different network device.<br>
-                    Leave this blank to not use this feature.<br>
-                    <details><summary>Examples</summary>
-                        (no trailing <span class="monospace">/</span>)
-                        <ul>
-                            <li><span class="monospace">http://localhost/custom_name_here</span></li>
-                            <li><span class="monospace">http://192.168.xxx.xxx/skyaware</span></li>
-                            <li><span class="monospace">http://192.168.xxx.xxx/tar1090</span></li>
-                            <li><span class="monospace">http://192.168.xxx.xxx:8080</span></li>
-                        </ul>
-                    </details>
-                </div>
-                <input type="url" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION" value="{{ config.CUSTOM_DUMP1090_LOCATION }}" style="font-family: monospace;" spellcheck="false" autocomplete="off">
+          </div>
+          <div class="mt-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="FASTER_REFRESH" name="FASTER_REFRESH" {% if
+                config.FASTER_REFRESH %}checked{% endif %}>
+              <label class="form-check-label setting-label" for="FASTER_REFRESH">Faster Refresh</label>
             </div>
-            <div class="mt-3">
-                <label for="CUSTOM_DUMP978_LOCATION" class="form-label setting-label">Custom dump978 Location</label>
-                <div class="help-text">
-                    URL of your dump978 install if it's in a different location or on a different network device.<br>
-                    Leave this blank to not use this feature.<br>
-                    <details><summary>Examples</summary>
-                        (no trailing <span class="monospace">/</span>)
-                        <ul>
-                            <li><span class="monospace">http://192.168.xxx.xxx:8978</span></li>
-                            <li><span class="monospace">http://192.168.xxx.xxx/skyaware978</span></li>
-                        </ul>
-                    </details>
-                </div>
-                <input type="url" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION" value="{{ config.CUSTOM_DUMP978_LOCATION }}" style="font-family: monospace;" spellcheck="false" autocomplete="off">
+            <div class="help-text">Decrease dump1090 polling time to 1 second.<br>
+              <i>Default: Disabled</i>
             </div>
-            <hr>
-            <div class="mt-3">
-                <label for="FOLLOW_THIS_AIRCRAFT" class="form-label setting-label">Follow This Aircraft</label>
-                <div class="help-text">
-                    ICAO hex ID of a specific aircraft to follow once it's detected by your receiver. Leave this blank to not use this feature.<br>
-                    <details><summary>More details</summary>
-                    When this aircraft enters the reception area for your ADS-B receiver (not the values set by <span class="monospace">Height Limit</span> or <span class="monospace">Range</span>),
-                     FlightGazer will start tracking it as if it were inside your designated <span class="monospace">Range</span>.<br>
-                    When tracking this aircraft, <span class="monospace">Enhanced Readout</span> will be used regardless of the setting for that option<br>
-                    and will append a "*" on the aircraft's callsign. This does not disable API use when this aircraft is being tracked.
-                    </details>
-                </div>
-                <input type="text" class="form-control" id="FOLLOW_THIS_AIRCRAFT" name="FOLLOW_THIS_AIRCRAFT" value="{{ config.FOLLOW_THIS_AIRCRAFT }}" style="font-family: monospace;" maxlength="6" pattern="[0-9a-fA-F]+" spellcheck="false" autocomplete="off">
-                <style>
-                input:invalid {
+          </div>
+          <hr>
+          <div class="mt-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="PREFER_LOCAL" name="PREFER_LOCAL" {% if
+                config.PREFER_LOCAL %}checked{% endif %}>
+              <label class="form-check-label setting-label" for="PREFER_LOCAL">Prefer Local</label>
+            </div>
+            <div class="help-text">
+              Read dump1090 data from local file system first.<br>
+              Disable this if you're using a custom dump1090 location.<br>
+              <i>Default: Enabled</i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="NO_DUMP978_SEARCH" name="NO_DUMP978_SEARCH" {% if
+                config.NO_DUMP978_SEARCH %}checked{% endif %}>
+              <label class="form-check-label setting-label" for="NO_DUMP978_SEARCH">No dump978 Search</label>
+            </div>
+            <div class="help-text">
+              When enabled, FlightGazer does not check for dump978 instances at startup, shortening startup times.<br>
+              If you're tracking UAT aircraft (U.S. only) and want FlightGazer to use this data, disable this
+              setting.<br>
+              <i>Default: Enabled</i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <label for="CUSTOM_DUMP1090_LOCATION" class="form-label setting-label">Custom dump1090 Location</label>
+            <div class="help-text">
+              URL of your dump1090 install if it's in a different location or on a different network device.<br>
+              Leave this blank to not use this feature.<br>
+              <details>
+                <summary>Examples</summary>
+                (no trailing <span class="monospace">/</span>)
+                <ul>
+                  <li><span class="monospace">http://localhost/custom_name_here</span></li>
+                  <li><span class="monospace">http://192.168.xxx.xxx/skyaware</span></li>
+                  <li><span class="monospace">http://192.168.xxx.xxx/tar1090</span></li>
+                  <li><span class="monospace">http://192.168.xxx.xxx:8080</span></li>
+                </ul>
+              </details>
+            </div>
+            <input type="url" class="form-control" id="CUSTOM_DUMP1090_LOCATION" name="CUSTOM_DUMP1090_LOCATION"
+              value="{{ config.CUSTOM_DUMP1090_LOCATION }}" style="font-family: monospace;" spellcheck="false"
+              autocomplete="off">
+          </div>
+          <div class="mt-3">
+            <label for="CUSTOM_DUMP978_LOCATION" class="form-label setting-label">Custom dump978 Location</label>
+            <div class="help-text">
+              URL of your dump978 install if it's in a different location or on a different network device.<br>
+              Leave this blank to not use this feature.<br>
+              <details>
+                <summary>Examples</summary>
+                (no trailing <span class="monospace">/</span>)
+                <ul>
+                  <li><span class="monospace">http://192.168.xxx.xxx:8978</span></li>
+                  <li><span class="monospace">http://192.168.xxx.xxx/skyaware978</span></li>
+                </ul>
+              </details>
+            </div>
+            <input type="url" class="form-control" id="CUSTOM_DUMP978_LOCATION" name="CUSTOM_DUMP978_LOCATION"
+              value="{{ config.CUSTOM_DUMP978_LOCATION }}" style="font-family: monospace;" spellcheck="false"
+              autocomplete="off">
+          </div>
+          <hr>
+          <div class="mt-3">
+            <label for="FOLLOW_THIS_AIRCRAFT" class="form-label setting-label">Follow This Aircraft</label>
+            <div class="help-text">
+              ICAO hex ID of a specific aircraft to follow once it's detected by your receiver. Leave this blank to not
+              use this feature.<br>
+              <details>
+                <summary>More details</summary>
+                When this aircraft enters the reception area for your ADS-B receiver (not the values set by <span
+                  class="monospace">Height Limit</span> or <span class="monospace">Range</span>),
+                FlightGazer will start tracking it as if it were inside your designated <span
+                  class="monospace">Range</span>.<br>
+                When tracking this aircraft, <span class="monospace">Enhanced Readout</span> will be used regardless of
+                the setting for that option<br>
+                and will append a "*" on the aircraft's callsign. This does not disable API use when this aircraft is
+                being tracked.
+              </details>
+            </div>
+            <input type="text" class="form-control" id="FOLLOW_THIS_AIRCRAFT" name="FOLLOW_THIS_AIRCRAFT"
+              value="{{ config.FOLLOW_THIS_AIRCRAFT }}" style="font-family: monospace;" maxlength="6"
+              pattern="[0-9a-fA-F]+" spellcheck="false" autocomplete="off">
+            <style>
+              input:invalid {
                 border: red solid 3px;
-                }
-                </style>
+              }
+            </style>
+          </div>
+          <div class="mt-3">
+            <label for="IGNORE_AIRCRAFT_ICAOS" class="form-label setting-label">Ignore Aircraft ICAOs</label>
+            <div class="help-text">
+              List of comma-separated ICAO hex IDs to ignore from tracking, such as ADS-B towers and tethered balloons.
+              Leave this blank to not use this feature.<br>
+              This feature does not support pattern matching, you must provide exact IDs.<br>
+              <details>
+                <summary>Examples</summary>
+                <ul>
+                  <li><span class="monospace">a00002,c97ef2,4cc088</span></li>
+                  <li><span class="monospace">5113FB, ADFB94</span></li>
+                  <li><span class="monospace">aaf2d6</span></li>
+                </ul>
+              </details>
             </div>
-            <div class="mt-3">
-                <label for="IGNORE_AIRCRAFT_ICAOS" class="form-label setting-label">Ignore Aircraft ICAOs</label>
-                <div class="help-text">
-                    List of comma-separated ICAO hex IDs to ignore from tracking, such as ADS-B towers and tethered balloons. Leave this blank to not use this feature.<br>
-                    This feature does not support pattern matching, you must provide exact IDs.<br>
-                    <details><summary>Examples</summary>
-                        <ul>
-                            <li><span class="monospace">a00002,c97ef2,4cc088</span></li>
-                            <li><span class="monospace">5113FB, ADFB94</span></li>
-                            <li><span class="monospace">aaf2d6</span></li>
-                        </ul>
-                    </details>
-                </div>
-                <input type="text" class="form-control" id="IGNORE_AIRCRAFT_ICAOS" name="IGNORE_AIRCRAFT_ICAOS" value="{{ config.IGNORE_AIRCRAFT_ICAOS }}" style="font-family: monospace;" maxlength="1000" pattern="[0-9a-fA-F, ]+" spellcheck="false" autocomplete="off">
-                <style>
-                input:invalid {
+            <input type="text" class="form-control" id="IGNORE_AIRCRAFT_ICAOS" name="IGNORE_AIRCRAFT_ICAOS"
+              value="{{ config.IGNORE_AIRCRAFT_ICAOS }}" style="font-family: monospace;" maxlength="1000"
+              pattern="[0-9a-fA-F, ]+" spellcheck="false" autocomplete="off">
+            <style>
+              input:invalid {
                 border: red solid 3px;
-                }
-                </style>
-            </div>
-            <hr>
-            <div class="mt-3">
+              }
+            </style>
+          </div>
+          <hr>
+          <div class="mt-3">
             <label for="OPENWEATHER_API_KEY" class="form-label setting-label">OpenWeatherMap API Key</label>
-                <div class="help-text">
-                    Put your OpenWeatherMap API key here to get weather information for your site's location. Leave blank to not use this.<br>
-                    <details><summary>More details</summary>
-                    This API will only be used if the clock center row is set to show weather information.<br>
-                    There's no need to subscribe to the One Call API 3.0, the basic free access version is sufficient.<br>
-                    </details>
-                    Don't have an API key? <a href="https://openweathermap.org/price" target="_blank" rel="noreferrer">Sign up here</a>
-                    <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
-                        <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
-                            <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
-                        </g>
-                    </svg>.
-                </div>
-                <input type="text" class="form-control" id="OPENWEATHER_API_KEY" name="OPENWEATHER_API_KEY" value="{{ config.OPENWEATHER_API_KEY }}" style="font-family: monospace;" maxlength="50" pattern="[0-9a-fA-F]+" spellcheck="false" autocomplete="off">
+            <div class="help-text">
+              Put your OpenWeatherMap API key here to get weather information for your site's location. Leave blank to
+              not use this.<br>
+              <details>
+                <summary>More details</summary>
+                This API will only be used if the clock center row is set to show weather information.<br>
+                There's no need to subscribe to the One Call API, the basic free access version is sufficient.<br>
+              </details>
+              Don't have an API key? <a href="https://openweathermap.org/price#:~:text=Learn%20more-,Free%20Weather%20API,-access" target="_blank" rel="noreferrer">Sign up
+                here</a>
+              <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">
+                <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>
+                  <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>
+                </g>
+              </svg>.
             </div>
-            <div class="mt-3">
-                <label class="form-label setting-label">Weather Units</label>
-                <div class="help-text">
-                    <ul>
-                        <li>Aeronautical (°C, kt, ft, smi, hPa)</li>
-                        <li>Metric (°C, m/s, m, km, hPa)</li>
-                        <li>U.S. Customary (°F, mph, ft, mi, inHg)</li>
-                    </ul>
-                </div>
-                <select class="form-select" id="UNITS_WX" name="UNITS_WX">
-                    <option value="0" {% if config.UNITS_WX == 0 %}selected{% endif %}>Aeronautical</option>
-                    <option value="1" {% if config.UNITS_WX == 1 %}selected{% endif %}>Metric</option>
-                    <option value="2" {% if config.UNITS_WX == 2 %}selected{% endif %}>U.S. Customary</option>
-                </select>
+            <input type="text" class="form-control" id="OPENWEATHER_API_KEY" name="OPENWEATHER_API_KEY"
+              value="{{ config.OPENWEATHER_API_KEY }}" style="font-family: monospace;" maxlength="50"
+              pattern="[0-9a-fA-F]+" spellcheck="false" autocomplete="off">
+          </div>
+          <div class="mt-3">
+            <label class="form-label setting-label">Weather Units</label>
+            <div class="help-text">
+              <ul>
+                <li>Aeronautical (°C, kt, ft, smi, hPa)</li>
+                <li>Metric (°C, m/s, m, km, hPa)</li>
+                <li>U.S. Customary (°F, mph, ft, mi, inHg)</li>
+              </ul>
             </div>
-            <div style="margin-top: 24px; text-align: left;">
-                <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-                    <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-                    </svg>
-                    Scroll back up</button>
-            </div>
+            <select class="form-select" id="UNITS_WX" name="UNITS_WX">
+              <option value="0" {% if config.UNITS_WX==0 %}selected{% endif %}>Aeronautical</option>
+              <option value="1" {% if config.UNITS_WX==1 %}selected{% endif %}>Metric</option>
+              <option value="2" {% if config.UNITS_WX==2 %}selected{% endif %}>U.S. Customary</option>
+            </select>
+          </div>
+          <div style="margin-top: 24px; text-align: left;">
+            <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd"
+                  d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+                <path fill-rule="evenodd"
+                  d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+              </svg>
+              Scroll back up</button>
+          </div>
         </div>
         <!-- RGB-Matrix Tab -->
         <div class="tab-pane fade" id="rgb" role="tabpanel">
-            <div class="mt-3">
-                <label><h4>WARNING! Changing these settings may cause your display to not work!</h4></label>
+          <div class="mt-3">
+            <label>
+              <h4>WARNING! Changing these settings may cause your display to not work!</h4>
+            </label>
+          </div>
+          <div class="mt-3">
+            <label for="GPIO_SLOWDOWN" class="form-label setting-label">GPIO Slowdown</label>
+            <div class="help-text">
+              Set for your setup. Higher values are used for faster Raspberry Pi's.<br>
+              <i>Default: 2</i>
             </div>
-            <div class="mt-3">
-                <label for="GPIO_SLOWDOWN" class="form-label setting-label">GPIO Slowdown</label>
-                <div class="help-text">
-                    Set for your setup. Higher values are used for faster Raspberry Pi's.<br>
-                    <i>Default: 2</i>
-                </div>
-                <div class="input-group">
-                    <input type="range" class="form-range" min="0" max="4" id="GPIO_SLOWDOWN" name="GPIO_SLOWDOWN" value="{{ config.GPIO_SLOWDOWN }}" oninput="GPIO_SLOWDOWN_value.value = this.value">
-                    <!-- <input type="number" class="form-control" min="0" max="4" id="GPIO_SLOWDOWN_num" value="{{ config.GPIO_SLOWDOWN }}" style="max-width:100px; margin-left:8px;" oninput="GPIO_SLOWDOWN.value = this.value; GPIO_SLOWDOWN_value.value = this.value"> -->
-                    <output id="GPIO_SLOWDOWN_value" style="margin-left:8px;">{{ config.GPIO_SLOWDOWN }}</output>
-                </div>
+            <div class="input-group">
+              <input type="range" class="form-range" min="0" max="4" id="GPIO_SLOWDOWN" name="GPIO_SLOWDOWN"
+                value="{{ config.GPIO_SLOWDOWN }}" oninput="GPIO_SLOWDOWN_value.value = this.value">
+              <!-- <input type="number" class="form-control" min="0" max="4" id="GPIO_SLOWDOWN_num" value="{{ config.GPIO_SLOWDOWN }}" style="max-width:100px; margin-left:8px;" oninput="GPIO_SLOWDOWN.value = this.value; GPIO_SLOWDOWN_value.value = this.value"> -->
+              <output id="GPIO_SLOWDOWN_value" style="margin-left:8px;">{{ config.GPIO_SLOWDOWN }}</output>
             </div>
-            <div class="mt-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="HAT_PWM_ENABLED" name="HAT_PWM_ENABLED" {% if config.HAT_PWM_ENABLED %}checked{% endif %}>
-                    <label class="form-check-label setting-label" for="HAT_PWM_ENABLED">HAT PWM Enabled</label>
-                </div>
-                <div class="help-text">
-                    Enable this if the quality modification for the RGB-Matrix Bonnet is present.<br>
-                    <i>Default: Enabled</i>
-                </div>
+          </div>
+          <div class="mt-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="HAT_PWM_ENABLED" name="HAT_PWM_ENABLED" {% if
+                config.HAT_PWM_ENABLED %}checked{% endif %}>
+              <label class="form-check-label setting-label" for="HAT_PWM_ENABLED">HAT PWM Enabled</label>
             </div>
-            <div class="mt-3">
-                <label for="LED_PWM_BITS" class="form-label setting-label">LED PWM Bits</label>
-                <div class="help-text">
-                    Lower values enable higher refresh rates on the physical RGB-Matrix but there is less color depth.<br>
-                    <i>Should be left at '8' (default) in most cases.</i>
-                </div>
-                <div class="input-group">
-                    <input type="range" class="form-range" min="2" max="11" id="LED_PWM_BITS" name="LED_PWM_BITS" value="{{ config.LED_PWM_BITS }}" oninput="LED_PWM_BITS_value.value = this.value">
-                    <!-- <input type="number" class="form-control" min="1" max="11" id="LED_PWM_BITS_num" value="{{ config.LED_PWM_BITS }}" style="max-width:100px; margin-left:8px;" oninput="LED_PWM_BITS.value = this.value; LED_PWM_BITS_value.value = this.value"> -->
-                    <output id="LED_PWM_BITS_value" style="margin-left:8px;">{{ config.LED_PWM_BITS }}</output>
-                </div>
+            <div class="help-text">
+              Enable this if the quality modification for the RGB-Matrix Bonnet is present.<br>
+              <i>Default: Enabled</i>
             </div>
+          </div>
+          <div class="mt-3">
+            <label for="LED_PWM_BITS" class="form-label setting-label">LED PWM Bits</label>
+            <div class="help-text">
+              Lower values enable higher refresh rates on the physical RGB-Matrix but there is less color depth.<br>
+              <i>Should be left at '8' (default) in most cases.</i>
+            </div>
+            <div class="input-group">
+              <input type="range" class="form-range" min="2" max="11" id="LED_PWM_BITS" name="LED_PWM_BITS"
+                value="{{ config.LED_PWM_BITS }}" oninput="LED_PWM_BITS_value.value = this.value">
+              <!-- <input type="number" class="form-control" min="1" max="11" id="LED_PWM_BITS_num" value="{{ config.LED_PWM_BITS }}" style="max-width:100px; margin-left:8px;" oninput="LED_PWM_BITS.value = this.value; LED_PWM_BITS_value.value = this.value"> -->
+              <output id="LED_PWM_BITS_value" style="margin-left:8px;">{{ config.LED_PWM_BITS }}</output>
+            </div>
+          </div>
         </div>
         <!-- Colors Tab -->
         <div class="tab-pane fade" id="colors" role="tabpanel">
-        <div class="help-text">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+          <div class="help-text">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle"
+              viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+              <path
+                d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
             </svg>
             <i>Tip: To hide screen elements, select 'BLACK'.<br>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-megaphone-fill" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0zm-1 .724c-2.067.95-4.539 1.481-7 1.656v6.237a25 25 0 0 1 1.088.085c2.053.204 4.038.668 5.912 1.56zm-8 7.841V4.934c-.68.027-1.399.043-2.008.053A2.02 2.02 0 0 0 0 7v2c0 1.106.896 1.996 1.994 2.009l.496.008a64 64 0 0 1 1.51.048m1.39 1.081q.428.032.85.078l.253 1.69a1 1 0 0 1-.983 1.187h-.548a1 1 0 0 1-.916-.599l-1.314-2.48a66 66 0 0 1 1.692.064q.491.026.966.06"/>
-            </svg>
-            Note: <b>These images are static.</b></i>
-        </div>
-        <div class="mt-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-megaphone-fill" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0zm-1 .724c-2.067.95-4.539 1.481-7 1.656v6.237a25 25 0 0 1 1.088.085c2.053.204 4.038.668 5.912 1.56zm-8 7.841V4.934c-.68.027-1.399.043-2.008.053A2.02 2.02 0 0 0 0 7v2c0 1.106.896 1.996 1.994 2.009l.496.008a64 64 0 0 1 1.51.048m1.39 1.081q.428.032.85.078l.253 1.69a1 1 0 0 1-.983 1.187h-.548a1 1 0 0 1-.916-.599l-1.314-2.48a66 66 0 0 1 1.692.064q.491.026.966.06" />
+              </svg>
+              Note: <b>These images are static.</b></i>
+          </div>
+          <div class="mt-3">
             <div style="text-align: center; margin-bottom: 24px;">
-                <h5>Clock Colors</h5>
-                <img src="{{ url_for('static', filename='FG-clock.png') }}" class="inline-image">
+              <h5>Clock Colors</h5>
+              <img src="{{ url_for('static', filename='FG-clock.png') }}" class="inline-image">
             </div>
             {% for var, label in [
             ('clock_color', 'Clock'),
@@ -836,27 +1101,33 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
             ('center_row2_color', 'Center Row 2')
             ] %}
             <div class="row align-items-center mb-2">
-            <div class="col-4">
+              <div class="col-4">
                 <label class="form-label">{{ label }}</label>
-            </div>
-            <div class="col-5 d-flex align-items-center" style="width: 60%;">
+              </div>
+              <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
-                {% for cname in predefined_colors %}
-                    <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
-                {% endfor %}
-                <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...</option>
+                  {% for cname in predefined_colors %}
+                  <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if
+                    color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{
+                    cname }}</option>
+                  {% endfor %}
+                  <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...
+                  </option>
                 </select>
-                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker" value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}" style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
-                <span class="color-preview ms-2" id="{{ var }}_preview" style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
-            </div>
+                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker"
+                  value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}"
+                  style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
+                <span class="color-preview ms-2" id="{{ var }}_preview"
+                  style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
+              </div>
             </div>
             {% endfor %}
-        </div>
-        <hr>
-        <div class="mt-3">
+          </div>
+          <hr>
+          <div class="mt-3">
             <div style="text-align: center; margin-bottom: 24px;">
-                <h5>Plane Readout Colors</h5>
-                <img src="{{ url_for('static', filename='FG-plane-readout.png') }}" class="inline-image">
+              <h5>Plane Readout Colors</h5>
+              <img src="{{ url_for('static', filename='FG-plane-readout.png') }}" class="inline-image">
             </div>
             {% for var, label in [
             ('callsign_color', 'Callsign'),
@@ -865,28 +1136,34 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
             ('uat_indicator_color', 'UAT Indicator')
             ] %}
             <div class="row align-items-center mb-2">
-            <div class="col-4">
+              <div class="col-4">
                 <label class="form-label">{{ label }}</label>
-            </div>
-            <div class="col-5 d-flex align-items-center" style="width: 60%;">
+              </div>
+              <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
-                {% for cname in predefined_colors %}
-                    <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
-                {% endfor %}
-                <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...</option>
+                  {% for cname in predefined_colors %}
+                  <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if
+                    color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{
+                    cname }}</option>
+                  {% endfor %}
+                  <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...
+                  </option>
                 </select>
-                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker" value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}" style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
-                <span class="color-preview ms-2" id="{{ var }}_preview" style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
-            </div>
+                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker"
+                  value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}"
+                  style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
+                <span class="color-preview ms-2" id="{{ var }}_preview"
+                  style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
+              </div>
             </div>
             {% endfor %}
-        </div>
-        <hr>
-        <div class="mt-3">
+          </div>
+          <hr>
+          <div class="mt-3">
             <div style="text-align: center; margin-bottom: 24px;">
-                <h5>Journey Colors</h5>
-                <img src="{{ url_for('static', filename='FG-default-journey-journey.png') }}" class="inline-image">
-                <img src="{{ url_for('static', filename='FG-journey-plus-journey.png') }}" class="inline-image">
+              <h5>Journey Colors</h5>
+              <img src="{{ url_for('static', filename='FG-default-journey-journey.png') }}" class="inline-image">
+              <img src="{{ url_for('static', filename='FG-journey-plus-journey.png') }}" class="inline-image">
             </div>
             {% for var, label in [
             ('origin_color', 'Origin'),
@@ -894,27 +1171,33 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
             ('arrow_color', 'Arrow')
             ] %}
             <div class="row align-items-center mb-2">
-            <div class="col-4">
+              <div class="col-4">
                 <label class="form-label">{{ label }}</label>
-            </div>
-            <div class="col-5 d-flex align-items-center" style="width: 60%;">
+              </div>
+              <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
-                {% for cname in predefined_colors %}
-                    <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
-                {% endfor %}
-                <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...</option>
+                  {% for cname in predefined_colors %}
+                  <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if
+                    color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{
+                    cname }}</option>
+                  {% endfor %}
+                  <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...
+                  </option>
                 </select>
-                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker" value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}" style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
-                <span class="color-preview ms-2" id="{{ var }}_preview" style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
-            </div>
+                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker"
+                  value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}"
+                  style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
+                <span class="color-preview ms-2" id="{{ var }}_preview"
+                  style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
+              </div>
             </div>
             {% endfor %}
-        </div>
-        <hr>
-        <div class="mt-3">
+          </div>
+          <hr>
+          <div class="mt-3">
             <div style="text-align: center; margin-bottom: 24px;">
-                <h5>Journey Plus Colors</h5>
-                <img src="{{ url_for('static', filename='FG-journey-plus-colors.png') }}" class="inline-image">
+              <h5>Journey Plus Colors</h5>
+              <img src="{{ url_for('static', filename='FG-journey-plus-colors.png') }}" class="inline-image">
             </div>
             {% for var, label in [
             ('time_header_color', 'Time Header'),
@@ -922,27 +1205,33 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
             ('center_readout_color', 'Center Readout')
             ] %}
             <div class="row align-items-center mb-2">
-            <div class="col-4">
+              <div class="col-4">
                 <label class="form-label">{{ label }}</label>
-            </div>
-            <div class="col-5 d-flex align-items-center" style="width: 60%;">
+              </div>
+              <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
-                {% for cname in predefined_colors %}
-                    <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
-                {% endfor %}
-                <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...</option>
+                  {% for cname in predefined_colors %}
+                  <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if
+                    color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{
+                    cname }}</option>
+                  {% endfor %}
+                  <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...
+                  </option>
                 </select>
-                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker" value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}" style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
-                <span class="color-preview ms-2" id="{{ var }}_preview" style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
-            </div>
+                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker"
+                  value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}"
+                  style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
+                <span class="color-preview ms-2" id="{{ var }}_preview"
+                  style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
+              </div>
             </div>
             {% endfor %}
-        </div>
-        <hr>
-        <div class="mt-3">
+          </div>
+          <hr>
+          <div class="mt-3">
             <div style="text-align: center; margin-bottom: 24px;">
-                <h5>Enhanced Readout Colors</h5>
-                <img src="{{ url_for('static', filename='FG-enhanced-readout-colors.png') }}" class="inline-image">
+              <h5>Enhanced Readout Colors</h5>
+              <img src="{{ url_for('static', filename='FG-enhanced-readout-colors.png') }}" class="inline-image">
             </div>
             {% for var, label in [
             ('latitude_color', 'Latitude'),
@@ -951,55 +1240,68 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
             ('verticalspeed_color', 'Vertical Speed')
             ] %}
             <div class="row align-items-center mb-2">
-            <div class="col-4">
+              <div class="col-4">
                 <label class="form-label">{{ label }}</label>
-            </div>
-            <div class="col-5 d-flex align-items-center" style="width: 60%;">
+              </div>
+              <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
-                {% for cname in predefined_colors %}
-                    <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
-                {% endfor %}
-                <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...</option>
+                  {% for cname in predefined_colors %}
+                  <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if
+                    color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{
+                    cname }}</option>
+                  {% endfor %}
+                  <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...
+                  </option>
                 </select>
-                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker" value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}" style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
-                <span class="color-preview ms-2" id="{{ var }}_preview" style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
-            </div>
+                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker"
+                  value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}"
+                  style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
+                <span class="color-preview ms-2" id="{{ var }}_preview"
+                  style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
+              </div>
             </div>
             {% endfor %}
-        </div>
-        <hr>
-        <div class="mt-3">
+          </div>
+          <hr>
+          <div class="mt-3">
             <div style="text-align: center; margin-bottom: 24px;">
-                <h5>Scrolling Info Line</h5>
-                <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-JourneyPlus.png') }}" class="inline-image">
-                <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-EnhancedReadout.png') }}" class="inline-image">
+              <h5>Scrolling Info Line</h5>
+              <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-JourneyPlus.png') }}" class="inline-image">
+              <img src="{{ url_for('static', filename='FG-SHOWEVENMOREINFO-EnhancedReadout.png') }}"
+                class="inline-image">
             </div>
             {% for var, label in [
             ('marquee_color_journey_plus', 'Marquee (Journey Plus)'),
             ('marquee_color_enhanced_readout', 'Marquee (Enhanced Readout)')
             ] %}
             <div class="row align-items-center mb-2">
-            <div class="col-4">
+              <div class="col-4">
                 <label class="form-label">{{ label }}</label>
-            </div>
-            <div class="col-5 d-flex align-items-center" style="width: 60%;">
+              </div>
+              <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
-                {% for cname in predefined_colors %}
-                    <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
-                {% endfor %}
-                <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...</option>
+                  {% for cname in predefined_colors %}
+                  <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if
+                    color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{
+                    cname }}</option>
+                  {% endfor %}
+                  <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...
+                  </option>
                 </select>
-                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker" value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}" style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
-                <span class="color-preview ms-2" id="{{ var }}_preview" style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
-            </div>
+                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker"
+                  value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}"
+                  style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
+                <span class="color-preview ms-2" id="{{ var }}_preview"
+                  style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
+              </div>
             </div>
             {% endfor %}
-        </div>
-        <hr>
-        <div class="mt-3">
+          </div>
+          <hr>
+          <div class="mt-3">
             <div style="text-align: center; margin-bottom: 24px;">
-                <h5>Stats at the Bottom</h5>
-                <img src="{{ url_for('static', filename='FG-bottom-stats.png') }}" class="inline-image">
+              <h5>Stats at the Bottom</h5>
+              <img src="{{ url_for('static', filename='FG-bottom-stats.png') }}" class="inline-image">
             </div>
             {% for var, label in [
             ('altitude_heading_color', 'Altitude Heading'),
@@ -1010,239 +1312,261 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
             ('time_rssi_color', 'Time/RSSI')
             ] %}
             <div class="row align-items-center mb-2">
-            <div class="col-4">
+              <div class="col-4">
                 <label class="form-label">{{ label }}</label>
-            </div>
-            <div class="col-5 d-flex align-items-center" style="width: 60%;">
+              </div>
+              <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
-                {% for cname in predefined_colors %}
-                    <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
-                {% endfor %}
-                <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...</option>
+                  {% for cname in predefined_colors %}
+                  <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if
+                    color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{
+                    cname }}</option>
+                  {% endfor %}
+                  <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...
+                  </option>
                 </select>
-                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker" value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}" style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
-                <span class="color-preview ms-2" id="{{ var }}_preview" style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
-            </div>
+                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker"
+                  value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}"
+                  style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
+                <span class="color-preview ms-2" id="{{ var }}_preview"
+                  style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
+              </div>
             </div>
             {% endfor %}
-        </div>
-        <hr>
-        <div class="mt-3">
+          </div>
+          <hr>
+          <div class="mt-3">
             <div style="text-align: center; margin-bottom: 24px;">
-                <h5>Plane Count Indicator</h5>
-                <img src="{{ url_for('static', filename='FG-plane-count-indicator.png') }}" class="inline-image">
+              <h5>Plane Count Indicator</h5>
+              <img src="{{ url_for('static', filename='FG-plane-count-indicator.png') }}" class="inline-image">
             </div>
             {% for var, label in [
             ('plane_count_color', 'Plane Count'),
             ('switch_progress_color', 'Switch Progress')
             ] %}
             <div class="row align-items-center mb-2">
-            <div class="col-4">
+              <div class="col-4">
                 <label class="form-label">{{ label }}</label>
-            </div>
-            <div class="col-5 d-flex align-items-center" style="width: 60%;">
+              </div>
+              <div class="col-5 d-flex align-items-center" style="width: 60%;">
                 <select class="form-select color-select me-2" data-var="{{ var }}" id="{{ var }}">
-                {% for cname in predefined_colors %}
-                    <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{ cname }}</option>
-                {% endfor %}
-                <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...</option>
+                  {% for cname in predefined_colors %}
+                  <option value="{{ cname }}" data-color="{{ predefined_colors_rgb[cname] }}" {% if
+                    color_config[var]['type']=='predef' and color_config[var]['value']==cname %}selected{% endif %}>{{
+                    cname }}</option>
+                  {% endfor %}
+                  <option value="custom" {% if color_config[var]['type']=='custom' %}selected{% endif %}>Custom...
+                  </option>
                 </select>
-                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker" value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}" style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
-                <span class="color-preview ms-2" id="{{ var }}_preview" style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
-            </div>
+                <input type="color" class="form-control form-control-color color-picker ms-2" id="{{ var }}_picker"
+                  value="{{ color_config[var]['hex'] if color_config[var]['type']=='custom' else '#ffffff' }}"
+                  style="max-width: 32px; min-width: 24px; display: {% if color_config[var]['type']=='custom' %}inline-block{% else %}none{% endif %};">
+                <span class="color-preview ms-2" id="{{ var }}_preview"
+                  style="width: 2em; height: 2em; display: inline-block; border: 1px solid #ccc; border-radius: 4px; background: {{ color_config[var]['hex'] if color_config[var]['type']=='custom' else predefined_colors_rgb.get(color_config[var]['value'], '#fff') }};"></span>
+              </div>
             </div>
             {% endfor %}
-        </div>
-        <div style="margin-top: 24px; text-align: left;">
+          </div>
+          <div style="margin-top: 24px; text-align: left;">
             <button type="button" class="btn btn-sm btn-outline-secondary scroll-up">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
-            <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
-            <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
-            </svg>
-                Scroll back up</button>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-chevron-double-up" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd"
+                  d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z" />
+                <path fill-rule="evenodd"
+                  d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z" />
+              </svg>
+              Scroll back up</button>
+          </div>
         </div>
-        </div>
-    </div>
-    <button type="button" class="btn btn-primary apply-btn" id="applyBtn" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark-check" viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0z"/>
-        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+      </div>
+      <button type="button" class="btn btn-primary apply-btn" id="applyBtn"
+        style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+          class="bi bi-file-earmark-check" viewBox="0 0 16 16" aria-hidden="true">
+          <path
+            d="M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0z" />
+          <path
+            d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
         </svg>
         Save Settings</button>
-    <button type="button" class="btn btn-warning" id="restartReminderBtn" style="display:none; position:fixed; bottom:72px; right:24px; z-index:9999; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
-        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+      <button type="button" class="btn btn-warning" id="restartReminderBtn"
+        style="display:none; position:fixed; bottom:72px; right:24px; z-index:9999; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-clockwise"
+          viewBox="0 0 16 16" aria-hidden="true">
+          <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+          <path
+            d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
         </svg>
         Restart to apply</button>
     </form>
-</div>
-<script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.js') }}"></script>
-<script>
-function setTheme(theme) {
-    if (theme === 'light') {
+  </div>
+  <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
+  <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+  <script>
+    function setTheme(theme) {
+      if (theme === 'light') {
         document.body.style.background = '#f8f9fa';
         document.body.style.color = '#222';
         let alerts = document.querySelectorAll('.alert');
         alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
         document.documentElement.setAttribute("data-bs-theme", theme);
-    } else {
+      } else {
         document.body.style.background = '#181818';
         document.body.style.color = '#fff';
         let alerts = document.querySelectorAll('.alert');
         alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#ffd700'; });
         document.documentElement.setAttribute("data-bs-theme", theme);
+      }
     }
-}
-function getPreferredTheme() {
-    if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-function toggleTheme() {
-    let current = getPreferredTheme();
-    let next = current === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('fg_theme', next);
-    setTheme(next);
-}
-document.getElementById('themeToggleBtn').onclick = toggleTheme;
-setTheme(getPreferredTheme());
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
-});
-</script>
-<script>
-// the back to home button logic (you'll see this in other pages)
-const homeUrl = {{ url_for('landing_page') | tojson }};
-const fullHomeUrl = window.location.origin + homeUrl;
-let windowHistoryCount = window.history.length;
+    function getPreferredTheme() {
+      if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function toggleTheme() {
+      let current = getPreferredTheme();
+      let next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('fg_theme', next);
+      setTheme(next);
+    }
+    document.getElementById('themeToggleBtn').onclick = toggleTheme;
+    setTheme(getPreferredTheme());
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+    });
+  </script>
+  <script>
+    // the back to home button logic (you'll see this in other pages)
+    const homeUrl = {{ url_for('landing_page') | tojson }};
+    const fullHomeUrl = window.location.origin + homeUrl;
+    let windowHistoryCount = window.history.length;
 
-function goHome() {
-    // Check if the user likely came from the landing page
-    if (document.referrer === fullHomeUrl) {
+    function goHome() {
+      // Check if the user likely came from the landing page
+      if (document.referrer === fullHomeUrl) {
         // Came from home: go back in history (no new entry added)
         if (windowHistoryCount > 1) {
-            window.history.back();
+          window.history.back();
         } else { // opened a new tab/window; just close it (browser should go to the referring tab)
-            close();
+          close();
         }
-    } else {
+      } else {
         // Direct access or from elsewhere: navigate to home (adds one entry)
         window.location.href = homeUrl;
+      }
     }
-}
-document.getElementById('backToHomeBtn').onclick = goHome;
-</script>
-<script>
-// main page logic
-const updateConfigURL = "{{ url_for('update_config') }}";
-const restartService = "{{ url_for('restart_flightgazer') }}";
-let headerObj = document.getElementById('configTabs')
-$(document).ready(function() {
-    // Dynamically adjust HEIGHT_LIMIT and RANGE min/max based on selected units
-    function updateLimits() {
+    document.getElementById('backToHomeBtn').onclick = goHome;
+  </script>
+  <script>
+    // main page logic
+    const updateConfigURL = "{{ url_for('update_config') }}";
+    const restartService = "{{ url_for('restart_flightgazer') }}";
+    let headerObj = document.getElementById('configTabs')
+    $(document).ready(function () {
+      // Dynamically adjust HEIGHT_LIMIT and RANGE min/max based on selected units
+      function updateLimits() {
         var units = parseInt($('#UNITS').val());
         // HEIGHT_LIMIT
         var heightMin, heightMax, heightStep, altitudeUnit;
         if (units === 1) { // metric
-            heightMin = 760;
-            heightMax = 22860;
-            heightStep = 5;
-            altitudeUnit = 'meters';
+          heightMin = 760;
+          heightMax = 22860;
+          heightStep = 5;
+          altitudeUnit = 'meters';
         } else { // aeronautical or U.S. Customary
-            heightMin = 2500;
-            heightMax = 75000;
-            heightStep = 5;
-            altitudeUnit = 'feet';
+          heightMin = 2500;
+          heightMax = 75000;
+          heightStep = 5;
+          altitudeUnit = 'feet';
         }
-        $('#HEIGHT_LIMIT, #HEIGHT_LIMIT_num').attr({min: heightMin, max: heightMax, step: heightStep});
+        $('#HEIGHT_LIMIT, #HEIGHT_LIMIT_num').attr({ min: heightMin, max: heightMax, step: heightStep });
         $('#aUnit').text(altitudeUnit);
         // Clamp value if out of bounds
         var hVal = parseInt($('#HEIGHT_LIMIT').val());
         if (hVal < heightMin || hVal > heightMax || isNaN(hVal)) {
-            $('#HEIGHT_LIMIT').val(heightMin);
-            $('#HEIGHT_LIMIT_num').val(heightMin);
+          $('#HEIGHT_LIMIT').val(heightMin);
+          $('#HEIGHT_LIMIT_num').val(heightMin);
         }
         // RANGE
         var rangeMin, rangeMax, rangeStep, distanceUnit;
-        switch(units) {
-            case 1: // metric
+        switch (units) {
+          case 1: // metric
             rangeMin = 0.9;
             rangeMax = 37;
             rangeStep = 0.1;
             distanceUnit = 'km';
             break;
-            case 2: // U.S. Customary
+          case 2: // U.S. Customary
             rangeMin = 0.6;
             rangeMax = 23;
             rangeStep = 0.1;
             distanceUnit = 'mi';
             break;
-            default: // aeronautical or anything else
+          default: // aeronautical or anything else
             rangeMin = 0.5;
             rangeMax = 20;
             rangeStep = 0.1;
             distanceUnit = 'nmi';
         }
-        $('#RANGE, #RANGE_num').attr({min: rangeMin, max: rangeMax, step: rangeStep});
+        $('#RANGE, #RANGE_num').attr({ min: rangeMin, max: rangeMax, step: rangeStep });
         $('#dUnit').text(distanceUnit);
         var rVal = parseFloat($('#RANGE').val());
         if (rVal < rangeMin || rVal > rangeMax || isNaN(rVal)) {
-            $('#RANGE').val(rangeMin);
-            $('#RANGE_num').val(rangeMin);
+          $('#RANGE').val(rangeMin);
+          $('#RANGE_num').val(rangeMin);
         }
-    }
-    $('#UNITS').on('change', function() {
+      }
+      $('#UNITS').on('change', function () {
         updateLimits();
-    });
-    // Initial call
-    updateLimits();
-    // Colors tab logic
-    $('.color-select').on('change', function() {
+      });
+      // Initial call
+      updateLimits();
+      // Colors tab logic
+      $('.color-select').on('change', function () {
         var v = $(this).val();
         var picker = $('#' + $(this).attr('id') + '_picker');
         var preview = $('#' + $(this).attr('id') + '_preview');
         if (v === 'custom') {
-            picker.show();
-            preview.css('background', picker.val());
+          picker.show();
+          preview.css('background', picker.val());
         } else {
-            picker.hide();
-            // get color from option's data-color
-            var hex = $(this).find('option:selected').data('color');
-            preview.css('background', hex);
+          picker.hide();
+          // get color from option's data-color
+          var hex = $(this).find('option:selected').data('color');
+          preview.css('background', hex);
         }
         $('#applyBtn').show();
-    });
-    $('.color-picker').on('input', function() {
-        var preview = $('#' + $(this).attr('id').replace('_picker','_preview'));
+      });
+      $('.color-picker').on('input', function () {
+        var preview = $('#' + $(this).attr('id').replace('_picker', '_preview'));
         preview.css('background', $(this).val());
         $('#applyBtn').show();
-    });
-    $('#configForm').on('input change', function() {
+      });
+      $('#configForm').on('input change', function () {
         $('#applyBtn').show();
-    });
-    // Warn user if navigating away with unsaved changes
-    window.addEventListener('beforeunload', function(e) {
+      });
+      // Warn user if navigating away with unsaved changes
+      window.addEventListener('beforeunload', function (e) {
         if ($('#applyBtn').is(':visible')) {
-            e.preventDefault();
-            e.returnValue = '';
-            return '';
+          e.preventDefault();
+          e.returnValue = '';
+          return '';
         }
-    });
-    function getApiSchedule() {
+      });
+      function getApiSchedule() {
         let schedule = {};
-        ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"].forEach(day => {
-            let am = '', pm = '';
-            for (let h = 0; h < 12; h++) {
-                am += $(".api-hour[data-day='"+day+"'][data-hour='"+h+"']").is(':checked') ? 'x' : '-';
-                pm += $(".api-hour[data-day='"+day+"'][data-hour='"+(h+12)+"']").is(':checked') ? 'x' : '-';
-            }
-            schedule[day] = {'0-11': am, '12-23': pm};
+        ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"].forEach(day => {
+          let am = '', pm = '';
+          for (let h = 0; h < 12; h++) {
+            am += $(".api-hour[data-day='" + day + "'][data-hour='" + h + "']").is(':checked') ? 'x' : '-';
+            pm += $(".api-hour[data-day='" + day + "'][data-hour='" + (h + 12) + "']").is(':checked') ? 'x' : '-';
+          }
+          schedule[day] = { '0-11': am, '12-23': pm };
         });
         schedule['ENABLED'] = $('#API_SCHEDULE_ENABLED').is(':checked');
         return schedule;
-    }
-    $('#applyBtn').on('click', function() {
+      }
+      $('#applyBtn').on('click', function () {
         let form = $('#configForm')[0];
         let errors = [];
         // Programmer's note: uncomment these if you decide to check these settings later
@@ -1301,63 +1625,63 @@ $(document).ready(function() {
 
         // API Daily Limit
         if (form.API_DAILY_LIMIT.value) {
-            let apiDailyLimit = parseInt(form.API_DAILY_LIMIT.value);
-            if (isNaN(apiDailyLimit) || apiDailyLimit < 1 || apiDailyLimit > 10000) {
-                errors.push('API Daily Limit must be between 1 and 10000.');
-            }
+          let apiDailyLimit = parseInt(form.API_DAILY_LIMIT.value);
+          if (isNaN(apiDailyLimit) || apiDailyLimit < 1 || apiDailyLimit > 10000) {
+            errors.push('API Daily Limit must be between 1 and 10000.');
+          }
         }
         // API Cost Limit
         if (form.API_COST_LIMIT.value) {
-            let apiCostLimit = parseFloat(form.API_COST_LIMIT.value);
-            if (isNaN(apiCostLimit) || apiCostLimit < 0.01 || apiCostLimit > 10000) {
-                errors.push('API Cost Limit must be between 0.01 and 10000.');
-            }
+          let apiCostLimit = parseFloat(form.API_COST_LIMIT.value);
+          if (isNaN(apiCostLimit) || apiCostLimit < 0.01 || apiCostLimit > 10000) {
+            errors.push('API Cost Limit must be between 0.01 and 10000.');
+          }
         }
         // Custom dump1090 location (basic URL check)
         if (form.CUSTOM_DUMP1090_LOCATION.value && !/^https?:\/\/.+/.test(form.CUSTOM_DUMP1090_LOCATION.value)) {
-            errors.push('Custom dump1090 location must be a valid URL starting with http:// or https://');
+          errors.push('Custom dump1090 location must be a valid URL starting with http:// or https://');
         }
         // Custom dump978 location (basic URL check)
         if (form.CUSTOM_DUMP978_LOCATION.value && !/^https?:\/\/.+/.test(form.CUSTOM_DUMP978_LOCATION.value)) {
-            errors.push('Custom dump978 location must be a valid URL starting with http:// or https://');
+          errors.push('Custom dump978 location must be a valid URL starting with http:// or https://');
         }
         // Follow This Aircraft (hex check)
         if (form.FOLLOW_THIS_AIRCRAFT.value && !/^[0-9a-fA-F]{1,6}$/.test(form.FOLLOW_THIS_AIRCRAFT.value)) {
-            errors.push('Follow This Aircraft must be a valid ICAO hex ID (6 hex digits).');
+          errors.push('Follow This Aircraft must be a valid ICAO hex ID (6 hex digits).');
         }
         if (form.FOLLOW_THIS_AIRCRAFT.value && (form.FOLLOW_THIS_AIRCRAFT.value).length != 6) {
-            errors.push('Follow This Aircraft must be exactly 6 characters.')
+          errors.push('Follow This Aircraft must be exactly 6 characters.')
         }
         // Brightness Switch Time
         if (form.BRIGHTNESS_SWITCH_TIME_Sunrise && form.BRIGHTNESS_SWITCH_TIME_Sunset) {
-            let sunrise = form.BRIGHTNESS_SWITCH_TIME_Sunrise.value;
-            let sunset = form.BRIGHTNESS_SWITCH_TIME_Sunset.value;
-            // Check for valid HH:MM format
-            let timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
-            if (!timeRegex.test(sunrise)) {
-                errors.push('Sunrise time must be in HH:MM format (00:00 to 23:59).');
+          let sunrise = form.BRIGHTNESS_SWITCH_TIME_Sunrise.value;
+          let sunset = form.BRIGHTNESS_SWITCH_TIME_Sunset.value;
+          // Check for valid HH:MM format
+          let timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
+          if (!timeRegex.test(sunrise)) {
+            errors.push('Sunrise time must be in HH:MM format (00:00 to 23:59).');
+          }
+          if (!timeRegex.test(sunset)) {
+            errors.push('Sunset time must be in HH:MM format (00:00 to 23:59).');
+          }
+          // Check that sunrise != sunset
+          if (sunrise && sunset && sunrise === sunset) {
+            errors.push('Sunrise and Sunset times must be different.');
+          }
+          // Check that sunrise does not occur after sunset
+          if (sunrise && sunset && timeRegex.test(sunrise) && timeRegex.test(sunset)) {
+            let sunriseParts = sunrise.split(':');
+            let sunsetParts = sunset.split(':');
+            let sunriseMinutes = parseInt(sunriseParts[0], 10) * 60 + parseInt(sunriseParts[1], 10);
+            let sunsetMinutes = parseInt(sunsetParts[0], 10) * 60 + parseInt(sunsetParts[1], 10);
+            if (sunriseMinutes > sunsetMinutes) {
+              errors.push('Sunrise time must occur before Sunset time.');
             }
-            if (!timeRegex.test(sunset)) {
-                errors.push('Sunset time must be in HH:MM format (00:00 to 23:59).');
-            }
-            // Check that sunrise != sunset
-            if (sunrise && sunset && sunrise === sunset) {
-                errors.push('Sunrise and Sunset times must be different.');
-            }
-            // Check that sunrise does not occur after sunset
-            if (sunrise && sunset && timeRegex.test(sunrise) && timeRegex.test(sunset)) {
-                let sunriseParts = sunrise.split(':');
-                let sunsetParts = sunset.split(':');
-                let sunriseMinutes = parseInt(sunriseParts[0], 10) * 60 + parseInt(sunriseParts[1], 10);
-                let sunsetMinutes = parseInt(sunsetParts[0], 10) * 60 + parseInt(sunsetParts[1], 10);
-                if (sunriseMinutes > sunsetMinutes) {
-                    errors.push('Sunrise time must occur before Sunset time.');
-                }
-            }
+          }
         }
         if (errors.length > 0) {
-            alert('Please correct the following errors before saving:\n\n' + errors.join('\n'));
-            return;
+          alert('Please correct the following errors before saving:\n\n' + errors.join('\n'));
+          return;
         }
         let data = {};
         data['UNITS'] = parseInt(form.UNITS.value);
@@ -1392,16 +1716,16 @@ $(document).ready(function() {
         // data['WRITE_STATE'] = form.WRITE_STATE && form.WRITE_STATE.checked;
         data['BRIGHTNESS'] = parseInt(form.BRIGHTNESS.value);
         if ($('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE').is(':checked')) {
-            data['ACTIVE_PLANE_DISPLAY_BRIGHTNESS'] = parseInt(form.ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value);
+          data['ACTIVE_PLANE_DISPLAY_BRIGHTNESS'] = parseInt(form.ACTIVE_PLANE_DISPLAY_BRIGHTNESS.value);
         } else {
-            data['ACTIVE_PLANE_DISPLAY_BRIGHTNESS'] = '';
+          data['ACTIVE_PLANE_DISPLAY_BRIGHTNESS'] = '';
         }
         if (form.BRIGHTNESS_2) data['BRIGHTNESS_2'] = parseInt(form.BRIGHTNESS_2.value);
         if (form.BRIGHTNESS_SWITCH_TIME_Sunrise && form.BRIGHTNESS_SWITCH_TIME_Sunset) {
-            data['BRIGHTNESS_SWITCH_TIME'] = {
-                'Sunrise': form.BRIGHTNESS_SWITCH_TIME_Sunrise.value,
-                'Sunset': form.BRIGHTNESS_SWITCH_TIME_Sunset.value
-            };
+          data['BRIGHTNESS_SWITCH_TIME'] = {
+            'Sunrise': form.BRIGHTNESS_SWITCH_TIME_Sunrise.value,
+            'Sunset': form.BRIGHTNESS_SWITCH_TIME_Sunset.value
+          };
         }
         data['FLYBY_STALENESS'] = parseInt(form.FLYBY_STALENESS.value);
         data['LOCATION_TIMEOUT'] = parseInt(form.LOCATION_TIMEOUT.value);
@@ -1413,119 +1737,119 @@ $(document).ready(function() {
         data['FOLLOW_THIS_AIRCRAFT'] = form.FOLLOW_THIS_AIRCRAFT.value;
         data['IGNORE_AIRCRAFT_ICAOS'] = form.IGNORE_AIRCRAFT_ICAOS.value;
         data['CLOCK_CENTER_ROW'] = {
-            'ROW1': parseInt(form.CLOCK_CENTER_ROW_ROW1.value),
-            'ROW2': parseInt(form.CLOCK_CENTER_ROW_ROW2.value)
+          'ROW1': parseInt(form.CLOCK_CENTER_ROW_ROW1.value),
+          'ROW2': parseInt(form.CLOCK_CENTER_ROW_ROW2.value)
         };
         data['LED_PWM_BITS'] = parseInt(form.LED_PWM_BITS.value);
         // Colors
         let colorVars = [
-            'clock_color','seconds_color','am_pm_color','day_of_week_color','date_color',
-            'flyby_header_color','flyby_color','track_header_color','track_color','range_header_color','range_color',
-            'center_row1_color','center_row2_color',
-            'callsign_color','distance_color','country_color','uat_indicator_color',
-            'origin_color','destination_color','arrow_color',
-            'time_header_color','time_readout_color','center_readout_color',
-            'latitude_color','longitude_color','groundtrack_color','verticalspeed_color',
-            'marquee_color_journey_plus','marquee_color_enhanced_readout',
-            'altitude_heading_color','altitude_color','speed_heading_color','speed_color','time_rssi_heading_color','time_rssi_color',
-            'plane_count_color','switch_progress_color'
+          'clock_color', 'seconds_color', 'am_pm_color', 'day_of_week_color', 'date_color',
+          'flyby_header_color', 'flyby_color', 'track_header_color', 'track_color', 'range_header_color', 'range_color',
+          'center_row1_color', 'center_row2_color',
+          'callsign_color', 'distance_color', 'country_color', 'uat_indicator_color',
+          'origin_color', 'destination_color', 'arrow_color',
+          'time_header_color', 'time_readout_color', 'center_readout_color',
+          'latitude_color', 'longitude_color', 'groundtrack_color', 'verticalspeed_color',
+          'marquee_color_journey_plus', 'marquee_color_enhanced_readout',
+          'altitude_heading_color', 'altitude_color', 'speed_heading_color', 'speed_color', 'time_rssi_heading_color', 'time_rssi_color',
+          'plane_count_color', 'switch_progress_color'
         ];
         let colorData = {};
-        colorVars.forEach(function(varname) {
-            let sel = $('#' + varname);
-            if (sel.length === 0) return;
-            let val = sel.val();
-            if (val === 'custom') {
-                let hex = $('#' + varname + '_picker').val();
-                colorData[varname] = {type: 'custom', hex: hex};
-            } else {
-                colorData[varname] = {type: 'predef', value: val};
-            }
+        colorVars.forEach(function (varname) {
+          let sel = $('#' + varname);
+          if (sel.length === 0) return;
+          let val = sel.val();
+          if (val === 'custom') {
+            let hex = $('#' + varname + '_picker').val();
+            colorData[varname] = { type: 'custom', hex: hex };
+          } else {
+            colorData[varname] = { type: 'predef', value: val };
+          }
         });
         data['colors'] = colorData;
         $.ajax({
-            url: updateConfigURL,
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function(resp) {
-                $('#applyBtn').hide();
-                // Prompt user to restart FlightGazer
-                if (confirm('Settings saved. Restart FlightGazer now to apply changes?')) {
-                    showSpinnerOverlay('Restarting FlightGazer...');
-                    $.post(restartService, function(restartResp) {
-                        hideSpinnerOverlay();
-                        if (restartResp.status === 'success') {
-                            alert('FlightGazer successfully restarted.');
-                        } else {
-                            if (restartResp.error === 'Service control timeout still active, try again later.') {
-                                alert("You recently used the service controls, you'll have to restart the service manually.");
-                            } else {
-                                let errstr = String(restartResp.error)
-                                let fullmsg = 'Failed to restart FlightGazer. Check the logs.\nDetails: ' + errstr
-                                alert(fullmsg);
-                            }
-                        }
-                        location.reload();
-                    });
-                } else {
-                    // Show persistent reminder button
-                    $('#restartReminderBtn').show();
-                }
-            },
-            error: function() {
-                alert('Failed to save config! Your changes may not have been saved.');
-            }
-        });
-    });
-    // Persistent restart reminder button logic
-    $('#restartReminderBtn').on('click', function() {
-        if (confirm('Restart FlightGazer now to apply your changes?')) {
-            showSpinnerOverlay('Restarting FlightGazer...');
-            $.post(restartService, function(restartResp) {
+          url: updateConfigURL,
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          success: function (resp) {
+            $('#applyBtn').hide();
+            // Prompt user to restart FlightGazer
+            if (confirm('Settings saved. Restart FlightGazer now to apply changes?')) {
+              showSpinnerOverlay('Restarting FlightGazer...');
+              $.post(restartService, function (restartResp) {
                 hideSpinnerOverlay();
                 if (restartResp.status === 'success') {
-                    alert('FlightGazer successfully restarted.');
+                  alert('FlightGazer successfully restarted.');
                 } else {
-                    if (restartResp.error === 'Service control timeout still active, try again later.') {
-                        alert("You recently used the service controls, you'll have to restart the service manually.");
-                    } else {
-                        let errstr = String(restartResp.error)
-                        let fullmsg = 'Failed to restart FlightGazer. Check the logs.\nDetails: ' + errstr
-                        alert(fullmsg);
-                    }
+                  if (restartResp.error === 'Service control timeout still active, try again later.') {
+                    alert("You recently used the service controls, you'll have to restart the service manually.");
+                  } else {
+                    let errstr = String(restartResp.error)
+                    let fullmsg = 'Failed to restart FlightGazer. Check the logs.\nDetails: ' + errstr
+                    alert(fullmsg);
+                  }
                 }
                 location.reload();
-            });
+              });
+            } else {
+              // Show persistent reminder button
+              $('#restartReminderBtn').show();
+            }
+          },
+          error: function () {
+            alert('Failed to save config! Your changes may not have been saved.');
+          }
+        });
+      });
+      // Persistent restart reminder button logic
+      $('#restartReminderBtn').on('click', function () {
+        if (confirm('Restart FlightGazer now to apply your changes?')) {
+          showSpinnerOverlay('Restarting FlightGazer...');
+          $.post(restartService, function (restartResp) {
+            hideSpinnerOverlay();
+            if (restartResp.status === 'success') {
+              alert('FlightGazer successfully restarted.');
+            } else {
+              if (restartResp.error === 'Service control timeout still active, try again later.') {
+                alert("You recently used the service controls, you'll have to restart the service manually.");
+              } else {
+                let errstr = String(restartResp.error)
+                let fullmsg = 'Failed to restart FlightGazer. Check the logs.\nDetails: ' + errstr
+                alert(fullmsg);
+              }
+            }
+            location.reload();
+          });
         }
-    });
-    // Active Plane Display Brightness toggle logic
-    function updateActivePlaneSliderState() {
+      });
+      // Active Plane Display Brightness toggle logic
+      function updateActivePlaneSliderState() {
         if ($('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE').is(':checked')) {
-            $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS').prop('disabled', false);
+          $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS').prop('disabled', false);
         } else {
-            $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS').prop('disabled', true);
+          $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS').prop('disabled', true);
         }
-    }
-    // Set initial state on page load
-    updateActivePlaneSliderState();
-    $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE').on('change', function() {
+      }
+      // Set initial state on page load
+      updateActivePlaneSliderState();
+      $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS_TOGGLE').on('change', function () {
         updateActivePlaneSliderState();
         $('#applyBtn').show();
-    });
-    $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS').on('input', function() {
+      });
+      $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS').on('input', function () {
         $('#ACTIVE_PLANE_DISPLAY_BRIGHTNESS_value').val($(this).val());
         $('#applyBtn').show();
-    });
-    // scroll-back button
-    $('.scroll-up').on('click', function(e) {
+      });
+      // scroll-back button
+      $('.scroll-up').on('click', function (e) {
         e.preventDefault();
         headerObj.scrollIntoView();
-    })
-// Spinner overlay logic
-function showSpinnerOverlay(message) {
-    if ($('#spinnerOverlay').length) return;
-    let overlay = $(`
+      })
+      // Spinner overlay logic
+      function showSpinnerOverlay(message) {
+        if ($('#spinnerOverlay').length) return;
+        let overlay = $(`
         <div id="spinnerOverlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(24,24,24,0.85);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <div style="margin-bottom:24px;color:#fff;font-size:1.3em;">${message || 'Please wait...'}</div>
             <div class="spinner-border text-info" style="width:4rem;height:4rem;" role="status">
@@ -1533,12 +1857,13 @@ function showSpinnerOverlay(message) {
             </div>
         </div>
     `);
-    $('body').append(overlay);
-}
-function hideSpinnerOverlay() {
-    $('#spinnerOverlay').remove();
-}
-});
-</script>
+        $('body').append(overlay);
+      }
+      function hideSpinnerOverlay() {
+        $('#spinnerOverlay').remove();
+      }
+    });
+  </script>
 </body>
+
 </html>

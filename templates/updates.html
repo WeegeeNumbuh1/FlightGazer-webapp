@@ -1,139 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlightGazer - Check for Updates</title>
-    <meta name="author" content="WeegeeNumbuh1">
-    <meta name="description" content="FlightGazer updater page.">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        body { background: #181818; color: #fff; }
-        .centered { text-align: center; margin-top: 60px; }
-        .back-btn { margin-top: 40px; }
-        .monospace { font-family: monospace; }
-    </style>
-</head>
-<body>
-    <div class="container py-4">
-        <button id="backToHomeBtnMain" class="btn btn btn-info">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-        </svg>
-            Back to Home</button>
-        <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end" style="position:relative;z-index:10;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
-    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
-    </svg>
-        </button>
-        <h2 class="mb-4">Check for Updates</h2>
-        <h5>Updates can include:</h5>
-        <ul>
-            <li>Bug &amp; issue fixes</li>
-            <li>New or better functionality</li>
-            <li>Performance improvements</li>
-            <li>Support for future changes</li>
-        </ul>
-        <details><summary>If you're having an issue...</summary>
-            <ul>
-                <li>Press the "Check Now" button below. An update might fix it.<br>
-                <ul>
-                <li>Additionally, you might need to check the <i>Also Reset Configuration to Default</i> option to make sure it's not a configuration issue. You'll have to reconfigure your settings if you reset.</li>
-                <li>If you still have an issue, <a href="{{ url_for('reference_guide') }}" target="_blank">send a bug report</a>.
-                </li></ul>
-            </ul>
-        </details>
-        It's recommended to use the latest version available, especially if it's been awhile since you last checked.<br>
-    </div>
-    <div class="container py-4">
-        <div class="mb-3" id="precheck">
-            <button id="checkUpdatesBtn" class="btn btn-success">Check Now</button>
-            <span id="versionInfo" style="margin-left:16px;"></span>
-            <span id="commit-history"></span>
-        </div>
-        <div id="changelogSection" style="display:none;">
-            <h5>Changes Since Current Version</h5>
-            <a target="_blank" rel="noopener noreferrer" href="{{ url_for('show_latest_changelog') }}">Read the entire Changelog</a> (opens new tab)
-            <iframe id="changelogFrame" style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#222;font-family:monospace;border-radius:8px;border:none;"></iframe>
-            <div id="confirm-update" class="mt-3 mb-2" style="display:flex;align-items:center;gap:16px;">
-                <button id="updateNowBtn" class="btn btn-warning">Update Now</button>
-                <label style="margin-bottom:0;display:flex;align-items:center;gap:6px;">
-                    <input type="checkbox" id="resetConfigCheckbox" style="margin-bottom:0;">
-                    <span>Also Reset Configuration to Default</span>
-                </label>
-            </div>
-        </div>
-        <div id="updateOutputSection" style="display:none;">
-            <h5></h5>Update Output</h5>
-            <iframe id="updateOutputFrame" style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#222;font-family:monospace;border-radius:8px;border:none;"></iframe>
-        </div>
-    </div>
-    <div id="updateProgressPage" style="display:none;position:fixed;top:0;left:0;width:100vw;height:77vh;background:#181818;z-index:1000;padding-right: 12px;padding-left: 12px;">
-        <button id="backToHomeBtn" class="btn btn-info" style="position:absolute;top:24px;left:24px;display:none;z-index:1100;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-        </svg>
-            Back to Home</button>
-        <h3 class="display-6" style="text-align:center;margin-top:64px;">Update Progress</h3>
-        <h4 style="text-align:center">Please wait, don't refresh the page or go back until "Back to Home" appears.</h4>
-        <iframe id="updateOutputFrameFull" style="display:block;margin:32px auto 0 auto;width:90vw;height:78vh;background:#222;color:#222;font-family:monospace;border-radius:12px;border:none;padding-bottom: 5vh;"></iframe>
-    </div>
-    <script>
-        // note this page is special as there are two of these buttons
-        // idk, how this page works is quite jank lmao
-        const homeUrl = {{ url_for('landing_page') | tojson }};
-        const fullHomeUrl = window.location.origin + homeUrl;
-        let windowHistoryCount = window.history.length;
 
-        function goHome() {
-            if (document.referrer === fullHomeUrl) {
-                if (windowHistoryCount > 1) {
-                    window.history.back();
-                } else {
-                    close();
-                }
-            } else {
-                window.location.href = homeUrl;
-            }
-        }
-        document.getElementById('backToHomeBtnMain').onclick = goHome;
-    </script>
-    <script>
-        function setTheme(theme) {
-        if (theme === 'light') {
-            document.body.style.background = '#f8f9fa';
-            document.body.style.color = '#222';
-            let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlightGazer - Check for Updates</title>
+  <meta name="author" content="WeegeeNumbuh1">
+  <meta name="description" content="FlightGazer updater page.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+    }
+
+    .centered {
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .back-btn {
+      margin-top: 40px;
+    }
+
+    .monospace {
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container py-4">
+    <button id="backToHomeBtnMain" class="btn btn btn-info">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+      </svg>
+      Back to Home</button>
+    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary mb-3 float-end"
+      style="position:relative;z-index:10;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278" />
+        <path
+          d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z" />
+      </svg>
+    </button>
+    <h2 class="mb-4">Check for Updates</h2>
+    <h5>Updates can include:</h5>
+    <ul>
+      <li>Bug &amp; issue fixes</li>
+      <li>New or better functionality</li>
+      <li>Performance improvements</li>
+      <li>Support for future changes</li>
+    </ul>
+    <details>
+      <summary>If you're having an issue...</summary>
+      <ul>
+        <li>Press the "Check Now" button below. An update might fix it.<br>
+          <ul>
+            <li>Additionally, you might need to check the <i>Also Reset Configuration to Default</i> option to make sure
+              it's not a configuration issue. You'll have to reconfigure your settings if you reset.</li>
+            <li>If you still have an issue, <a href="{{ url_for('reference_guide') }}" target="_blank">send a bug
+                report</a>.
+            </li>
+          </ul>
+      </ul>
+    </details>
+    It's recommended to use the latest version available, especially if it's been awhile since you last checked.<br>
+  </div>
+  <div class="container py-4">
+    <div class="mb-3" id="precheck">
+      <button id="checkUpdatesBtn" class="btn btn-success">Check Now</button>
+      <span id="versionInfo" style="margin-left:16px;"></span>
+      <span id="commit-history"></span>
+    </div>
+    <div id="changelogSection" style="display:none;">
+      <h5>Changes Since Current Version</h5>
+      <a target="_blank" rel="noopener noreferrer" href="{{ url_for('show_latest_changelog') }}">Read the entire
+        Changelog</a> (opens new tab)
+      <iframe id="changelogFrame"
+        style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#222;font-family:monospace;border-radius:8px;border:none;"></iframe>
+      <div id="confirm-update" class="mt-3 mb-2" style="display:flex;align-items:center;gap:16px;">
+        <button id="updateNowBtn" class="btn btn-warning">Update Now</button>
+        <label style="margin-bottom:0;display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="resetConfigCheckbox" style="margin-bottom:0;">
+          <span>Also Reset Configuration to Default</span>
+        </label>
+      </div>
+    </div>
+    <div id="updateOutputSection" style="display:none;">
+      <h5></h5>Update Output</h5>
+      <iframe id="updateOutputFrame"
+        style="width:100%;min-height:220px;height:calc(100vh - 320px);background:#222;color:#222;font-family:monospace;border-radius:8px;border:none;"></iframe>
+    </div>
+  </div>
+  <div id="updateProgressPage"
+    style="display:none;position:fixed;top:0;left:0;width:100vw;height:77vh;background:#181818;z-index:1000;padding-right: 12px;padding-left: 12px;">
+    <button id="backToHomeBtn" class="btn btn-info"
+      style="position:absolute;top:24px;left:24px;display:none;z-index:1100;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+      </svg>
+      Back to Home</button>
+    <h3 class="display-6" style="text-align:center;margin-top:64px;">Update Progress</h3>
+    <h4 style="text-align:center">Please wait, don't refresh the page or go back until "Back to Home" appears.</h4>
+    <iframe id="updateOutputFrameFull"
+      style="display:block;margin:32px auto 0 auto;width:90vw;height:78vh;background:#222;color:#222;font-family:monospace;border-radius:12px;border:none;padding-bottom: 5vh;"></iframe>
+  </div>
+  <script>
+    // note this page is special as there are two of these buttons
+    // idk, how this page works is quite jank lmao
+    const homeUrl = {{ url_for('landing_page') | tojson }};
+    const fullHomeUrl = window.location.origin + homeUrl;
+    let windowHistoryCount = window.history.length;
+
+    function goHome() {
+      if (document.referrer === fullHomeUrl) {
+        if (windowHistoryCount > 1) {
+          window.history.back();
         } else {
-            document.body.style.background = '#181818';
-            document.body.style.color = '#fff';
-            let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#a78e04'; });
+          close();
         }
+      } else {
+        window.location.href = homeUrl;
+      }
+    }
+    document.getElementById('backToHomeBtnMain').onclick = goHome;
+  </script>
+  <script>
+    function setTheme(theme) {
+      if (theme === 'light') {
+        document.body.style.background = '#f8f9fa';
+        document.body.style.color = '#222';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
+      } else {
+        document.body.style.background = '#181818';
+        document.body.style.color = '#fff';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#a78e04'; });
+      }
     }
     function getPreferredTheme() {
-        if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     function toggleTheme() {
-        let current = getPreferredTheme();
-        let next = current === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('fg_theme', next);
-        setTheme(next);
+      let current = getPreferredTheme();
+      let next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('fg_theme', next);
+      setTheme(next);
     }
     document.getElementById('themeToggleBtn').onclick = toggleTheme;
     setTheme(getPreferredTheme());
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+      if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
     });
-    </script>
-    <script>
+  </script>
+  <script>
     const updatesCheckUrl = "{{ url_for('check_for_updates') }}";
     const updatesStartUrl = "{{ url_for('start_update') }}";
     const updatesOutputUrl = "{{ url_for('get_update_output') }}";
@@ -146,176 +181,177 @@
     let changelogContent = '';
 
     // Add navigation warning when update is running
-    window.addEventListener('beforeunload', function(e) {
-        if (updateRunning) {
-            e.preventDefault();
-            // Most browsers will show their own message instead of this custom one,
-            // but we set it anyway for browsers that might use it
-            e.returnValue = 'An update is in progress. Are you sure you want to leave?';
-            return e.returnValue;
-        }
+    window.addEventListener('beforeunload', function (e) {
+      if (updateRunning) {
+        e.preventDefault();
+        // Most browsers will show their own message instead of this custom one,
+        // but we set it anyway for browsers that might use it
+        e.returnValue = 'An update is in progress. Are you sure you want to leave?';
+        return e.returnValue;
+      }
     });
 
-    document.getElementById('checkUpdatesBtn').onclick = function() {
-        document.getElementById('versionInfo').innerText = 'Checking...';
-        fetch(updatesCheckUrl, {method:'POST'}).then(r => r.json()).then(data => {
-            if (data.error) {
-                document.getElementById('versionInfo').innerText = data.error;
-                return;
-            }
-            document.getElementById('versionInfo').innerHTML = `\
+    document.getElementById('checkUpdatesBtn').onclick = function () {
+      document.getElementById('versionInfo').innerText = 'Checking...';
+      fetch(updatesCheckUrl, { method: 'POST' }).then(r => r.json()).then(data => {
+        if (data.error) {
+          document.getElementById('versionInfo').innerText = data.error;
+          return;
+        }
+        document.getElementById('versionInfo').innerHTML = `\
             <br><span class="monospace">Your Current Version: ${data.local_version}\
             <br>The Latest Version: &nbsp;&nbsp;<b>${data.latest_version}</b></span>`;
-            document.getElementById('commit-history').innerHTML = '<br><a target="_blank" rel="noopener noreferrer" href="https://github.com/WeegeeNumbuh1/FlightGazer/commits/main/">Review the source code changes</a>\
+        document.getElementById('commit-history').innerHTML = '<br><a target="_blank" rel="noopener noreferrer" href="https://github.com/WeegeeNumbuh1/FlightGazer/commits/main/">Review the source code changes</a>\
             <svg width="24px" height="24px" viewBox="0 0 24 24" style="cursor:pointer">\
                 <g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round">\
                     <polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline>\
                     <path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path>\
                 </g>\
             </svg>';
-            changelogContent = data.changelog || 'No changelog available.';
-            document.getElementById('changelogSection').style.display = '';
-            let doc = document.getElementById('changelogFrame').contentDocument;
-            doc.open();
-            doc.write(`<pre style='background:#222;color:#ffffff;font-family:monospace;font-size:1em;margin:0;padding:12px;'>${changelogContent.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
-            doc.close();
-            document.getElementById('checkUpdatesBtn').disabled = true;
-            document.getElementById('precheck').scrollIntoView();
-        });
+        changelogContent = data.changelog || 'No changelog available.';
+        document.getElementById('changelogSection').style.display = '';
+        let doc = document.getElementById('changelogFrame').contentDocument;
+        doc.open();
+        doc.write(`<pre style='background:#222;color:#ffffff;font-family:monospace;font-size:1em;margin:0;padding:12px;'>${changelogContent.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`);
+        doc.close();
+        document.getElementById('checkUpdatesBtn').disabled = true;
+        document.getElementById('precheck').scrollIntoView();
+      });
     };
     function sendUpdateInput(val) {
-        fetch(updatesInputUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({input:val})});
+      fetch(updatesInputUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ input: val }) });
     }
     // Add a dedicated update progress page
-function showUpdateProgressPage() {
-    document.body.innerHTML = `
+    function showUpdateProgressPage() {
+      document.body.innerHTML = `
         <div id="updateProgressContainer" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#181818;color:#fff;z-index:9999;display:flex;flex-direction:column;">
             <button id="backToHomeBtn" class="btn btn-info" style="position:absolute;top:24px;left:24px;z-index:1000;display:none;">&larr; Back to Home</button>
             <h2 style="text-align:center;margin-top:48px;">Updating FlightGazer...</h2>
             <iframe id="updateOutputFrame" style="flex:1 1 auto;width:96vw;height:70vh;margin:32px 2vw 32px 2vw;background:#222;color:#fff;font-family:monospace;border-radius:12px;border:none;box-shadow:0 0 24px #000;overflow:auto;"></iframe>
         </div>
     `;
-    // Start update and polling
-    let doc = document.getElementById('updateOutputFrame').contentDocument;
-    doc.open();
-    doc.write('<pre style="background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
-    doc.close();
-    fetch(updatesStartUrl, {method:'POST'}).then(r => r.json()).then(data => {
+      // Start update and polling
+      let doc = document.getElementById('updateOutputFrame').contentDocument;
+      doc.open();
+      doc.write('<pre style="background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
+      doc.close();
+      fetch(updatesStartUrl, { method: 'POST' }).then(r => r.json()).then(data => {
         if (data.status === 'started') {
-            pollUpdateOutputIframe();
+          pollUpdateOutputIframe();
         } else if (data.status === 'already_running') {
-            let doc = document.getElementById('updateOutputFrame').contentDocument;
-            doc.open();
-            doc.write('<pre style="background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Update already running.</pre>');
-            doc.close();
+          let doc = document.getElementById('updateOutputFrame').contentDocument;
+          doc.open();
+          doc.write('<pre style="background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Update already running.</pre>');
+          doc.close();
         } else {
-            alert(data.status)
-            let btn = document.getElementById('backToHomeBtn');
-            if (btn) btn.style.display = '';
+          alert(data.status)
+          let btn = document.getElementById('backToHomeBtn');
+          if (btn) btn.style.display = '';
         }
-    });
-}
-function pollUpdateOutputIframe() {
-    fetch(updatesOutputUrl).then(r => r.json()).then(data => {
+      });
+    }
+    function pollUpdateOutputIframe() {
+      fetch(updatesOutputUrl).then(r => r.json()).then(data => {
         if (data.lines && data.lines.length) {
-            let doc = document.getElementById('updateOutputFrame').contentDocument;
-            doc.open();
-            let newText = data.lines[data.lines.length-1];
-            doc.write(`<pre style='background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
-            doc.close();
+          let doc = document.getElementById('updateOutputFrame').contentDocument;
+          doc.open();
+          let newText = data.lines[data.lines.length - 1];
+          doc.write(`<pre style='background:#222;color:#fff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;'>${newText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`);
+          doc.close();
         }
         updateRunning = data.running;
         if (updateRunning) {
-            setTimeout(pollUpdateOutputIframe, 500);
+          setTimeout(pollUpdateOutputIframe, 500);
         } else {
-            // Show back to home button when update completes
-            let btn = document.getElementById('backToHomeBtn');
-            if (btn) btn.style.display = '';
+          // Show back to home button when update completes
+          let btn = document.getElementById('backToHomeBtn');
+          if (btn) btn.style.display = '';
         }
-    });
-}
-document.getElementById('updateNowBtn').onclick = function() {
-    if (!window.confirm('Are you sure you want to update FlightGazer?')) return;
-    // Hide main content, show progress page
-    document.querySelector('.container').style.display = 'none';
-    let updatediv = document.getElementById('confirm-update');
-    updatediv.style.visibility = "hidden";
-    updatediv.style.display = "none";
-    let changelogsec = document.getElementById('changelogSection');
-    changelogsec.style.visibility = "hidden";
-    changelogsec.style.display = "none";
-    let checknowbtn = document.getElementById('checkUpdatesBtn');
-    checknowbtn.style.visibility = "hidden";
-    checknowbtn.style.display = "none";
-    document.getElementById('updateProgressPage').style.display = '';
-    let doc = document.getElementById('updateOutputFrameFull').contentDocument;
-    doc.open();
-    doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
-    doc.close();
-    // Check if reset config is requested
-    let resetConfig = document.getElementById('resetConfigCheckbox').checked;
-    fetch(updatesStartUrl, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({reset_config: resetConfig})
-    }).then(r => r.json()).then(data => {
+      });
+    }
+    document.getElementById('updateNowBtn').onclick = function () {
+      if (!window.confirm('Are you sure you want to update FlightGazer?')) return;
+      // Hide main content, show progress page
+      document.querySelector('.container').style.display = 'none';
+      let updatediv = document.getElementById('confirm-update');
+      updatediv.style.visibility = "hidden";
+      updatediv.style.display = "none";
+      let changelogsec = document.getElementById('changelogSection');
+      changelogsec.style.visibility = "hidden";
+      changelogsec.style.display = "none";
+      let checknowbtn = document.getElementById('checkUpdatesBtn');
+      checknowbtn.style.visibility = "hidden";
+      checknowbtn.style.display = "none";
+      document.getElementById('updateProgressPage').style.display = '';
+      let doc = document.getElementById('updateOutputFrameFull').contentDocument;
+      doc.open();
+      doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Starting update...</pre>');
+      doc.close();
+      // Check if reset config is requested
+      let resetConfig = document.getElementById('resetConfigCheckbox').checked;
+      fetch(updatesStartUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reset_config: resetConfig })
+      }).then(r => r.json()).then(data => {
         if (data.status === 'started') {
-            pollUpdateOutputIframeFull();
+          pollUpdateOutputIframeFull();
         } else if (data.status === 'already_running') {
-            let doc = document.getElementById('updateOutputFrameFull').contentDocument;
-            doc.open();
-            doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Update already running.</pre>');
-            doc.close();
+          let doc = document.getElementById('updateOutputFrameFull').contentDocument;
+          doc.open();
+          doc.write('<pre style="background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:18px;">Update already running.</pre>');
+          doc.close();
         } else {
-            alert(data.status)
-            let btn = document.getElementById('backToHomeBtn');
-            if (btn) btn.style.display = '';
+          alert(data.status)
+          let btn = document.getElementById('backToHomeBtn');
+          if (btn) btn.style.display = '';
         }
-    });
-}
-let lastUpdateOutput = '';
-function pollUpdateOutputIframeFull() {
-    try {
+      });
+    }
+    let lastUpdateOutput = '';
+    function pollUpdateOutputIframeFull() {
+      try {
         fetch(updatesOutputUrl).then(r => r.json()).then(data => {
-            if (data.lines && data.lines.length) {
-                let newText = data.lines[data.lines.length-1];
-                if (newText !== lastUpdateOutput && newText !== '') {
-                    let doc = document.getElementById('updateOutputFrameFull').contentDocument;
-                    doc.open();
-                    doc.write(`<pre id='updatePre' style='background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:10px;/* max-height:100%; */overflow-y:auto;'>${newText.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
-                    doc.close();
-                    lastUpdateOutput = newText;
-                    // Auto-scroll to bottom
-                    // doc.scrollTop = doc.scrollHeight // option 1, kinda works
-                    const preElement = doc.getElementById('updatePre');
-                    preElement.scrollIntoView(false) // should basically work all the time (tested: chromium & mozilla)
-                    // online guides have failed me here:
-                    // const preElement = doc.getElementById('updatePre');
-                    // if (preElement) {
-                    //     preElement.scrollTop = preElement.scrollHeight;
-                    // }
-                }
+          if (data.lines && data.lines.length) {
+            let newText = data.lines[data.lines.length - 1];
+            if (newText !== lastUpdateOutput && newText !== '') {
+              let doc = document.getElementById('updateOutputFrameFull').contentDocument;
+              doc.open();
+              doc.write(`<pre id='updatePre' style='background:#222;color:#ffffff;font-family:monospace;font-size:1.1em;margin:0;padding:10px;/* max-height:100%; */overflow-y:auto;'>${newText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`);
+              doc.close();
+              lastUpdateOutput = newText;
+              // Auto-scroll to bottom
+              // doc.scrollTop = doc.scrollHeight // option 1, kinda works
+              const preElement = doc.getElementById('updatePre');
+              preElement.scrollIntoView(false) // should basically work all the time (tested: chromium & mozilla)
+              // online guides have failed me here:
+              // const preElement = doc.getElementById('updatePre');
+              // if (preElement) {
+              //     preElement.scrollTop = preElement.scrollHeight;
+              // }
             }
-            updateRunning = data.running;
-            if (updateRunning) {
-                setTimeout(pollUpdateOutputIframeFull, 500);
-            } else {
-                document.getElementById('backToHomeBtn').style.display = '';
-            }
+          }
+          updateRunning = data.running;
+          if (updateRunning) {
+            setTimeout(pollUpdateOutputIframeFull, 500);
+          } else {
+            document.getElementById('backToHomeBtn').style.display = '';
+          }
         });
-    } catch(e) {
+      } catch (e) {
         alert("Connection to system interrupted! The update may not have succeeded.\n\
         If the version number did not change at the homepage, try to update again at a later time.");
         document.getElementById('backToHomeBtn').style.display = '';
+      }
     }
-}
-document.getElementById('backToHomeBtn').onclick = function() {
-    if (document.referrer === homepageURL) {
+    document.getElementById('backToHomeBtn').onclick = function () {
+      if (document.referrer === homepageURL) {
         window.history.back();
-    } else {
+      } else {
         window.location.href = homepage;
-    }
-};
-    </script>
+      }
+    };
+  </script>
 </body>
+
 </html>
