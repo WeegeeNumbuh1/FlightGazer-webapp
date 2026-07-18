@@ -4,8 +4,9 @@
 # This script will always try to patch the necessary files
 # to a consistent state, and should be run after every
 # adsb.im update/rebuild.
-# Version: v.1.1.0
+# Version: v.1.1.1
 # Last adsb.im version tested: v3.0.13
+# by: WeegeeNumbuh1
 
 print("********** FlightGazer adsb.im Proxy Patcher **********\n")
 import os
@@ -57,7 +58,9 @@ def inserter(file: Path, text: str, lineno: int) -> None:
 
 def main_patcher() -> bool:
     print(f"> Patching {MAIN_FILE.absolute()}...")
-    service_def = """\
+    # this will get inserted in the `AdsbIm` class
+    # 1 indent (4 spaces) over
+    service_def = r"""
     def _service_exists(self, service_name: str) -> bool:
         if not service_name:
             return False
@@ -69,6 +72,8 @@ def main_patcher() -> bool:
     service_idem = "def _service_exists(self,"
     # `service_def` needs to be inserted above `service_def_anchor`
     service_def_anchor = "def handle_temp_sensor(self,"
+    # this will get inserted before the proxy routes are built in `AdsbIm` in the `__init()__` section
+    # 2 indents (8 spaces) over
     proxy_def = """\
         self._d.env_by_tags("flightgazer_proxy").value = self._service_exists("flightgazer-webapp.service")
         if self._d.is_enabled("flightgazer_proxy") and not any(
@@ -101,10 +106,14 @@ def main_patcher() -> bool:
 
 def data_patcher() -> bool:
     print(f"> Patching {DATA_FILE.absolute()}...")
+    # this will get inserted in the `_proxy_routes` list in the `Data` class,
+    # 2 indents (8 spaces) over
     proxy_route_def = """        ["/flightgazer/", "FLIGHTGAZER", "/flightgazer/"],"""
-    proxy_anchor = """["/dump978/", "UAT978", "/skyaware978/"],"""
     proxy_route_idem = """["/flightgazer/", "FLIGHTGAZER", "/flightgazer/"]"""
     # `proxy_route_def` needs to inserted below `proxy_anchor`
+    proxy_anchor = """["/dump978/", "UAT978", "/skyaware978/"],"""
+    # this will get inserted in the `_env` dict in the `Data` class,
+    # 2 indents (8 spaces) over (not strictly necessary)
     env_route_def = """\
         Env("AF_FLIGHTGAZER_PORT", default=9898, tags=["flightgazerport", "norestore"]),
         Env("AF_IS_FLIGHTGAZER_PROXY_ENABLED", default=False, tags=["flightgazer_proxy", "is_enabled"]),"""
@@ -133,6 +142,7 @@ def data_patcher() -> bool:
 
 def html_patcher() -> bool:
     print(f"> Patching {HTML_FILE.absolute()}...")
+    # this will get inserted in the `navbarDropdownLogs` node
     html_entry_def = """\
             {% if is_enabled('flightgazer_proxy') %}
             <li><a class="dropdown-item" href="/flightgazer/">FlightGazer</a></li>

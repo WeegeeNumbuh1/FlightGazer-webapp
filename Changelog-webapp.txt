@@ -5,6 +5,11 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.1.1 - 2026-07-18
+    - Updated adsb.im helper scripts
+    - Updated Mictronics link in Help & Reference page
+    - All 1's in the Version number
+
 v.1.1.0 - 2026-07-17
     - HTML reformatting and cleanups
     - Add adsb.im helper scripts for the webapp installer

@@ -1,5 +1,6 @@
 #!/bin/bash
 # get adsb.im images/apps to run the FlightGazer proxy patcher script
+# Last updated: v.1.1.1
 
 BASEDIR="$(cd "$(dirname -- "$0")" && pwd)"
 SERVICE_FILE_DIR=/etc/systemd/system/flightgazer-proxy.service
@@ -13,7 +14,6 @@ service_file() {
 	[Unit]
 	Description=Runs FlightGazer adsbim proxy patcher after adsb-im update
 	Documentation="https://github.com/WeegeeNumbuh1/FlightGazer-webapp"
-	Wants=adsb-feeder-update.service
 	After=adsb-feeder-update.service
 
 	[Service]
@@ -21,9 +21,13 @@ service_file() {
 	Type=oneshot
 	ExecStart=/usr/bin/python3 "${BASEDIR}/adsbim-proxy.py"
 
+	[Install]
+	WantedBy=adsb-feeder-update.service
+
 	EOF
 
 	systemctl daemon-reload >/dev/null 2>&1
+	systemctl enable flightgazer-proxy.service >/dev/null 2>&1
 }
 
 systemctl list-unit-files adsb-feeder-update.service >/dev/null 2>&1
