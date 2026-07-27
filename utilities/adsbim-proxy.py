@@ -4,7 +4,7 @@
 # This script will always try to patch the necessary files
 # to a consistent state, and should be run after every
 # adsb.im update/rebuild.
-# Version: v.1.1.1
+# Version: v.1.1.2
 # Last adsb.im version tested: v3.0.13
 # by: WeegeeNumbuh1
 
@@ -65,7 +65,7 @@ def main_patcher() -> bool:
         if not service_name:
             return False
         success, _ = run_shell_captured(
-            f"systemctl list-unit-files --type=service {service_name} 2>/dev/null | grep -q '^{service_name}\\s'",
+            f"systemctl list-unit-files --type=service {service_name} 2>/dev/null | grep -q '^{service_name}[[:space:]]'",
             timeout=5,
         )
         return success"""
