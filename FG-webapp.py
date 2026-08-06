@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.1.2 --- 2026-07-27"
+VERSION = "v.1.1.3 --- 2026-08-06"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -94,6 +94,7 @@ LATEST_CHANGELOG = '/run/FlightGazer/latest_changelog'
 CURRENT_IP = '' # local IP address of the system
 HOSTNAME = socket.gethostname()
 RUNNING_ADSBIM = False
+adsbim_root_page = ''
 localpages = {}
 localpages_timestamp = 0.0
 whitelabel = os.path.join(os.path.dirname(__file__), 'static', 'extra')
@@ -325,6 +326,7 @@ def local_webpage_prober() -> dict:
     and a tuple of `(URL, priority [int], help string)`.
     """
     global RUNNING_ADSBIM
+    global adsbim_root_page
     pages = {}
     def webpage_title(url: str) -> tuple[str, str | None]:
         """ Get the title of a webpage given `input` as a string. """
@@ -347,6 +349,8 @@ def local_webpage_prober() -> dict:
             return True
         return False
 
+    adsbim_check = False
+    adsbim_root = ''
     root = f"http://{CURRENT_IP}"
     adsbim = f"http://{CURRENT_IP}:1099"
     candidates = {
@@ -399,7 +403,8 @@ def local_webpage_prober() -> dict:
                     "System Configuration & Management, Maps, and Stats":
                     (root, 1, "Configure and control your system with ADSB.im")}
                 )
-                RUNNING_ADSBIM = True
+                adsbim_check = True
+                adsbim_root = root
             case x if "PiAware" in x: # FlightAware's PiAware is running here
                 pages.update(
                     {"FlightAware PiAware page":
@@ -410,7 +415,8 @@ def local_webpage_prober() -> dict:
                     {"⚠️ SDR Disconnected! Click Here to Investigate/Fix":
                     (root, 2, "Your SDR is having issues, please check on it")}
                 )
-                RUNNING_ADSBIM = True
+                adsbim_check = True
+                adsbim_root = root
 
     if len(pages) == 0:
         local_page = results.get(adsbim)
@@ -418,12 +424,14 @@ def local_webpage_prober() -> dict:
             pages.update(
                 {"System Configuration & Management, Maps, and Stats":
                 (adsbim, 1, "Configure and control your system with ADSB.im")})
-            RUNNING_ADSBIM = True
+            adsbim_check = True
+            adsbim_root = adsbim
         elif match_title(local_page, "SDR Setup"):
             pages.update(
                 {"⚠️ SDR Disconnected! Click Here to Investigate/Fix":
                  (adsbim, 2, "Your SDR is having issues, please check on it")})
-            RUNNING_ADSBIM = True
+            adsbim_check = True
+            adsbim_root = adsbim
 
     # try to find the display emulator
     for url in candidates['display_emulator']:
@@ -480,6 +488,13 @@ def local_webpage_prober() -> dict:
             )
             break
 
+    # adsb.im docker logs
+    if adsbim_check and adsbim_root:
+        pages.update(
+            {"System Logs":
+             (f"{adsbim_root}/logs", 0, "View logs of various system services")}
+        )
+
     # skystats
     for url in candidates['skystats']:
         if match_title(results.get(url), "Skystats"):
@@ -497,6 +512,8 @@ def local_webpage_prober() -> dict:
              (planefence_url, 0, "Overview of the flights encountered in your specified area")}
         )
 
+    RUNNING_ADSBIM = adsbim_check
+    adsbim_root_page = adsbim_root
     return pages
 
 def linecounter(file: str) -> int | None:
@@ -1776,31 +1793,17 @@ def show_latest_changelog():
 @app.route('/reference')
 def reference_guide():
     adsb_info = ''
-    adsb_logs = ''
-    valid_keys = [
-        'System Configuration',
-        'SDR Disconnected'
-    ]
-    if RUNNING_ADSBIM:
-        key_view = list(localpages.keys())
-        for lookup_key in valid_keys:
-            found = False
-            for available_key in key_view:
-                if lookup_key in available_key:
-                    if isinstance((adsb_root_ := localpages[available_key][0]), str):
-                        adsb_info = adsb_root_ + '/info'
-                        adsb_logs = adsb_root_ + '/logs'
-                        found = True
-                        break
-            if found:
-                break
+    adsb_support = ''
+    if RUNNING_ADSBIM and adsbim_root_page:
+        adsb_info = adsbim_root_page + '/info'
+        adsb_support = adsbim_root_page + '/support'
 
     device_desc = f'{HOSTNAME}, local IP address: {CURRENT_IP}'
     return render_template(
         'reference.html',
         is_adsbim = RUNNING_ADSBIM,
         adsb_info = adsb_info,
-        adsb_logs = adsb_logs,
+        adsb_support = adsb_support,
         device_name = device_desc
     )
 

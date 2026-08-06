@@ -4,7 +4,7 @@
 # This script will always try to patch the necessary files
 # to a consistent state, and should be run after every
 # adsb.im update/rebuild.
-# Version: v.1.1.2
+# Version: v.1.1.3
 # Last adsb.im version tested: v3.0.13
 # by: WeegeeNumbuh1
 
@@ -101,7 +101,7 @@ def main_patcher() -> bool:
     shutil.chown(MAIN_FILE, user=file_owner)
     check1 = anchor_finder(MAIN_FILE, service_idem)
     check2 = anchor_finder(MAIN_FILE, proxy_idem)
-    print(f"Successfully inserted at line {check1} and {check2}")
+    print(f"Successfully inserted at lines {check1} and {check2}")
     return True
 
 def data_patcher() -> bool:
