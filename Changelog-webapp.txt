@@ -5,6 +5,14 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.2.0 - 2026-08-08
+    - Add new "What's Overhead" feature on main landing page that will show the callsigns
+      of aircraft in the tracking area and link it to the corresponding local tracking page
+    - Add support for new event log introduced in FlightGazer v.11.6.0
+    - Somewhat mitigate issue when the changelog cannot be downloaded which would prevent updates
+    - Improve log readers to handle empty logs
+    - Small layout tweaks for the above new features
+
 v.1.1.3 - 2026-08-06
     - Add link to adsb.im system logs for the local webpage searcher
     - Reference page now links to the adsb.im local diagnostics page

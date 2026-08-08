@@ -43,15 +43,15 @@
           <li>To programmatically access this same data, check the <code>/data/current_state.json</code> endpoint.</li>
         </ul><br>
       </li>
-      <li><b>Main Log</b> - Logfile of FlightGazer events.<br>
+      <li><b>Main Log</b> - Logfile of FlightGazer's runtime.<br>
         <ul>
           <li>
             This file keeps a history of the times FlightGazer is running. It records startup configuration, issues with
             certain settings and features, and any errors that may arise.
           </li>
           <li>
-            After the <q><span class="monospace">Main loop started!</span></q> line, FlightGazer tracks special events
-            and generates stats at the end of each day.
+            After the <q><span class="monospace">Main loop started!</span></q> line, FlightGazer tracks API usage (when enabled),
+            generates stats at the end of each day, and logs other peculiar occurrences.
           </li>
           <li><b>If FlightGazer is running in a degraded state, this log will explain why.</b></li>
         </ul>
@@ -72,6 +72,15 @@
             is no information about it).
         </details>
       </li><br>
+      <li><b>Event Log</b> - Logfile of special tracking events.<br>
+        This file keeps track of events unique to your tracking site, namely:
+        <ul>
+          <li>DXing events (when an aircraft position is detected beyond the normal detection range, >290 nmi)</li>
+          <li>When an aircraft in your detection area declares an emergency</li>
+          <li>When the aircraft in the <span class="monospace">FOLLOW_THIS_AIRCRAFT</span> setting is first detected that day</li>
+          <li>When a PIA aircraft enters your tracking area (U.S. only)</li>
+        </ul>
+      </li><br>
       <li><b>Initialization Log</b> - Startup information before the main FlightGazer program runs.
         <ul>
           <li>This is a system-level log that keeps track of startup tasks and any required preparation handled by the
@@ -91,7 +100,6 @@
           <li>This file is used by FlightGazer so that the flyby count and API usage isn't lost whenever it's restarted.
           </li>
           <li>The data in this file can be used for long term traffic analysis of your site.</li>
-          <li>In a year, this file grows by roughly 250 KiB.</li>
         </ul>
       </li><br>
       <li><b>Migration History</b> - Logfile of FlightGazer updates.

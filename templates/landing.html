@@ -30,7 +30,7 @@
     .version-text {
       text-align: center;
       font-size: 1em;
-      margin: 12px 0 32px 0;
+      margin: 6px 0 24px 0;
     }
 
     .main-btns {
@@ -70,6 +70,13 @@
     .small-status {
       text-align: center;
       font-size: 0.6em;
+      color: grey;
+    }
+
+    .overhead-status {
+      text-align: center;
+      font-size: 0.75em;
+      font-style: italic;
       color: grey;
     }
   </style>
@@ -158,6 +165,9 @@
     Version {{ version }}
     <span id="update_text" style="color:#16b85f;text-align: center; font-size: 0.7em;"
       title="Go to the Updates page to check out the changes!"></span>
+      <div class="overhead-status" id="overhead-div">
+        <span id="overhead-links" title="What's currently flying near you"></span>
+      </div>
   </div>
   <div class="footer">
     <!-- web-app <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp" target="_blank" rel="noopener noreferrer" title="View the source code">v.{{ webapp_version }}</a>
@@ -285,6 +295,7 @@
     const serviceStop = "{{ url_for('stop_flightgazer_service') }}";
     const serviceStart = "{{ url_for('start_flightgazer_service') }}";
     const localPagesURL = "{{ url_for('api_localpages') }}";
+    const overheadURL = "{{ url_for('api_overhead') }}";
     const SERVICE_BTN_DISABLE_KEY = 'fg_service_buttons_disabled_until';
     const SERVICE_BTN_TIMEOUT_MS = 30000;
 
@@ -477,12 +488,63 @@ It\'s recommended to bookmark this page for easy access.\n\
         document.querySelector('.status-indicator span + span').innerText = statusText;
       })
     }
+
+    function getOverheadFlights() {
+      const overheadDiv = document.getElementById('overhead-div');
+      const overheadLinks = document.getElementById('overhead-links');
+
+      if (!overheadDiv || !overheadLinks) {
+        return;
+      }
+
+      fetch(overheadURL, { cache: 'no-store' })
+        .then(response => response.json())
+        .then(data => {
+          const count = Number(data?.count || 0);
+          const callsigns = String(data?.callsigns || '').trim();
+          const link = String(data?.link || '').trim();
+
+          // note, count can be -1 which enables this to be shown
+          // but without having anything active
+          if (!count || !callsigns) {
+            overheadDiv.style.display = 'none';
+            overheadLinks.textContent = '';
+            return;
+          }
+
+          overheadDiv.style.display = 'block';
+          const label = "What's overhead? ";
+
+          if (link) {
+            overheadLinks.textContent = '';
+            const anchor = document.createElement('a');
+            anchor.href = link;
+            anchor.target = '_blank';
+            anchor.rel = 'noopener noreferrer';
+            anchor.title = 'Open the related map view';
+            anchor.textContent = `${label}${callsigns}`;
+            overheadLinks.appendChild(anchor);
+          } else {
+            overheadLinks.textContent = `${label}${callsigns}`;
+          }
+        })
+        .catch(() => {
+          overheadDiv.style.display = 'none';
+          overheadLinks.textContent = '';
+        });
+    }
+
+    function refreshThings() {
+      updateStatusIndicator();
+      getOverheadFlights();
+    }
+
     let statusPollingInterval;
 
     function startStatusPolling() {
       if (!statusPollingInterval) {
-        updateStatusIndicator();
-        statusPollingInterval = setInterval(updateStatusIndicator, 10000);
+        refreshThings();
+        statusPollingInterval = setInterval(refreshThings, 10000);
       }
     }
 

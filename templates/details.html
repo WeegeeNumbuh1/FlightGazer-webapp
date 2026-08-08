@@ -79,6 +79,15 @@
               d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
           </svg>
           Main Log</a>
+        <a href="{{ url_for('download_event_log') }}" class="btn btn-sm btn-secondary" download>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+            <path
+              d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+          </svg>
+          Events</a>
         <a href="{{ url_for('download_init_log') }}" class="btn btn-sm btn-secondary" download>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
             class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" aria-hidden="true">
@@ -154,6 +163,10 @@
           </svg>
           Main Log</button>
       </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="event-log-tab" data-bs-toggle="tab" data-bs-target="#event-log" type="button"
+          role="tab">Events Log</button>
+      </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="init-log-tab" data-bs-toggle="tab" data-bs-target="#init-log" type="button"
           role="tab">Initialization Log</button>
@@ -187,6 +200,10 @@
       </div>
       <div class="tab-pane fade" id="logs" role="tabpanel">
         <iframe id="logFrame" src="{{ url_for('details_log_html') }}"
+          style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
+      </div>
+      <div class="tab-pane fade" id="event-log" role="tabpanel">
+        <iframe id="eventLogFrame" src="{{ url_for('details_events_html') }}"
           style="width:100%; min-height:320px; height:70vh; border:none; background:#181818; color:#fff; font-family:monospace;"></iframe>
       </div>
       <div class="tab-pane fade" id="migrate-log" role="tabpanel">
@@ -347,7 +364,7 @@
       function refreshAll() {
         loadLiveDetails();
         // Reload log iframes
-        const iframeIds = ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame'];
+        const iframeIds = ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame', 'eventLogFrame'];
         iframeIds.forEach(id => {
           const frame = document.getElementById(id);
           if (frame) {
@@ -366,7 +383,7 @@
       );
       // enable/disable the scroll button depending on active tab
       function updateScrollBtnState(targetSelector) {
-        const enabledTabs = ['#logs', '#migrate-log', '#init-log', '#flybys-csv'];
+        const enabledTabs = ['#logs', '#migrate-log', '#init-log', '#flybys-csv', '#event-log'];
         const ok = enabledTabs.includes(targetSelector);
         $('#scrollToBottomBtn').prop('disabled', !ok);
       }
@@ -379,7 +396,7 @@
 
       // Auto-scroll log iframes to bottom when loaded
       function scrollAllLogFramesToBottom() {
-        ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame'].forEach(function (id) {
+        ['logFrame', 'migrateLogFrame', 'initLogFrame', 'flybysCsvFrame', 'eventLogFrame'].forEach(function (id) {
           let iframe = document.getElementById(id);
           if (iframe) {
             setTimeout(function () {
@@ -391,7 +408,7 @@
           }
         });
       }
-      $('#logFrame, #migrateLogFrame, #initLogFrame, #flybysCsvFrame').on('load', function () {
+      $('#logFrame, #migrateLogFrame, #initLogFrame, #flybysCsvFrame', '#eventLogFrame').on('load', function () {
         scrollAllLogFramesToBottom();
       });
       $('#scrollToBottomBtn').on('click', function () {

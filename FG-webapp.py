@@ -66,7 +66,7 @@ import zipfile
 import gzip
 import tempfile
 
-VERSION = "v.1.1.3 --- 2026-08-06"
+VERSION = "v.1.2.0 --- 2026-08-08"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -79,6 +79,7 @@ COLORS_PATH = os.path.join(os.path.dirname(__file__), '..', 'setup', 'colors.py'
 VERSION_PATH = os.path.join(os.path.dirname(__file__), '..', 'version')
 WEBAPP_VERSION_PATH = os.path.join(os.path.dirname(__file__), 'version-webapp')
 LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-log.log')
+EVENTS_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-events.log')
 MIGRATE_LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'settings_migrate.log')
 FLYBY_STATS_PATH = os.path.join(os.path.dirname(__file__), '..', 'flybys.csv')
 CURRENT_STATE_JSON_PATH = '/run/FlightGazer/current_state.json'
@@ -107,6 +108,9 @@ except Exception:
 
 webapp_session = requests.Session()
 outward_session = requests.Session()
+# may help avoid the github scraping filters caused by AI crawlers since there has been some issues
+# when trying to fetch the changelog and therefore an update will never work
+outward_session.headers.update({'User-Agent': 'git/2.47.3', 'Git-Protocol': 'version=2', 'Accept-Language': 'en-US, *;q=0.9'})
 # note: unlike in the main FlightGazer application where we bother to clean up after outselves
 # we just let systemd/gunicorn kill these threads off when this exits (no `ThreadPool.shutdown()`)
 prober_tp = CF.ThreadPoolExecutor(max_workers=10, thread_name_prefix='LocalSiteProberWorker')
@@ -909,6 +913,58 @@ def service_status():
     status = get_flightgazer_status()
     return jsonify({'status': status})
 
+@app.route('/api/overhead')
+def api_overhead():
+    """ Grabs data from the FlightGazer state file, checks to see if tar1090 is available,
+    then presents a list of callsigns with the associated tar1090 map link. """
+    json_path = CURRENT_STATE_JSON_PATH
+    if not os.path.exists(json_path) and os.name == 'nt': # for debug
+        json_path = os.path.join(os.path.dirname(__file__), '..', 'current_state.json')
+    output = {'count': 0, 'callsigns': '', 'link': ''}
+    nothing = jsonify(output)
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data: dict = json.load(f)
+    except (FileNotFoundError, json.decoder.JSONDecodeError):
+        return nothing
+    except Exception as e:
+        main_logger.exception(f"Failed to load state file: {e}")
+        return nothing
+    # if for some reason this key doesn't exist, don't bother doing anything else
+    plane_stats: dict = data.get('plane_stats', {})
+    no_filter: bool | None = plane_stats.get('no_filter')
+    if no_filter or no_filter is None:
+        return nothing
+    relevant_planes: dict = plane_stats.get('relevant_planes')
+    # only generate the url if we're reading from the same system
+    is_local = data.get('receivers', {}).get('using_filesystem', False)
+    # override the auto hide feature on the frontend
+    if len(relevant_planes) == 0:
+        output['count'] = -1
+        output['callsigns'] = "Nothing yet..."
+        return jsonify(output)
+    callsigns = []
+    icaos = []
+    count_ = 0
+    for plane in relevant_planes:
+        if (callsign_ := plane.get('Flight')):
+            callsigns.append(callsign_)
+        if (icao_ := plane.get('ID')):
+            icaos.append(icao_)
+        count_ += 1
+    # check if we have tar1090 available
+    tar1090_ = [key for key in localpages if 'tar1090' in key]
+    if tar1090_ and is_local:
+        tar1090_url = localpages.get(tar1090_[0])[0]
+        query_string = '/?icao=' + ','.join(icaos)
+        output['link'] = tar1090_url + query_string
+    if len(callsigns) > 4:
+        output['callsigns'] = ', '.join(callsigns[0:3]) + ', ...'
+    else:
+        output['callsigns'] = ', '.join(callsigns)
+    output['count'] = count_
+    return jsonify(output)
+
 # ========= Root Route =========
 
 @app.route('/')
@@ -1142,7 +1198,7 @@ def update_config():
 def details_page():
     return render_template('details.html')
 
-current_state_json_cache: str | dict | None = None
+current_state_json_cache: str | dict | None = None # used when downloading the state file
 @app.route('/details/live')
 def details_live():
     global current_state_json_cache
@@ -1275,26 +1331,51 @@ def download_log():
     except Exception as e:
         return f'Log file not found: {e}', 404
 
+@app.route('/details/download_event_log')
+def download_event_log():
+    if not os.path.exists(EVENTS_PATH):
+        raise FileNotFoundError
+    try:
+        main_logger.info("FlightGazer event log download requested")
+        return send_file(
+            EVENTS_PATH,
+            mimetype='text/plain',
+            as_attachment=True,
+            download_name=f'FlightGazer-events_[{append_date_now()}].log'
+        )
+    except Exception as e:
+        return f'Log file not found: {e}', 404
+
 @app.route('/details/log_html')
 def details_log_html():
     try:
         if not os.path.exists(LOG_PATH):
             raise FileNotFoundError('Main log file could not be found.')
         loglen = linecounter(LOG_PATH)
+        length_cutoff = 5000
         with open(LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
             if loglen:
-                lines = tail(f, 5000)
-        html_lines = []
+                lines = tail(f, length_cutoff)
+            else:
+                raise ValueError('No log entries are present.')
+        log_lines = []
+        html_ = []
         for line in lines:
             # Highlight timestamp
             line = re.sub(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)', r'<span style="color:#ffd700;">\1</span>', line)
             # Highlight log levels
             line = re.sub(r'\b(DEBUG|INFO|WARNING|ERROR|CRITICAL)\b',
                           lambda m: f'<span style="color:{ {"DEBUG":"#8cf","INFO":"#6f6","WARNING":"#ff0","ERROR":"#f66","CRITICAL":"#f00"}[m.group(1)]};font-weight:bold;">{m.group(1)}</span>', line)
-            html_lines.append(line)
-        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>'
-        html += '\n'.join(f'<div class="logline"><code>{l}</code></div>' for l in html_lines)
-        html += '</body></html>'
+            log_lines.append(line)
+        html_.append(r'<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>')
+        if loglen > length_cutoff:
+            html_.append(
+                f'<div class="logline"><i>Showing the latest {length_cutoff} lines (out of {loglen})</i>.<br>'
+                'Download the file for complete data.<br><br></div>'
+            )
+        html_.append('\n'.join(f'<div class="logline"><code>{l}</code></div>' for l in log_lines))
+        html_.append('</body></html>')
+        html = ''.join(html_)
         # below technique adapted from https://stackoverflow.com/a/59635292
         if 'gzip' in request.accept_encodings:
             content = gzip.compress(html.encode('utf-8'), 5)
@@ -1308,6 +1389,46 @@ def details_log_html():
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
         return html + f'<span style="color:#f66;font-family:monospace">Log file could not be loaded -> {e.__class__.__name__}: {e}</span></body></html>'
 
+@app.route('/details/events_html')
+def details_events_html():
+    try:
+        if not os.path.exists(EVENTS_PATH):
+            raise FileNotFoundError('File could not be found.')
+        loglen = linecounter(EVENTS_PATH)
+        length_cutoff = 1000
+        with open(EVENTS_PATH, 'r', encoding='utf-8', errors='replace') as f:
+            if loglen:
+                lines = tail(f, length_cutoff)
+            else:
+                raise ValueError('No events have been logged yet.')
+        log_lines = []
+        html_ = []
+        for line in lines:
+            line = re.sub(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)', r'<span style="color:#ffd700;">\1</span>', line)
+            line = re.sub(r'\b(DEBUG|INFO|WARNING|ERROR|CRITICAL)\b',
+                          lambda m: f'<span style="color:{ {"DEBUG":"#8cf","INFO":"#6f6","WARNING":"#ff0","ERROR":"#f66","CRITICAL":"#f00"}[m.group(1)]};font-weight:bold;">{m.group(1)}</span>', line)
+            log_lines.append(line)
+        html_.append(r'<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#fff;font-family:monospace;font-size:1em;margin:0;padding:12px;} .logline{white-space:pre;}</style></head><body>')
+        if loglen > length_cutoff:
+            html_.append(
+                f'<div class="logline"><i>Showing the latest {length_cutoff} lines (out of {loglen})</i>.<br>'
+                'Download the file for complete data.<br><br></div>'
+            )
+        html_.append('\n'.join(f'<div class="logline"><code>{l}</code></div>' for l in log_lines))
+        html_.append('</body></html>')
+        html = ''.join(html_)
+        if 'gzip' in request.accept_encodings:
+            content = gzip.compress(html.encode('utf-8'), 5)
+            response = make_response(content)
+            response.headers['Content-length'] = len(content)
+            response.headers['Content-Encoding'] = 'gzip'
+            return response
+        else:
+            return html
+    except Exception as e:
+        html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
+        return html + f'<span style="color:#f66;font-family:monospace">Events log file could not be loaded -> {e.__class__.__name__}: {e}</span></body></html>'
+
 @app.route('/details/migrate_log')
 def details_migrate_log():
     if not os.path.exists(MIGRATE_LOG_PATH):
@@ -1315,6 +1436,8 @@ def details_migrate_log():
         return html + '<div>Migration history log not found or an update has not been done yet.</div></body></html>'
     try:
         line_count = linecounter(MIGRATE_LOG_PATH)
+        if not line_count:
+            raise ValueError('File is empty.')
         with open(MIGRATE_LOG_PATH, 'r', encoding='utf-8', errors='replace') as f:
             content = tail(f, 1000)
         header_line = ''
@@ -1341,7 +1464,7 @@ def details_migrate_log():
             return html
     except Exception as e:
         html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{background:#222;color:#f66;font-family:monospace;font-size:1em;margin:0;padding:12px;}</style></head><body>'
-        return html + f'<span style="color:#f66;font-family:monospace">Log file not found.<br>{e.__class__.__name__}: {e}</span></body></html>'
+        return html + f'<span style="color:#f66;font-family:monospace">Could not read file.<br>{e.__class__.__name__}: {e}</span></body></html>'
 
 @app.route('/details/download_migrate_log')
 def download_migrate_log():
@@ -1449,6 +1572,8 @@ def details_flybys_csv():
         return html + '<div style="color:#f66;font-family:monospace;padding:12px;">flybys.csv not found.</div></body></html>'
     try:
         csv_len = linecounter(FLYBY_STATS_PATH)
+        if not csv_len:
+            raise ValueError('File is empty.')
         with open(FLYBY_STATS_PATH, 'r', encoding='utf-8', errors='replace') as f:
             if csv_len:
                 lines = tail(f, 760)
@@ -1499,6 +1624,7 @@ def download_all():
     files = [
         CURRENT_STATE_JSON_PATH,
         LOG_PATH,
+        EVENTS_PATH,
         FLYBY_STATS_PATH,
         MIGRATE_LOG_PATH,
     ]
