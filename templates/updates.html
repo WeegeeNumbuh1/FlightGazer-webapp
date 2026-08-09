@@ -192,7 +192,7 @@
     });
 
     document.getElementById('checkUpdatesBtn').onclick = function () {
-      document.getElementById('versionInfo').innerText = 'Checking...';
+      document.getElementById('versionInfo').innerText = 'Checking... (please wait)';
       fetch(updatesCheckUrl, { method: 'POST' }).then(r => r.json()).then(data => {
         if (data.error) {
           document.getElementById('versionInfo').innerText = data.error;

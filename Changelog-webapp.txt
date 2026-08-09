@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.2.1 - 2026-08-09
+    - Results for the overhead feature now expire if the state file stops being updated
+    - More mitigation features for changelog checking
+
 v.1.2.0 - 2026-08-08
     - Add new "What's Overhead" feature on main landing page that will show the callsigns
       of aircraft in the tracking area and link it to the corresponding local tracking page

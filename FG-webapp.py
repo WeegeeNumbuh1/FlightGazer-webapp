@@ -65,8 +65,9 @@ import concurrent.futures as CF
 import zipfile
 import gzip
 import tempfile
+import signal
 
-VERSION = "v.1.2.0 --- 2026-08-08"
+VERSION = "v.1.2.1 --- 2026-08-09"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -108,18 +109,13 @@ except Exception:
 
 webapp_session = requests.Session()
 outward_session = requests.Session()
-# may help avoid the github scraping filters caused by AI crawlers since there has been some issues
-# when trying to fetch the changelog and therefore an update will never work
-outward_session.headers.update({'User-Agent': 'git/2.47.3', 'Git-Protocol': 'version=2', 'Accept-Language': 'en-US, *;q=0.9'})
-# note: unlike in the main FlightGazer application where we bother to clean up after outselves
-# we just let systemd/gunicorn kill these threads off when this exits (no `ThreadPool.shutdown()`)
 prober_tp = CF.ThreadPoolExecutor(max_workers=10, thread_name_prefix='LocalSiteProberWorker')
 
 yaml = YAML()
 yaml.preserve_quotes = True
 
 main_logger = logging.getLogger("FlightGazer-webapp")
-# set root logger to write out to file but not stdout
+# set root logger to only write out to stdout
 logging.basicConfig(
     stream=sys.stdout,
     format='%(asctime)s.%(msecs)03d - %(name)s %(threadName)s | %(levelname)s: %(message)s',
@@ -140,6 +136,15 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # ========= Helper Functions =========
+
+def sigterm_handler(signum, frame):
+    """ Cleanup and exit. """
+    signal.signal(signum, signal.SIG_IGN) # ignore additional signals
+    main_logger.info(f"Caught exit signal ({signum}), shutting down.")
+    prober_tp.shutdown(wait=False, cancel_futures=True)
+    webapp_session.close()
+    outward_session.close()
+    sys.exit(0)
 
 def load_config():
     """ Load FlightGazer's config file. You must try-except this function. """
@@ -577,6 +582,32 @@ def match_commandline(command_search: str, process_name: str) -> int | None:
     else:
         return None
 
+def get_local_git() -> str | None:
+    """ Try to use the local git version to use as a User-Agent. """
+    git_version = None
+    result_str = ''
+    try:
+        result = subprocess.run(
+            ['git', '--version'],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True
+            )
+        result_ = result.stdout.strip()
+        if not result_:
+            return git_version
+        result_str = result_.split(' ')[2]
+    except Exception as e:
+        main_logger.debug(f"Could not parse local git version: {e}")
+        return git_version
+
+    if not result_str:
+        return git_version
+    else:
+        git_version = result_str
+        return git_version
+
 # Use psutil to track/monitor the main running FlightGazer process instead of
 # having to fire up a subprocess each time we want to poll FlightGazer's running status
 current_flightgazer_pid = None
@@ -742,21 +773,21 @@ def update_fetcher() -> None:
     ver_file = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version'
     new_changelog = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt'
     if remote_ver is None:
-        remote_ver_resp = outward_session.get(ver_file, timeout=5)
+        remote_ver_resp = outward_session.get(ver_file, timeout=10)
         remote_ver_resp.raise_for_status()
         remote_ver = remote_ver_resp.text.strip()
-        remote_changelog_ = outward_session.get(new_changelog, timeout=5).text
+        remote_changelog_ = outward_session.get(new_changelog, timeout=10).text
         main_logger.info(f"Got changelog: {len(remote_changelog_) / 1024:.3f}KiB")
         remote_changelog = updated_changelog.write(remote_changelog_)
         main_logger.info(f"Version available online: {remote_ver}")
     else:
-        remote_ver_resp = outward_session.get(ver_file, timeout=5)
+        remote_ver_resp = outward_session.get(ver_file, timeout=10)
         remote_ver_resp.raise_for_status()
         remote_ver_ = remote_ver_resp.text.strip()
         if remote_ver_ != remote_ver:
             main_logger.info(f"Version available online: {remote_ver}")
             remote_ver = remote_ver_
-            remote_changelog_ = outward_session.get(new_changelog, timeout=5).text
+            remote_changelog_ = outward_session.get(new_changelog, timeout=10).text
             main_logger.info(f"Got changelog: {len(remote_changelog_) / 1024:.3f}KiB")
             remote_changelog = updated_changelog.write(remote_changelog_)
         else:
@@ -817,6 +848,20 @@ class ActionTimeout:
 
 # ========= Initialization Stuff =========
 get_ip()
+
+# may help avoid the github scraping filters caused by AI crawlers since there have been some issues
+# when trying to fetch the changelog and therefore an update will never work
+git_useragent = {'User-Agent': 'git/2.47.3', 'Git-Protocol': 'version=2', 'Accept-Language': 'en-US, *;q=0.9'}
+current_git = get_local_git()
+if current_git:
+    git_useragent['User-Agent'] = f'git/{current_git}'
+    main_logger.info(f"Found local git version: {current_git}")
+else:
+    # the update script requires git to work, if this isn't here, then expect problems
+    main_logger.warning(f"Did not find a local git version.")
+
+outward_session.headers.update(git_useragent)
+
 def probing_thread() -> None:
     """ Probes available webpages: does an initial burst every
     30 seconds for 10 minutes at startup (to wait for the other pages to start),
@@ -918,8 +963,10 @@ def api_overhead():
     """ Grabs data from the FlightGazer state file, checks to see if tar1090 is available,
     then presents a list of callsigns with the associated tar1090 map link. """
     json_path = CURRENT_STATE_JSON_PATH
-    if not os.path.exists(json_path) and os.name == 'nt': # for debug
+    debugging = False
+    if os.name == 'nt' and not os.path.exists(json_path) : # for debug
         json_path = os.path.join(os.path.dirname(__file__), '..', 'current_state.json')
+        debugging = True
     output = {'count': 0, 'callsigns': '', 'link': ''}
     nothing = jsonify(output)
     try:
@@ -938,6 +985,12 @@ def api_overhead():
     relevant_planes: dict = plane_stats.get('relevant_planes')
     # only generate the url if we're reading from the same system
     is_local = data.get('receivers', {}).get('using_filesystem', False)
+    # check for staleness
+    current_json_time_ = data.get('time_now', '1970-01-01T00:00:00')
+    current_json_time = datetime.datetime.fromisoformat(current_json_time_)
+    timedelt = datetime.datetime.now() - current_json_time
+    if timedelt.total_seconds() > 60 and not debugging:
+        relevant_planes = {}
     # override the auto hide feature on the frontend
     if len(relevant_planes) == 0:
         output['count'] = -1
@@ -1936,6 +1989,10 @@ def reference_guide():
 # ========= Misc =========
 if os.path.exists(VERSION_PATH):
     main_logger.info(f"Found FlightGazer ({get_version()})")
+signal.signal(signal.SIGINT, sigterm_handler)
+signal.signal(signal.SIGTERM, sigterm_handler)
+if is_posix:
+    signal.signal(signal.SIGHUP, sigterm_handler)
 
 # ========= Debugging =========
 if __name__ == '__main__':
