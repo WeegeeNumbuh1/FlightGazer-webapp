@@ -5,6 +5,9 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.2.2 - 2026-08-17
+    - Minor tweaks to the overhead feature
+
 v.1.2.1 - 2026-08-09
     - Results for the overhead feature now expire if the state file stops being updated
     - More mitigation features for changelog checking

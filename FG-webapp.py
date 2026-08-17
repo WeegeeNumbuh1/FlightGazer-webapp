@@ -67,7 +67,7 @@ import gzip
 import tempfile
 import signal
 
-VERSION = "v.1.2.1 --- 2026-08-09"
+VERSION = "v.1.2.2 --- 2026-08-17"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -1009,10 +1009,11 @@ def api_overhead():
     tar1090_ = [key for key in localpages if 'tar1090' in key]
     if tar1090_ and is_local:
         tar1090_url = localpages.get(tar1090_[0])[0]
-        query_string = '/?icao=' + ','.join(icaos)
+        query_string = '/?icao=' + ','.join(icaos) + '&zoom=11.5'
         output['link'] = tar1090_url + query_string
-    if len(callsigns) > 4:
-        output['callsigns'] = ', '.join(callsigns[0:3]) + ', ...'
+    plane_count = len(callsigns)
+    if plane_count > 3:
+        output['callsigns'] = ', '.join(callsigns[0:3]) + f', and {plane_count - 3} more...'
     else:
         output['callsigns'] = ', '.join(callsigns)
     output['count'] = count_
