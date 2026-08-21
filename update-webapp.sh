@@ -1,8 +1,9 @@
 #!/bin/bash
 {
 # Script to update FlightGazer's web interface
-# Last updated: v.1.1.0
+# Last updated: v.1.2.3
 # by: WeegeeNumbuh1
+
 BASEDIR="$(cd "$(dirname -- "$0")" && pwd)"
 TEMPPATH=/tmp/FlightGazer-tmp
 GREEN='\033[0;32m'
@@ -31,6 +32,9 @@ git clone --depth=1 https://github.com/WeegeeNumbuh1/FlightGazer-webapp "$TEMPPA
 if [ $? -ne 0 ]; then
 	rm -rf "$TEMPPATH" >/dev/null 2>&1
 	echo -e "${RED}>>> ERROR: Failed to download from GitHub. Installer cannot continue.${NC}"
+	if ! systemctl is-active --quiet flightgazer-webapp.service; then
+		systemd-run --scope -p "Delegate=yes" systemctl restart flightgazer-webapp.service >/dev/null 2>&1
+	fi
 	exit 1
 fi
 rm -rf "${TEMPPATH}/.git" >/dev/null 2>&1
