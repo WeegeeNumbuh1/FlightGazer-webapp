@@ -552,6 +552,57 @@
           </div>
           <hr>
           <div>
+            <img src="{{ url_for('static', filename='FG-clock-centerrow.png') }}" class="inline-image">
+            <div class="mt-3">
+              <label for="CLOCK_CENTER_ROW_ROW1" class="form-label setting-label">Clock Center Row 1</label>
+              <div class="help-text">Select the main readout in the center section of the clock display.<br>
+                <i>Note: for the weather options, you can set your API key in the Advanced section.</i>
+              </div>
+              <select class="form-select" id="CLOCK_CENTER_ROW_ROW1" name="CLOCK_CENTER_ROW_ROW1">
+                <option value="0" {% if config.CLOCK_CENTER_ROW.ROW1==0 %}selected{% endif %}>Don't use</option>
+                <option value="1" {% if config.CLOCK_CENTER_ROW.ROW1==1 %}selected{% endif %}>Sunrise/Sunset</option>
+                <option value="2" {% if config.CLOCK_CENTER_ROW.ROW1==2 %}selected{% endif %}>ADS-B receiver stats</option>
+                <option value="3" {% if config.CLOCK_CENTER_ROW.ROW1==3 %}selected{% endif %}>Extended calendar info</option>
+                <option value="4" {% if config.CLOCK_CENTER_ROW.ROW1==4 %}selected{% endif %}>Current weather (requires OpenWeather API)</option>
+                <option value="5" {% if config.CLOCK_CENTER_ROW.ROW1==5 %}selected{% endif %}>Extended observations (requires OpenWeather API)</option>
+                <option value="6" {% if config.CLOCK_CENTER_ROW.ROW1==6 %}selected{% endif %}>Range stats</option>
+              </select>
+            </div>
+            <div class="mt-3">
+              <label for="CLOCK_CENTER_ROW_ROW2" class="form-label setting-label">Clock Center Row 2</label>
+              <div class="help-text">
+                Add an additional line of info in the center section of the clock display.<br>
+                <details>
+                  <summary>More details</summary>
+                  If the above setting is set to "Don't use" and this setting is enabled, this will force the use of a
+                  smaller font on the clock display.
+                </details>
+              </div>
+              <select class="form-select" id="CLOCK_CENTER_ROW_ROW2" name="CLOCK_CENTER_ROW_ROW2">
+                <option value="0" {% if config.CLOCK_CENTER_ROW.ROW2==0 %}selected{% endif %}>Don't use</option>
+                <option value="1" {% if config.CLOCK_CENTER_ROW.ROW2==1 %}selected{% endif %}>Sunrise/Sunset</option>
+                <option value="2" {% if config.CLOCK_CENTER_ROW.ROW2==2 %}selected{% endif %}>ADS-B receiver stats</option>
+                <option value="3" {% if config.CLOCK_CENTER_ROW.ROW2==3 %}selected{% endif %}>Extended calendar info</option>
+                <option value="4" {% if config.CLOCK_CENTER_ROW.ROW2==4 %}selected{% endif %}>Current weather (requires OpenWeather API)</option>
+                <option value="5" {% if config.CLOCK_CENTER_ROW.ROW2==5 %}selected{% endif %}>Extended observations (requires OpenWeather API)</option>
+                <option value="6" {% if config.CLOCK_CENTER_ROW.ROW2==6 %}selected{% endif %}>Range stats</option>
+              </select>
+            </div>
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="CLOCK_CENTER_ROW_CYCLE"
+                  name="CLOCK_CENTER_ROW_CYCLE" {% if config.CLOCK_CENTER_ROW_CYCLE %}checked{% endif %}>
+                <label class="form-check-label setting-label" for="CLOCK_CENTER_ROW_CYCLE">Cycle Between Center Row
+                  Options</label>
+              </div>
+              <div class="help-text">Automatically cycle through all available clock center row options every 10
+                seconds. Overrides above settings.<br>
+                If the Weather API is available, this will cycle through those display options as well.
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div>
             <div class="mt-3">
               <img src="{{ url_for('static', filename='FG-clock-24hr.png') }}" class="inline-image">
               <div class="form-check">
@@ -597,63 +648,6 @@
               <div class="help-text">Show a progress bar at the bottom of the aircraft info screen that represents how
                 long the current aircraft will remain on display.<br>
                 Only appears when two (2) or more aircraft are present in the area.</div>
-            </div>
-          </div>
-          <hr>
-          <div>
-            <img src="{{ url_for('static', filename='FG-clock-centerrow.png') }}" class="inline-image">
-            <div class="mt-3">
-              <label for="CLOCK_CENTER_ROW_ROW1" class="form-label setting-label">Clock Center Row 1</label>
-              <div class="help-text">Select the main readout in the center section of the clock display.<br>
-                <i>Note: for the weather options, you can set your API key in the Advanced section.</i>
-              </div>
-              <select class="form-select" id="CLOCK_CENTER_ROW_ROW1" name="CLOCK_CENTER_ROW_ROW1">
-                <option value="0" {% if config.CLOCK_CENTER_ROW.ROW1==0 %}selected{% endif %}>Don't use</option>
-                <option value="1" {% if config.CLOCK_CENTER_ROW.ROW1==1 %}selected{% endif %}>Sunrise/Sunset</option>
-                <option value="2" {% if config.CLOCK_CENTER_ROW.ROW1==2 %}selected{% endif %}>ADS-B receiver stats
-                </option>
-                <option value="3" {% if config.CLOCK_CENTER_ROW.ROW1==3 %}selected{% endif %}>Extended calendar info
-                </option>
-                <option value="4" {% if config.CLOCK_CENTER_ROW.ROW1==4 %}selected{% endif %}>Current weather (requires
-                  OpenWeather API)</option>
-                <option value="5" {% if config.CLOCK_CENTER_ROW.ROW1==5 %}selected{% endif %}>Extended observations
-                  (requires OpenWeather API)</option>
-              </select>
-            </div>
-            <div class="mt-3">
-              <label for="CLOCK_CENTER_ROW_ROW2" class="form-label setting-label">Clock Center Row 2</label>
-              <div class="help-text">
-                Add an additional line of info in the center section of the clock display.<br>
-                <details>
-                  <summary>More details</summary>
-                  If the above setting is set to "Don't use" and this setting is enabled, this will force the use of a
-                  smaller font on the clock display.
-                </details>
-              </div>
-              <select class="form-select" id="CLOCK_CENTER_ROW_ROW2" name="CLOCK_CENTER_ROW_ROW2">
-                <option value="0" {% if config.CLOCK_CENTER_ROW.ROW2==0 %}selected{% endif %}>Don't use</option>
-                <option value="1" {% if config.CLOCK_CENTER_ROW.ROW2==1 %}selected{% endif %}>Sunrise/Sunset</option>
-                <option value="2" {% if config.CLOCK_CENTER_ROW.ROW2==2 %}selected{% endif %}>ADS-B receiver stats
-                </option>
-                <option value="3" {% if config.CLOCK_CENTER_ROW.ROW2==3 %}selected{% endif %}>Extended calendar info
-                </option>
-                <option value="4" {% if config.CLOCK_CENTER_ROW.ROW2==4 %}selected{% endif %}>Current weather (requires
-                  OpenWeather API)</option>
-                <option value="5" {% if config.CLOCK_CENTER_ROW.ROW2==5 %}selected{% endif %}>Extended observations
-                  (requires OpenWeather API)</option>
-              </select>
-            </div>
-            <div class="mt-3">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="CLOCK_CENTER_ROW_CYCLE"
-                  name="CLOCK_CENTER_ROW_CYCLE" {% if config.CLOCK_CENTER_ROW_CYCLE %}checked{% endif %}>
-                <label class="form-check-label setting-label" for="CLOCK_CENTER_ROW_CYCLE">Cycle Between Center Row
-                  Options</label>
-              </div>
-              <div class="help-text">Automatically cycle through all available clock center row options every 10
-                seconds. Overrides above settings.<br>
-                If the Weather API is available, this will cycle through those display options as well.
-              </div>
             </div>
           </div>
           <div style="margin-top: 24px; text-align: left;">
@@ -891,6 +885,7 @@
                   <li><span class="monospace">http://localhost/custom_name_here</span></li>
                   <li><span class="monospace">http://192.168.xxx.xxx/skyaware</span></li>
                   <li><span class="monospace">http://192.168.xxx.xxx/tar1090</span></li>
+                  <li><span class="monospace">http://192.168.xxx.xxx:1090</span></li>
                   <li><span class="monospace">http://192.168.xxx.xxx:8080</span></li>
                 </ul>
               </details>
@@ -910,6 +905,7 @@
                 <ul>
                   <li><span class="monospace">http://192.168.xxx.xxx:8978</span></li>
                   <li><span class="monospace">http://192.168.xxx.xxx/skyaware978</span></li>
+                  <li><span class="monospace">http://192.168.xxx.xxx:1091/skyaware978</span></li>
                 </ul>
               </details>
             </div>

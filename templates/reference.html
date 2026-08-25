@@ -242,7 +242,8 @@ FLYBY  TRKG  RNGE
                   <li>Receiver service (<code>dump1090</code>) is not running/stopped. Check for errors for that
                     service.</li>
                   <li>The SDR hardware or its connection (USB port, cables, etc.) may be degraded. Check on these
-                    components.</li>
+                    components.
+                    <ul><li>Additionally, check for undervoltage if you're using a Raspberry Pi as this may affect stability.</li></ul></li>
                   <li>The current system may be overloaded. Check on the system.</li>
                   <li>If operating on a remote instance of <code>dump1090</code>, check the network or remote system.
                   </li>
@@ -510,7 +511,7 @@ N/A    123   N/A </code></pre>
     <h4>Clock Center Row &amp; Abbreviations</h4>
     <details>
       <summary><b>Expand/Collapse</b></summary>
-      <div class="help-text"><i>Valid for FlightGazer v.11.3.0 and newer.</i></div>
+      <div class="help-text"><i>Valid for FlightGazer v.11.7.0 and newer.</i></div>
       <div style="margin: 20px 0; overflow-x: auto;">
         <table cellpadding="8">
           <thead>
@@ -571,6 +572,15 @@ N/A    123   N/A </code></pre>
                 <code>D</code> = Dew point (same unit as temperature)<br>
                 <code>V</code> = Visibility (miles or kilometers)<br>
                 <code>C</code> = Estimated cloud base (feet or meters)
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>Avg:### Max:###</code>
+              </td>
+              <td>
+                Current average (root mean square) of aircraft distances<br>
+                Farthest distance detected today
               </td>
             </tr>
           </tbody>
@@ -739,7 +749,7 @@ N/A    123   N/A </code></pre>
         <ul>
           <li><b>Accessing FlightGazer's data/state programmatically</b></li>
           Visit the <code>/data/current_state.json</code> endpoint to poll FlightGazer's current state.<br>
-          You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack) to access running stats and
+          You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack, a Home Assistant integration, MQTT, etc.) to access running stats and
           other information like aircraft details and more.<br>
           The details on how to interpret this JSON
           <a href="https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/docs/state-file-schema.md" target="_blank"

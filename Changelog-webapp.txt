@@ -5,6 +5,11 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.1.2.4 - 2026-08-24
+    - Added support for FlightGazer v.11.7.0
+    - Slight reorganization of the Display Layout sections in the configurator
+    - Various other text tweaks
+
 v.1.2.3 - 2026-08-20
     - Update script will start the service if the service isn't running and the download fails
     - Sequential Version number
