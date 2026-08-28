@@ -195,7 +195,8 @@
       document.getElementById('versionInfo').innerText = 'Checking... (please wait)';
       fetch(updatesCheckUrl, { method: 'POST' }).then(r => r.json()).then(data => {
         if (data.error) {
-          document.getElementById('versionInfo').innerText = data.error;
+          document.getElementById('versionInfo').innerHTML = `<br><br><span class="monospace">${data.error}</span>`;
+          document.getElementById('checkUpdatesBtn').innerText = 'Check Again'
           return;
         }
         document.getElementById('versionInfo').innerHTML = `\

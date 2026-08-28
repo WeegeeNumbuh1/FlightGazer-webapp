@@ -37,8 +37,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 22px;
-      margin-top: 10px;
+      gap: 20px;
+      margin-top: 12px;
     }
 
     .main-btns .btn {
@@ -50,8 +50,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      margin-top: 10px;
+      gap: 10px;
+      margin-top: 24px;
     }
 
     .quick-access-btns .btn {
@@ -78,6 +78,42 @@
       font-size: 0.8em;
       font-style: italic;
       color: grey;
+    }
+
+    @media (min-width: 800px) {
+      body {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 360px));
+        column-gap: 18px;
+        justify-content: center;
+        align-items: start;
+      }
+
+      #top-buttons {
+        grid-column: 1 / -1;
+      }
+
+      #main-header {
+        grid-column: 1;
+      }
+
+      .main-btns {
+        grid-column: 2;
+        grid-row: 2;
+        margin-top: 24px;
+        margin-bottom: 12px;
+      }
+
+      .actions-column {
+        display: contents;
+      }
+
+      #quickAccessBtns {
+        grid-column: 1 / -1;
+        grid-row: 3;
+        justify-self: center;
+        width: min(100%, 420px);
+      }
     }
   </style>
   <script type="text/javascript">
@@ -158,7 +194,7 @@
           </svg></span>
         <span class="small-status" id="device-info" title="Device that FlightGazer runs on">FlightGazer IP address</span>
       </div>
-      <div id="serviceStatus" style="position: relative;margin: auto;width: 60%;">
+      <div id="serviceStatus" style="position: relative;margin: auto;width: 90%;">
         <span id="serviceStatusMsg" style="color:#eda907;text-align: center;"></span>
       </div>
     </div>
@@ -187,7 +223,7 @@
     <a href="{{ url_for('reference_guide') }}" class="btn btn-secondary" target="_blank"
       title="View tips, display output meanings, and get help with FlightGazer">Help &amp; Reference</a>
   </div>
-  <div class="quick-access-btns" id="quickAccessBtns" style="margin-top:32px; text-align:center;"
+  <div class="quick-access-btns" id="quickAccessBtns" style="text-align:center;"
     title="Shortcuts to other running services on this system">
     <!-- Show something (if available) before the page updates this section -->
     {% if localpages %}

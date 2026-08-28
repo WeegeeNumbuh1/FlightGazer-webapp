@@ -67,7 +67,7 @@ import gzip
 import tempfile
 import signal
 
-VERSION = "v.1.2.4 --- 2026-08-24"
+VERSION = "v.1.2.5 --- 2026-08-28"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -1928,10 +1928,17 @@ def check_for_updates():
         update_fetcher()
     except requests.exceptions.RequestException as e:
         main_logger.error(f"Update checker failed to fetch remote files. {e}")
-        return jsonify({'error': f'Failed to fetch remote files due to a connection issue. Check the network. Details ---> {e}'}), 500
+        return jsonify({'error': (
+            'Failed to fetch remote files due to a connection issue. '
+            f'Check the network and try again. Details ---> {e}'
+            )}), 500
     except Exception as e:
         main_logger.exception("Could not fetch remote files.")
-        return jsonify({'error': f'Failed to fetch remote files due to an internal error. Details ---> {e.__class__.__name__}: {e}'}), 500
+        return jsonify({'error': (
+            'Failed to fetch remote files due to an internal error. '
+            'If this message keeps appearing, contact the developer. '
+            f'Details ---> {e.__class__.__name__}: {e}'
+            )}), 500
     local_ver = get_version()
     # Truncate changelog to only show entries newer than local version
     if remote_changelog:
