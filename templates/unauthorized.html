@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlightGazer - Unauthorized</title>
+  <meta name="author" content="WeegeeNumbuh1">
+  <meta name="description" content="Unauthorized action">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+    }
+
+    .centered {
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .back-btn {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container py-4">
+    <button id="backToHomeBtn" class="btn btn btn-info">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+      </svg>
+      Go Back</button>
+    <h2 class="mb-4">Unauthorized</h2>
+    <div style="text-align: center;">
+    <h4>You need to provide the correct password first in order to use this feature.</h4>
+    </div>
+  <script>
+    let windowHistoryCount = window.history.length;
+
+    function goBack() {
+      if (windowHistoryCount > 1) {
+        window.history.back();
+      } else {
+        close();
+      }
+    }
+    document.getElementById('backToHomeBtn').onclick = goBack;
+  </script>
+  <script>
+    function setTheme(theme) {
+      if (theme === 'light') {
+        document.body.style.background = '#f8f9fa';
+        document.body.style.color = '#222';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#fffbe6'; a.style.color = '#b58900'; });
+      } else {
+        document.body.style.background = '#181818';
+        document.body.style.color = '#fff';
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(a => { a.style.background = '#222'; a.style.color = '#eda907'; });
+      }
+    }
+    function getPreferredTheme() {
+      if (localStorage.getItem('fg_theme')) return localStorage.getItem('fg_theme');
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    setTheme(getPreferredTheme());
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('fg_theme')) setTheme(e.matches ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

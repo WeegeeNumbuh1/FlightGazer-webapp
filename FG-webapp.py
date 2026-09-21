@@ -43,6 +43,7 @@ from flask import (
     send_file,
     send_from_directory,
     make_response,
+    session
 )
 from ruamel.yaml import YAML
 import os
@@ -50,6 +51,7 @@ import sys
 import re
 import json
 import threading
+import functools
 import queue
 import subprocess
 import requests
@@ -66,8 +68,10 @@ import zipfile
 import gzip
 import tempfile
 import signal
+import secrets
+import hashlib
 
-VERSION = "v.1.2.5 --- 2026-08-28"
+VERSION = "v.2.0.0 --- 2026-09-20"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -75,22 +79,24 @@ os.environ['SCRIPT_NAME'] = '/flightgazer'
 # Define the paths for all the files we're looking for.
 # NB: It is expected that this Flask app lives inside the `web-app` folder
 # in the FlightGazer directory.
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')
-COLORS_PATH = os.path.join(os.path.dirname(__file__), '..', 'setup', 'colors.py')
-VERSION_PATH = os.path.join(os.path.dirname(__file__), '..', 'version')
-WEBAPP_VERSION_PATH = os.path.join(os.path.dirname(__file__), 'version-webapp')
-LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-log.log')
-EVENTS_PATH = os.path.join(os.path.dirname(__file__), '..', 'FlightGazer-events.log')
-MIGRATE_LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'settings_migrate.log')
-FLYBY_STATS_PATH = os.path.join(os.path.dirname(__file__), '..', 'flybys.csv')
+THIS_FILE_DIR = os.path.dirname(__file__)
+FLIGHTGAZER_ROOT = os.path.dirname(THIS_FILE_DIR)
+CONFIG_PATH = os.path.join(FLIGHTGAZER_ROOT, 'config.yaml')
+COLORS_PATH = os.path.join(FLIGHTGAZER_ROOT, 'setup', 'colors.py')
+VERSION_PATH = os.path.join(FLIGHTGAZER_ROOT, 'version')
+WEBAPP_VERSION_PATH = os.path.join(THIS_FILE_DIR, 'version-webapp')
+LOG_PATH = os.path.join(FLIGHTGAZER_ROOT, 'FlightGazer-log.log')
+EVENTS_PATH = os.path.join(FLIGHTGAZER_ROOT, 'FlightGazer-events.log')
+MIGRATE_LOG_PATH = os.path.join(FLIGHTGAZER_ROOT, 'settings_migrate.log')
+FLYBY_STATS_PATH = os.path.join(FLIGHTGAZER_ROOT, 'flybys.csv')
+INIT_PATH = os.path.join(os.path.abspath(FLIGHTGAZER_ROOT), 'FlightGazer-init.sh')
+UPDATE_PATH = os.path.join(FLIGHTGAZER_ROOT, 'update.sh')
 CURRENT_STATE_JSON_PATH = '/run/FlightGazer/current_state.json'
 BAD_STATE_SEMAPHORE = '/run/FlightGazer/not_good'
 SERVICE_PATH = '/etc/systemd/system/flightgazer.service'
-# Get the main FlightGazer path rather than using a relational path.
-# If the latter approach is used and this web-app is uninstalled, it will break the service
-# as now this working directory `web-app` no longer exists.
-INIT_PATH = os.path.join(os.path.dirname(os.getcwd()), 'FlightGazer-init.sh')
-UPDATE_PATH = os.path.join(os.path.dirname(__file__), '..', 'update.sh')
+INSTANCE_FOLDER = os.path.join(THIS_FILE_DIR, 'instance')
+PASSWORD_STORAGE_PATH = os.path.join(INSTANCE_FOLDER, '.fgwebapp-pswd')
+SESSION_TIMEOUT_SECONDS = 600
 VENV_CHECKFILE = '/etc/FlightGazer-pyvenv/first_run_complete'
 LATEST_CHANGELOG = '/run/FlightGazer/latest_changelog'
 CURRENT_IP = '' # local IP address of the system
@@ -99,7 +105,7 @@ RUNNING_ADSBIM = False
 adsbim_root_page = ''
 localpages = {}
 localpages_timestamp = 0.0
-whitelabel = os.path.join(os.path.dirname(__file__), 'static', 'extra')
+whitelabel = os.path.join(THIS_FILE_DIR, 'static', 'extra')
 wlstr = ''
 is_posix = True if os.name == 'posix' else False
 try:
@@ -124,11 +130,29 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-app = Flask(__name__)
-app.json.sort_keys = False
 main_logger.info(f"This is the FlightGazer-webapp, version {VERSION}")
 main_logger.info(f"Running from {os.getcwd()} on {HOSTNAME}")
 main_logger.info(f"Flask version: {FLASK_VER}")
+app = Flask(__name__, instance_path=os.path.abspath(INSTANCE_FOLDER))
+app.config.from_pyfile(os.path.join(app.instance_path, 'settings.cfg'), silent=True)
+# we're a "real" Flask app now, gotta set this up on deployed setups
+if not app.config['SECRET_KEY']:
+    main_logger.info("No instance folder present, making new one.")
+    os.makedirs(app.instance_path, exist_ok=True)
+    with open(os.path.join(app.instance_path, 'settings.cfg'), 'w', encoding='utf-8') as new_cfg:
+        new_cfg.write(f'SECRET_KEY = \"{secrets.token_hex()}\"')
+    app.config.from_pyfile(os.path.join(app.instance_path, 'settings.cfg'), silent=True)
+    if not app.config['SECRET_KEY']:
+        main_logger.warning("Could not load local configuration.")
+        app.config['SECRET_KEY'] = secrets.token_hex()
+    else:
+        main_logger.info(f"Local configuration created at {app.instance_path}")
+else:
+    main_logger.info(f"Successfully loaded settings from {app.instance_path}")
+
+app.json.sort_keys = False
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=10)
+app.config['MAX_CONTENT_LENGTH'] = 10000
 
 @app.route('/favicon.ico')
 def favicon():
@@ -145,6 +169,70 @@ def sigterm_handler(signum, frame):
     webapp_session.close()
     outward_session.close()
     sys.exit(0)
+
+def password_file_exists():
+    return os.path.exists(PASSWORD_STORAGE_PATH)
+
+def read_password_hash():
+    if not password_file_exists():
+        return None
+    try:
+        with open(PASSWORD_STORAGE_PATH, 'r', encoding='utf-8') as f:
+            stored_value = f.read().strip()
+        return stored_value or None
+    except Exception:
+        return None
+
+def hash_password(value):
+    salt = secrets.token_hex(16)
+    digest = hashlib.sha256((salt + str(value)).encode('utf-8')).hexdigest()
+    return f'{salt}:{digest}'
+
+def verify_password(value, stored_hash):
+    if not stored_hash or ':' not in stored_hash:
+        return False
+    salt, digest = stored_hash.split(':', 1)
+    candidate = hashlib.sha256((salt + str(value)).encode('utf-8')).hexdigest()
+    return candidate == digest
+
+def save_password(value):
+    password = str(value).strip()
+    if not password:
+        raise ValueError('Password cannot be empty.')
+    with open(PASSWORD_STORAGE_PATH, 'w', encoding='utf-8') as f:
+        f.write(hash_password(password))
+    try:
+        os.chmod(PASSWORD_STORAGE_PATH, 0o600)
+    except OSError:
+        pass
+
+def session_is_authenticated():
+    if not password_file_exists():
+        return True
+    if not session.get('fg_authenticated'):
+        return False
+    login_ts = session.get('fg_auth_ts')
+    if login_ts is None:
+        session.clear()
+        return False
+    if time.time() - float(login_ts) > SESSION_TIMEOUT_SECONDS:
+        session.clear()
+        return False
+    return True
+
+def require_password(view_func):
+    """ Decorator to use that guards specific endpoints.
+    Returns a 401, either as a json or a template. """
+    @functools.wraps(view_func)
+    def wrapper(*args, **kwargs):
+        if not password_file_exists():
+            return view_func(*args, **kwargs)
+        if session_is_authenticated():
+            return view_func(*args, **kwargs)
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'status': 'unauthorized', 'error': 'Password required.'}), 401
+        return render_template('unauthorized.html'), 401
+    return wrapper
 
 def load_config():
     """ Load FlightGazer's config file. You must try-except this function. """
@@ -403,11 +491,12 @@ def local_webpage_prober() -> dict:
         url, title = fut.result()
         results[url] = title
 
+    adsbim_titles = ["Feeder Homepage", "Login"]
     # find adsb.im
     local_page = results.get(root)
     if local_page:
         match local_page:
-            case x if "Feeder Homepage" in x:
+            case x if any(sub in x for sub in adsbim_titles):
                 pages.update({
                     "System Configuration & Management, Maps, and Stats":
                     (root, 1, "Configure and control your system with ADSB.im")}
@@ -429,7 +518,7 @@ def local_webpage_prober() -> dict:
 
     if len(pages) == 0:
         local_page = results.get(adsbim)
-        if match_title(local_page, "Feeder Homepage"):
+        if match_title(local_page, "Feeder Homepage") or match_title(local_page, "Login"):
             pages.update(
                 {"System Configuration & Management, Maps, and Stats":
                 (adsbim, 1, "Configure and control your system with ADSB.im")})
@@ -773,21 +862,21 @@ def update_fetcher() -> None:
     ver_file = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/version'
     new_changelog = 'https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer/main/Changelog.txt'
     if remote_ver is None:
-        remote_ver_resp = outward_session.get(ver_file, timeout=10)
+        remote_ver_resp = outward_session.get(ver_file, timeout=5)
         remote_ver_resp.raise_for_status()
         remote_ver = remote_ver_resp.text.strip()
-        remote_changelog_ = outward_session.get(new_changelog, timeout=10).text
+        remote_changelog_ = outward_session.get(new_changelog, timeout=5).text
         main_logger.info(f"Got changelog: {len(remote_changelog_) / 1024:.3f}KiB")
         remote_changelog = updated_changelog.write(remote_changelog_)
         main_logger.info(f"Version available online: {remote_ver}")
     else:
-        remote_ver_resp = outward_session.get(ver_file, timeout=10)
+        remote_ver_resp = outward_session.get(ver_file, timeout=5)
         remote_ver_resp.raise_for_status()
         remote_ver_ = remote_ver_resp.text.strip()
         if remote_ver_ != remote_ver:
             main_logger.info(f"Version available online: {remote_ver}")
             remote_ver = remote_ver_
-            remote_changelog_ = outward_session.get(new_changelog, timeout=10).text
+            remote_changelog_ = outward_session.get(new_changelog, timeout=5).text
             main_logger.info(f"Got changelog: {len(remote_changelog_) / 1024:.3f}KiB")
             remote_changelog = updated_changelog.write(remote_changelog_)
         else:
@@ -847,6 +936,10 @@ class ActionTimeout:
                 return False
 
 # ========= Initialization Stuff =========
+if password_file_exists():
+    main_logger.info("This instance of the webapp is protected with a password.")
+else:
+    main_logger.info("This instance of the webapp has no password protection.")
 get_ip()
 
 # may help avoid the github scraping filters caused by AI crawlers since there have been some issues
@@ -931,6 +1024,7 @@ if os.path.isfile(whitelabel):
         msg = head.decode(encoding='utf-8').strip()
         if len(msg) > 0:
             wlstr = f'This system was designed for {msg}.'
+            main_logger.info(wlstr)
     except Exception:
         pass
 
@@ -1019,6 +1113,69 @@ def api_overhead():
     output['count'] = count_
     return jsonify(output)
 
+# ========= Auth Routes =========
+
+@app.route('/auth/status')
+def auth_status():
+    has_password = password_file_exists()
+    authenticated = has_password and session_is_authenticated()
+    return jsonify({
+        'has_password': has_password,
+        'authenticated': authenticated,
+        'session_max_seconds': SESSION_TIMEOUT_SECONDS
+    })
+
+@app.route('/auth/login', methods=['POST'])
+def auth_login():
+    if not password_file_exists():
+        return jsonify({'status': 'not_configured'}), 200
+    data = request.get_json(silent=True) or request.form or {}
+    password = str(data.get('password', '')).strip()
+    stored_hash = read_password_hash()
+    if verify_password(password, stored_hash):
+        session['fg_authenticated'] = True
+        session['fg_auth_ts'] = time.time()
+        session.permanent = True
+        main_logger.info("Session authenticated.")
+        return jsonify({'status': 'success', 'authenticated': True})
+    return jsonify({'status': 'error', 'error': 'Incorrect password.'}), 401
+
+@app.route('/auth/logout', methods=['POST'])
+def auth_logout():
+    session.clear()
+    main_logger.info("Session logged out.")
+    return jsonify({'status': 'logged_out'})
+
+@app.route('/password-setup', methods=['GET'])
+@require_password
+def password_setup_page():
+    return render_template('password-setup.html', has_password=password_file_exists())
+
+@app.route('/auth/password', methods=['POST'])
+def auth_password():
+    data = request.get_json(silent=True) or request.form or {}
+    current_password = str(data.get('current_password', '')).strip()
+    new_password = str(data.get('password', '')).strip()
+    confirm_password = str(data.get('confirm_password', '')).strip()
+
+    if not new_password or new_password != confirm_password:
+        return jsonify({'status': 'error', 'error': 'Passwords do not match or are empty.'}), 400
+
+    if password_file_exists():
+        stored_hash = read_password_hash()
+        if not stored_hash or not verify_password(current_password, stored_hash):
+            return jsonify({'status': 'error', 'error': 'Current password is incorrect.'}), 400
+    else:
+        if not new_password:
+            return jsonify({'status': 'error', 'error': 'Password cannot be empty.'}), 400
+
+    save_password(new_password)
+    main_logger.info("Authentication updated.")
+    session['fg_authenticated'] = True
+    session['fg_auth_ts'] = time.time()
+    session.permanent = True
+    return jsonify({'status': 'success', 'has_password': True})
+
 # ========= Root Route =========
 
 @app.route('/')
@@ -1046,6 +1203,7 @@ def landing_page():
 # ========= Service Control Routes =========
 
 @app.route('/restart', methods=['POST'])
+@require_password
 def restart_flightgazer():
     try:
         status = get_flightgazer_status()
@@ -1097,6 +1255,7 @@ def restart_flightgazer():
         return jsonify({'status': 'error', 'error': str(e)})
 
 @app.route('/service/start', methods=['POST'])
+@require_password
 def start_flightgazer_service():
     try:
         status = get_flightgazer_status()
@@ -1123,6 +1282,7 @@ def start_flightgazer_service():
         return jsonify({'status': 'error', 'error': str(e)})
 
 @app.route('/service/stop', methods=['POST'])
+@require_password
 def stop_flightgazer_service():
     try:
         status = get_flightgazer_status()
@@ -1146,6 +1306,7 @@ def stop_flightgazer_service():
 # ========= Config Modification Routes =========
 
 @app.route('/config')
+@require_password
 def config_page():
     try:
         config = load_config()
@@ -1174,6 +1335,7 @@ def config_page():
     )
 
 @app.route('/update', methods=['POST'])
+@require_password
 def update_config():
     data = request.json
     try:
@@ -1716,6 +1878,7 @@ def detail_reference():
 # ========= Startup Control Routes =========
 
 @app.route('/startup')
+@require_password
 def startup_options():
     return render_template('startup.html')
 
@@ -1744,6 +1907,7 @@ def get_startup_options():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/startup/set', methods=['POST'])
+@require_password
 def set_startup_options():
     if not os.path.exists(SERVICE_PATH):
         return jsonify({'error': 'Service file does not exist. FlightGazer might not be installed.'}), 500
@@ -1819,6 +1983,7 @@ def set_startup_options():
 # ========= Updates Handling Routes and Functions =========
 
 @app.route('/updates')
+@require_password
 def updates_page():
     return render_template('updates.html')
 
@@ -1881,6 +2046,7 @@ class UpdateRunner(threading.Thread):
         update_running = False
 
 @app.route('/updates/start', methods=['POST'])
+@require_password
 def start_update():
     global update_process, update_output_queue, update_input_queue, update_running
     # Get reset_config flag from frontend
@@ -1923,6 +2089,7 @@ def send_update_input():
     return jsonify({'status':'sent'})
 
 @app.route('/updates/check', methods=['POST'])
+@require_password
 def check_for_updates():
     try:
         update_fetcher()

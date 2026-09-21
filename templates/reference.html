@@ -738,6 +738,10 @@ N/A    123   N/A </code></pre>
         <i>Configure Settings → Colors</i><br><br>
         Simply set the display element to 'BLACK'<br><br>
 
+        <li><b>Quick n' dirty color theme changing</b></li>
+        <i>Configure Settings → RGB-Matrix</i><br><br>
+        Change <span class="monospace">Panel Color Order</span> to something other than your display panel's actual layout.<br><br>
+
         <li><b>Extending the life of the physical display</b></li>
         The display is a wear item.<br>
         Over time, some of the pixels may become dimmer or their ability to reproduce accurate color is hindered.<br>
@@ -748,7 +752,7 @@ N/A    123   N/A </code></pre>
         <summary><b>More Technical Tips (Expand/Collapse)</b></summary>
         <ul>
           <li><b>Accessing FlightGazer's data/state programmatically</b></li>
-          Visit the <code>/data/current_state.json</code> endpoint to poll FlightGazer's current state.<br>
+          Visit the <a href="{{ url_for('show_json') }}"><code>/data/current_state.json</code></a> endpoint to poll FlightGazer's current state.<br>
           You can use this data for your own use (e.g. an InfluxDB/Telegraf/Grafana stack, a Home Assistant integration, MQTT, etc.) to access running stats and
           other information like aircraft details and more.<br>
           The details on how to interpret this JSON
@@ -763,11 +767,15 @@ N/A    123   N/A </code></pre>
           <li><b>Other API endpoints for this webapp</b></li>
           The below endpoints return JSON objects:
           <ul>
-            <li><code>/api/status</code> (what drives the status message on the landing page)</li>
-            <li><code>/api/localpages</code> (list of other relevant pages accessible on this system)</li>
-            <li><code>/api/overhead</code> (list of aircraft within your tracking area, an example of how to use <span class="monospace">current_state.json</span>)</li>
+            <li><a href="{{ url_for('service_status') }}"><code>/api/status</code></a> (what drives the status message on the landing page)</li>
+            <li><a href="{{ url_for('api_localpages') }}"><code>/api/localpages</code></a> (list of other relevant pages accessible on this system)</li>
+            <li><a href="{{ url_for('api_overhead') }}"><code>/api/overhead</code></a> (list of aircraft within your tracking area, an example of how to use <span class="monospace">current_state.json</span>)</li>
           </ul>
           It's recommended to not poll these too often (status about every minute, localpages once an hour).<br>
+          <br>
+
+          <li><b>Resetting the webapp password</b></li>
+          The password file exists in the web-app's <code>instance</code> directory. Removing this file will remove the password.<br>
           <br>
 
           <li><b>Viewing FlightGazer in a terminal</b></li>

@@ -4,8 +4,8 @@
 # This script will always try to patch the necessary files
 # to a consistent state, and should be run after every
 # adsb.im update/rebuild.
-# Version: v.1.1.3
-# Last adsb.im version tested: v3.0.13
+# Version: v.2.0.0
+# Last adsb.im version tested: v3.0.14
 # by: WeegeeNumbuh1
 
 print("********** FlightGazer adsb.im Proxy Patcher **********\n")

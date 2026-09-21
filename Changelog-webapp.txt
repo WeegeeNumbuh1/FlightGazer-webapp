@@ -5,6 +5,20 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.2.0.0 - 2026-09-20
+    - Added long-needed authentication features to protect certain sensitive parts of the webapp
+        - Guards against config changes, service controls, and updates
+        - Optional feature; a password can be set later by the end user
+    - Numerous logic changes to pages to handle the new authentication feature
+    - Further improved Landing page layout to host this added feature
+    - Add support for new settings in FlightGazer v.11.9.0
+    - Add support for detecting adsbim when authentication is required
+    - Update progress page improvements
+        - Improved layout handling
+        - Fix white theme
+        - Title message changes upon completion
+    - Add links for endpoints in the Reference page
+
 v.1.2.5 - 2026-08-28
     - Made landing page more responsive to take advantage of wide viewports (no longer
       strictly smartphone-oriented)

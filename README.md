@@ -1,7 +1,7 @@
 <!-- Title -->
 <div align="center">
     <a href="https://github.com/WeegeeNumbuh1/FlightGazer-webapp">
-    <img src="static/FlightGazer-logo_webapp.png" alt="Logo">
+    <img src="static/FlightGazer-logo_webapp.png" alt="Logo" height="200px">
     </a>
     <h1 align="center">FlightGazer Web App</h1>
     Web interface for <a href="https://github.com/WeegeeNumbuh1/FlightGazer">FlightGazer</a>.
@@ -57,7 +57,7 @@ Use the `uninstall-webapp.sh` script in the `web-app` folder in the FlightGazer 
 [`Changelog-webapp.txt`](/Changelog-webapp.txt)
 
 ## Planned Features
-- [ ] Basic web authentication for some features
+- [x] Basic web authentication for some features (completed v.2.0.0)
 
 ## Contributions
 Pull requests are not accepted.<br>

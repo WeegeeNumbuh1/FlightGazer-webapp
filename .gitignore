@@ -8,3 +8,6 @@ test
 *.csv
 .vscode
 *.db
+*password
+*pswd
+instance/

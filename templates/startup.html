@@ -112,8 +112,18 @@
   <script>
     const startupOptionsUrl = "{{ url_for('get_startup_options') }}";
     const setStartupOptionsUrl = "{{ url_for('set_startup_options') }}";
+    function showAuthenticationExpiredMessage() {
+      alert('Your session has expired. Please log in and load this page again.');
+    }
     function loadStartupOptions() {
-      fetch(startupOptionsUrl).then(r => r.json()).then(data => {
+      fetch(startupOptionsUrl).then(response => {
+        if (response.status === 401) {
+          showAuthenticationExpiredMessage();
+          return null;
+        }
+        return response.json();
+      }).then(data => {
+        if (!data) return;
         if (data.error) {
           document.getElementById('startupStatus').innerText = data.error;
           document.getElementById('applyStartupBtn').disabled = true;
@@ -129,14 +139,22 @@
     document.getElementById('applyStartupBtn').onclick = function () {
       if (!window.confirm('Are you sure you want to apply these options?')) return;
       let checked = Array.from(document.querySelectorAll('#startupOptionsCheckboxes input:checked')).map(cb => cb.value);
+      document.getElementById('applyStartupBtn').disabled = true;
       document.getElementById('startupStatus').innerText = 'Applying changes...';
-      fetch(setStartupOptionsUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ flags: checked }) }).then(r => r.json()).then(data => {
+      fetch(setStartupOptionsUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ flags: checked }) }).then(response => {
+        if (response.status === 401) {
+          showAuthenticationExpiredMessage();
+          goHome()
+          return null;
+        }
+        return response.json();
+      }).then(data => {
+        if (!data) return;
         if (data.status === 'success') {
           document.getElementById('startupStatus').innerText = 'Startup options updated and systemd reloaded. A service restart is required to see the changes.';
         } else {
           document.getElementById('startupStatus').innerText = data.error || 'Error.';
         }
-        document.getElementById('applyStartupBtn').disabled = true;
       });
     };
     loadStartupOptions();
