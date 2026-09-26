@@ -71,7 +71,7 @@ import signal
 import secrets
 import hashlib
 
-VERSION = "v.2.0.0 --- 2026-09-20"
+VERSION = "v.2.0.1 --- 2026-09-26"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -402,20 +402,26 @@ def get_ip() -> None:
 def local_webpage_prober() -> dict:
     """ Probes what webpages are available running locally on this system.
     Probes these key locations:
-    - Find adsb.im
+    - adsb.im
         - Either at root IP address or at port 1099
-    - Find tar1090
+    - tar1090
         - Either at /tar1090 or ports 1090, 8080
-    - Find graphs1090
+    - graphs1090
         - Either at /graphs1090, 1099/graphs1090, or port 8542
-    - Port 8888
+    - 8888
         - The Display Emulator
-    - Find Skystats
+    - Skystats
         - Either at /skystats or port 5173
-    - Find FA's SkyAware
+    - FA's SkyAware
         - /skyaware or port 8080 (handled with the tar1090 logic)
-    - Find SkyAware UAT
+    - SkyAware UAT
         - Either at /skyaware978, 1091/skyaware978, or port 8978
+    - AIS
+        - /aiscatcher or port 9990
+    - ACARS
+        - /acarshub or port 8090
+    - Radiosonde
+        - /radiosonde or port 9989
     - Port 8088
         - Planefence
 
@@ -440,7 +446,7 @@ def local_webpage_prober() -> dict:
         return url, None
 
     def match_title(input: None | str, title: str) -> bool:
-        """ If a given `input` is found in `title`, returns True,
+        """ If a given `title` is found in `input`, returns True,
         False otherwise. """
         if input and title in input:
             return True
@@ -474,6 +480,9 @@ def local_webpage_prober() -> dict:
             f"http://{CURRENT_IP}:8542"
             ],
         'skystats': [f"http://{CURRENT_IP}/skystats", f"http://{CURRENT_IP}:5173"],
+        'ais': [f"http://{CURRENT_IP}/aiscatcher", f"http://{CURRENT_IP}:9990"],
+        'acars': [f"http://{CURRENT_IP}/acarshub", f"http://{CURRENT_IP}:8090"],
+        'radiosonde': [f"http://{CURRENT_IP}/radiosonde", f"http://{CURRENT_IP}:9989"],
         'planefence': [f"http://{CURRENT_IP}:8088"],
     }
 
@@ -540,7 +549,6 @@ def local_webpage_prober() -> dict:
                  (url, 0, "Emulated version of the RGB LED display")}
             )
             break
-
     # find the rest of our stuff
     # skyaware (check this first)
     for url in candidates['skyaware']:
@@ -550,7 +558,6 @@ def local_webpage_prober() -> dict:
                  (url, 0, "Watch real-time aircraft positions on a map")}
             )
             break
-
     # tar1090/skyaware
     for url in candidates['tar1090']:
         if match_title(results.get(url), "tar1090"):
@@ -567,7 +574,6 @@ def local_webpage_prober() -> dict:
                      (url, 0, "Watch real-time aircraft positions on a map")}
                 )
                 break
-
     # skyaware978
     for url in candidates['skyaware978']:
         if match_title(results.get(url), "SkyAware"):
@@ -576,7 +582,6 @@ def local_webpage_prober() -> dict:
                  (url, 0, "Watch real-time UAT aircraft positions on a map")}
             )
             break
-
     # graphs1090
     for url in candidates['graphs1090']:
         if match_title(results.get(url), "graphs1090"):
@@ -585,24 +590,49 @@ def local_webpage_prober() -> dict:
                  (url, 0, "Graphs of your system's performance")}
             )
             break
-
     # adsb.im docker logs
     if adsbim_check and adsbim_root:
         pages.update(
             {"System Logs":
              (f"{adsbim_root}/logs", 0, "View logs of various system services")}
         )
-
     # skystats
     for url in candidates['skystats']:
         if match_title(results.get(url), "Skystats"):
             pages.update(
                 {"Skystats":
-                 (url, 0, "Summary of all the flights encountered by your tracking system")}
+                 (url, 0, "Summary of all the flights encountered by your system")}
             )
             break
-
+    # AIS
+    # https://github.com/jvde-github/AIS-catcher/blob/main/frontend/src/index.html
+    for url in candidates['ais']:
+        if match_title(results.get(url), "AIS-catcher"):
+            pages.update(
+                {"Live Watercraft Map (AIS-catcher)":
+                (url, 0, "Watch real-time watercraft positions on a map")}
+            )
+            break
+    # ACARS
+    # https://github.com/sdr-enthusiasts/docker-acarshub/blob/main/acarshub-react/index.html
+    for url in candidates['acars']:
+        if match_title(results.get(url), "ACARS Hub"):
+            pages.update(
+                {"ACARS Hub":
+                (url, 0, "View ACARS messages decoded by your receiver")}
+            )
+            break
+    # radiosonde
+    # https://github.com/projecthorus/radiosonde_auto_rx/blob/master/auto_rx/autorx/templates/index.html
+    for url in candidates['radiosonde']:
+        if match_title(results.get(url), "Radiosonde"):
+            pages.update(
+                {"Radiosonde":
+                (url, 0, "View telemetry data from weather balloons")}
+            )
+            break
     # planefence
+    # https://github.com/sdr-enthusiasts/docker-planefence/blob/main/rootfs/usr/share/planefence/stage/html/index.html
     planefence_url = candidates['planefence'][0]
     if match_title(results.get(planefence_url), "Planefence"):
         pages.update(

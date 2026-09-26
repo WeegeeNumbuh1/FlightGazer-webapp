@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.2.0.1 - 2026-09-26
+    - Add support for linking ACARS Hub, Radiosonde, and AIS Catcher pages on the Landing page
+    - Minor text tweaks
+
 v.2.0.0 - 2026-09-20
     - Added long-needed authentication features to protect certain sensitive parts of the webapp
         - Guards against config changes, service controls, and updates
