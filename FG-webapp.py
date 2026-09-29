@@ -71,7 +71,7 @@ import signal
 import secrets
 import hashlib
 
-VERSION = "v.2.0.1 --- 2026-09-26"
+VERSION = "v.2.0.2 --- 2026-09-29"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'

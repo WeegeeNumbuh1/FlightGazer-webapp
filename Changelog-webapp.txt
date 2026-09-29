@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.2.0.2 - 2026-09-29
+    - Add a small reference section for the Startup page
+    - Minor text tweaks to support FlightGazer v.11.9.2
+
 v.2.0.1 - 2026-09-26
     - Add support for linking ACARS Hub, Radiosonde, and AIS Catcher pages on the Landing page
     - Minor text tweaks
