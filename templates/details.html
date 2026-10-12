@@ -9,6 +9,7 @@
   <meta name="description" content="FlightGazer logs and stats viewer.">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <script async src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
   <style>
     body {
       background: #181818;
@@ -224,8 +225,8 @@
       </div>
     </div>
   </div>
-  <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
-  <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+  <!-- Note: this needs to be loaded as blocking because then the live details section never loads -->
+  <script src="{{ url_for('static', filename='jquery.js') }}"></script> 
   <script>
     function setTheme(theme) {
       if (theme === 'light') {

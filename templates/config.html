@@ -9,6 +9,7 @@
   <meta name="description" content="FlightGazer configuration page.">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <script async src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
   <style>
     .help-text {
       font-size: 0.95em;
@@ -1428,7 +1429,6 @@
         Restart to apply</button>
     </form>
   </div>
-  <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
   <script src="{{ url_for('static', filename='jquery.js') }}"></script>
   <script>
     function setTheme(theme) {

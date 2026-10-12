@@ -765,13 +765,15 @@ N/A    123   N/A </code></pre>
           .
           <br><br>
           <li><b>Other API endpoints for this webapp</b></li>
-          The below endpoints return JSON objects:
+          The below endpoints return JSON objects (besides the changelog):
           <ul>
             <li><a href="{{ url_for('service_status') }}"><code>/api/status</code></a> (what drives the status message on the landing page)</li>
             <li><a href="{{ url_for('api_localpages') }}"><code>/api/localpages</code></a> (list of other relevant pages accessible on this system)</li>
             <li><a href="{{ url_for('api_overhead') }}"><code>/api/overhead</code></a> (list of aircraft within your tracking area, an example of how to use <span class="monospace">current_state.json</span>)</li>
+            <li><a href="{{ url_for('flyby_stats_tail') }}"><code>/api/flybys</code></a> (latest 60 lines of the flyby stats)</li>
+            <li><a href="{{ url_for('show_latest_changelog') }}"><code>/data/latest_changelog_cached.txt</code></a> (fetch the full changelog from GitHub)</li>
           </ul>
-          It's recommended to not poll these too often (status about every minute, localpages once an hour).<br>
+          It's recommended to not poll these too often.<br>
           <br>
 
           <li><b>Resetting the webapp password</b></li>

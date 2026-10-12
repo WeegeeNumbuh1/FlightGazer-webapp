@@ -70,8 +70,9 @@ import tempfile
 import signal
 import secrets
 import hashlib
+import csv
 
-VERSION = "v.2.0.2 --- 2026-09-29"
+VERSION = "v.2.0.3 --- 2026-10-12"
 
 # don't touch this, this is for proxying the webpages
 os.environ['SCRIPT_NAME'] = '/flightgazer'
@@ -652,7 +653,7 @@ def linecounter(file: str) -> int | None:
     except Exception:
         return None
 
-def tail(f, lines=1, _buffer=4098):
+def tail(f, lines=1, _buffer=4098) -> list:
     """ Tail a file and get X lines from the end.
     ### Source:
     https://stackoverflow.com/a/13790289 """
@@ -1142,6 +1143,38 @@ def api_overhead():
         output['callsigns'] = ', '.join(callsigns)
     output['count'] = count_
     return jsonify(output)
+
+@app.route('/api/flybys')
+def flyby_stats_tail():
+    """ Return the last 60 lines of the flyby csv into a JSON """
+    output = {}
+    if not os.path.exists(FLYBY_STATS_PATH):
+        return jsonify(output)
+    csv_len = linecounter(FLYBY_STATS_PATH)
+    if not csv_len:
+        return jsonify(output)
+    lines = []
+    with open(FLYBY_STATS_PATH, 'r', encoding='utf-8', errors='replace') as f:
+        if csv_len:
+            lines = tail(f, 60)
+            f.seek(0)
+            lines.insert(0, f.readline())
+    try:
+        reader = csv.DictReader(io.StringIO("\n".join(lines)))
+        output = {
+            row["Date"]: [
+                int(row["Number of flybys"]),
+                int(row["API calls (successful)"]),
+                int(row["API calls (failed)"]),
+                int(row["API calls (empty)"]),
+            ]
+            for row in reader
+        }
+    except Exception as e:
+        main_logger.error(f"Failed to read flyby stats for API. {e}")
+        return jsonify({})
+    else:
+        return jsonify(output)
 
 # ========= Auth Routes =========
 

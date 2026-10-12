@@ -43,6 +43,8 @@ In the same spirit like you can poll `dump1090` data, FlightGazer's running stat
 /data/current_state.json
 ```
 
+Additional and up-to-date API endpoints for accessing the webapp's data can be found in the Help and Reference page on the webapp itself.
+
 ## Update
 When running an update for FlightGazer, the webapp is automatically updated to the latest version available on the repo.<br>
 

@@ -5,6 +5,10 @@ v.V.R.U - Release date
   | `--- Release
   `----- Version
 
+v.2.0.3 - 2026-10-12
+    - Added new API endpoint for accessing the flyby stats
+    - Minor page loading speedups for the Details and Config pages
+
 v.2.0.2 - 2026-09-29
     - Add a small reference section for the Startup page
     - Minor text tweaks to support FlightGazer v.11.9.2

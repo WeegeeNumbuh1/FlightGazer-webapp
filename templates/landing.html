@@ -9,6 +9,7 @@
   <meta name="description" content="FlightGazer main landing page.">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <script async src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
   <style>
     body {
       background: #181818;
@@ -358,7 +359,6 @@
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='bootstrap-bundle-min.js') }}"></script>
   <script>
     function setTheme(theme) {
       if (theme === 'light') {
